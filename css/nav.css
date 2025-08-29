@@ -1,0 +1,28 @@
+/* Header */
+.header-container {
+    background-color: hsl(44, 100%, 50%);
+    padding: 1rem;
+}
+
+.Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.title h1 {
+    color: white;
+    font-size: 2rem;
+}
+
+.header-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    font-weight: bold;
+}
+
+.header-links a:hover {
+    text-decoration: underline;
+}

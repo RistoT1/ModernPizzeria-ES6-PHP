@@ -1,0 +1,160 @@
+.container {
+    margin: 0;
+    width: 100vw;
+}
+
+.hero {
+    text-align: center;
+    width: 100vw;
+    padding: 40px;
+}
+
+.hero h2,
+.hero h1 {
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1rem;
+}
+
+.menu-container {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px 30px;
+    justify-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px;
+}
+
+.menuItem {
+    width: 100%;
+    max-width: 350px;
+    border: solid 2px rgb(227, 225, 225);
+    border-radius: 10px;
+    box-sizing: border-box;
+    text-align: center;
+}
+.itemHeader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-inline: 10px;
+}
+.itemTitle{
+    color: hsl(44, 99%, 39%);
+}
+
+.itemImg {
+    width: 100%;
+    border-radius: 10px 10px 0 0; 
+}
+
+.itemImg img {
+    width: 100%;
+    height: auto;    
+    display: block;    
+    object-fit: cover;  
+}
+
+.active{
+    display: flex !important;
+}
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.popupContent {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.popupContent button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #ff6f00;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.popupContent button:hover {
+    background-color: #e65c00;
+}
+
+@media (max-width: 600px) {
+    .menu-container {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .menu {
+        grid-template-columns: 1fr;
+        gap: 15px 15px;
+        width: 100%;
+        margin: 0;
+    }
+
+    .menuItem {
+        display: flex; /* horizontal layout */
+        flex-direction: row; /* image left, text right */
+        align-items: center; /* vertically center content */
+        text-align: left !important;
+        padding: 0;
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+    }
+    .itemHeader
+    {
+        padding-inline: 0;
+    }
+    .itemContent
+    {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .itemImg {
+        flex: 0 0 150px; /* smaller fixed width */
+        margin-right: 10px; /* space between image and text */
+        height: 150px; /* ensure consistent height */
+        overflow: hidden; /* crop overflow */
+        border-radius: 8px; /* optional rounding */
+    }
+
+    .itemImg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* make image fit container without distortion */
+        display: block;
+    }
+
+    .itemHeader,
+    .itemTitle,
+    .itemDescription {
+        text-align: left;
+        flex: 1; /* allow text to take remaining space */
+    }
+}
