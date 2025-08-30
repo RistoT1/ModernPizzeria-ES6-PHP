@@ -1,14 +1,23 @@
 const menu = document.getElementById("menu");
 const popup = document.getElementById('pizzaPopup');
-const popupTitle = popup.querySelector('.popupTitle');
-const popupPrice = popup.querySelector('.popupPrice');
-const popupInfo = popup.querySelector('.popupInfo');
+const popupHeader = document.querySelector('.popup-header');
+const popupTitle = popup.querySelector('.popup-title');
+const popupPrice = popup.querySelector('.popup-price');
+const popupInfo = popup.querySelector('.popup-info');
 const closeBtn = document.getElementById('closePopup');
 
 const openPopup = (pizza) => {
     popupTitle.textContent = pizza.Nimi || "Pizza";
     popupPrice.textContent = pizza.Hinta ? `€${pizza.Hinta}` : "";
     popupInfo.textContent = pizza.Tiedot || "";
+
+     if (pizza.Kuva) {
+        popupHeader.style.backgroundImage = `url(src/img/${pizza.Kuva})`;
+        popupHeader.style.backgroundSize = "cover";
+        popupHeader.style.backgroundPosition = "center";
+    } else {
+        popupHeader.style.backgroundImage = "none";
+    }
 
     popup.classList.add('active'); // Show popup via CSS class
 };

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/popup.css">
 </head>
 
 <body>
@@ -39,13 +40,30 @@
 
         </div>
         <div id="pizzaPopup" class="popup">
-            <div class="popupContent">
-                <button id="closePopup">Close</button>
-                <h2 class="popupTitle"></h2>
-                <p class="popupPrice"></p>
-                <p class="popupInfo"></p>
+            <div class="popup-content">
+                <div class="popup-header">
+                    <button id="closePopup" class="close-btn">←</button>
+                </div>
+                <div class="popup-body">
+                    <div class="popup-head">
+                        <h2 class="popup-title"></h2>
+                        <h2 class="popup-price"></h2>
+                    </div>
+                    <div class="popup-info-main">
+                        <p class="popup-info"></p>
+
+                        <ul class="pizza-ingredients">
+                          
+                        </ul>
+                        <div class="pizza-options">
+
+                        </div>
+
+                        <button class="add-to-cart-btn">Lisää koriin</button>
+                    </div>
+
+                </div>
             </div>
-        </div>
         </div>
     </main>
     <script src="js/index.js"></script>
