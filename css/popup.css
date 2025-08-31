@@ -210,16 +210,15 @@
     border-bottom: none;
 }
 
-.crust {
+.popup-size-options {
     border: none;
-    width: 50%;
     background: none;
     color: #2e7d32;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
 }
 
-/* Quantity and add to cart */
 .bottom-section {
     padding: 20px;
     border-top: 1px solid #eee;

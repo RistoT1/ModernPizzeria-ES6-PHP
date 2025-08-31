@@ -51,14 +51,25 @@
                     </div>
                     <div class="popup-info-main">
                         <p class="popup-info"></p>
-                        <p class="popup-ingredients">
-                        <div class="popup-crust-options">
-                            <select name="crust"class="crust" id="crust">
-                                <option value="1">normaali</option>
-                                <option value="2">pieni</option>
-                                <option value="3">suuri</option>
-                            </select>
-
+                        <p class="popup-ingredients"></p>
+                        <div class="size-options">
+                            <button class="size-btn" data-size="pieni">
+                                Pieni<br><small>25cm</small>
+                            </button>
+                            <button class="size-btn active" data-size="normaali">
+                                Normaali<br><small>30cm</small>
+                            </button>
+                            <button class="size-btn" data-size="suuri">
+                                Suuri<br><small>35cm</small>
+                            </button>
+                        </div>
+                        <div class="quantity-section">
+                            <div class="options-title">Määrä</div>
+                            <div class="quantity-control">
+                                <button class="qty-btn" data-change="-1">-</button>
+                                <span class="quantity-display" id="quantity">1</span>
+                                <button class="qty-btn" data-change="1">+</button>
+                            </div>
                         </div>
 
                         <button class="add-to-cart-btn">Lisää koriin</button>

@@ -6,14 +6,19 @@ const popupPrice = popup.querySelector('.popup-price');
 const popupIncredient = popup.querySelector('.popup-ingredients')
 const popupInfo = popup.querySelector('.popup-info');
 const closeBtn = document.getElementById('closePopup');
+//kooko
+const sizeButtons = document.querySelectorAll(".size-btn");
+//määrä
+const quantityDisplay = document.getElementById("quantity");
+const qtyButtons = document.querySelectorAll(".qty-btn");
 
 const openPopup = (pizza) => {
     popupTitle.textContent = pizza.Nimi || "Pizza";
     popupPrice.textContent = pizza.Hinta ? `€${pizza.Hinta}` : "";
     popupInfo.textContent = pizza.Tiedot || "";
     popupIncredient.textContent = pizza.Ainesosat || "";
-    
-     if (pizza.Kuva) {
+
+    if (pizza.Kuva) {
         popupHeader.style.backgroundImage = `url(src/img/${pizza.Kuva})`;
         popupHeader.style.backgroundSize = "cover";
         popupHeader.style.backgroundPosition = "center";
@@ -35,6 +40,23 @@ popup.addEventListener('click', (e) => {
 });
 
 closeBtn.addEventListener('click', closePopup);
+
+//koko
+for (const button of sizeButtons) {
+    button.addEventListener('click', (e) => {
+            // if active remove active 
+    });
+}
+//määrä
+for (const button of qtyButtons) {
+    button.addEventListener('click', () => {
+        let change = parseInt(button.dataset.change);
+        let current = parseInt(quantityDisplay.textContent);
+        current = Math.max(1, current + change);
+        quantityDisplay.textContent = current;
+    })
+}
+
 
 const fetchPizza = async () => {
     try {
