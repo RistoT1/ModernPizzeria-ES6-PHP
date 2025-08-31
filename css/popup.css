@@ -210,8 +210,9 @@
     border-bottom: none;
 }
 
-.base-select {
+.crust {
     border: none;
+    width: 50%;
     background: none;
     color: #2e7d32;
     font-weight: 500;

@@ -51,11 +51,13 @@
                     </div>
                     <div class="popup-info-main">
                         <p class="popup-info"></p>
-
-                        <ul class="pizza-ingredients">
-                          
-                        </ul>
-                        <div class="pizza-options">
+                        <p class="popup-ingredients">
+                        <div class="popup-crust-options">
+                            <select name="crust"class="crust" id="crust">
+                                <option value="1">normaali</option>
+                                <option value="2">pieni</option>
+                                <option value="3">suuri</option>
+                            </select>
 
                         </div>
 

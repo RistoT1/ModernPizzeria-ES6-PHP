@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';        
-$db   = 'pizzeria';
+$db   = '213603';
 $user = 'root';  
 $pass = '';  
 $charset = 'utf8mb4';         

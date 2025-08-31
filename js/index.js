@@ -3,6 +3,7 @@ const popup = document.getElementById('pizzaPopup');
 const popupHeader = document.querySelector('.popup-header');
 const popupTitle = popup.querySelector('.popup-title');
 const popupPrice = popup.querySelector('.popup-price');
+const popupIncredient = popup.querySelector('.popup-ingredients')
 const popupInfo = popup.querySelector('.popup-info');
 const closeBtn = document.getElementById('closePopup');
 
@@ -10,7 +11,8 @@ const openPopup = (pizza) => {
     popupTitle.textContent = pizza.Nimi || "Pizza";
     popupPrice.textContent = pizza.Hinta ? `€${pizza.Hinta}` : "";
     popupInfo.textContent = pizza.Tiedot || "";
-
+    popupIncredient.textContent = pizza.Ainesosat || "";
+    
      if (pizza.Kuva) {
         popupHeader.style.backgroundImage = `url(src/img/${pizza.Kuva})`;
         popupHeader.style.backgroundSize = "cover";
