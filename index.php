@@ -53,13 +53,13 @@
                         <p class="popup-info"></p>
                         <p class="popup-ingredients"></p>
                         <div class="size-options">
-                            <button class="size-btn" data-size="pieni">
+                            <button class="size-btn" data-size="1">
                                 Pieni<br><small>25cm</small>
                             </button>
-                            <button class="size-btn active" data-size="normaali">
+                            <button class="size-btn active" data-size="2">
                                 Normaali<br><small>30cm</small>
                             </button>
-                            <button class="size-btn" data-size="suuri">
+                            <button class="size-btn" data-size="3">
                                 Suuri<br><small>35cm</small>
                             </button>
                         </div>
@@ -72,7 +72,7 @@
                             </div>
                         </div>
 
-                        <button class="add-to-cart-btn">Lisää koriin</button>
+                        <button class="add-to-cart-btn" id="addCart">Lisää koriin</button>
                     </div>
 
                 </div>
