@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sakky-Pizzeria</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/popup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -23,7 +24,10 @@
                     <a href="#">Menu</a>
                     <a href="#">Contact</a>
                     <a href="#">Kirjaudu</a>
-                    <a href="#">Ostoskori</a>
+                    <a href="./pages/ostoskori.php" class="shopping-cart">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                        <span class="cart-counter">0</span>
+                    </a>
                 </div>
             </div>
         </div>

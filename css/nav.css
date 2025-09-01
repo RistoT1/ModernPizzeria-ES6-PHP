@@ -1,7 +1,7 @@
 /* Header */
 .header-container {
     background-color: hsl(44, 100%, 50%);
-    padding: 1rem;
+    padding: 1.5rem;
 }
 
 .Header {
@@ -19,10 +19,25 @@
 .header-links a {
     color: white;
     text-decoration: none;
-    margin-left: 15px;
+    margin-right: 15px;
     font-weight: bold;
 }
 
 .header-links a:hover {
     text-decoration: underline;
+}
+.shopping-cart
+{   
+    font-size: 1.5rem;
+}
+.cart-counter {
+  display: none; 
+  background: rgb(0, 0, 0);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  position: absolute;
+
 }
