@@ -36,12 +36,18 @@ if ($quantity < 1 || $quantity > 99) {
 $asiakasID = $_SESSION['userID'] ?? null;
 $guestToken = $_SESSION['guestToken'] ?? null;
 
-// Generate guest token if needed
-if (!$asiakasID && !$guestToken) {
-    $guestToken = bin2hex(random_bytes(32));
-    $_SESSION['guestToken'] = $guestToken;
-}
+if (!$asiakasID) {
+    if (!$guestToken && isset($_COOKIE['guestToken'])) {
+        $guestToken = $_COOKIE['guestToken'];
+        $_SESSION['guestToken'] = $guestToken; // restore to session
+    }
 
+    if (!$guestToken) {
+        $guestToken = bin2hex(random_bytes(32));
+        setcookie('guestToken', $guestToken, time() + (30*24*60*60), "/"); // expires in 30 days
+        $_SESSION['guestToken'] = $guestToken;
+    }
+}
 // Debug session info
 error_log("Session data: " . print_r($_SESSION, true));
 error_log("Guest token: " . ($guestToken ?? 'NULL'));
@@ -119,6 +125,7 @@ try {
             $cartID = $pdo->lastInsertId();
         }
     }
+    $_SESSION['cartID'] = $cartID;
 
     error_log("Using cart ID: $cartID");
 

@@ -11,6 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "GET") {
 // Get session info
 $guestToken = $_SESSION['guestToken'] ?? null;
 $asiakasID = $_SESSION['userID'] ?? null;
+$cartID = $_SESSION['cartID'] ?? null;
 
 // Debug session info
 error_log("FetchCart - Guest token: " . ($guestToken ?? 'NULL'));
@@ -22,28 +23,29 @@ if (!$guestToken && !$asiakasID) {
 }
 
 try {
-    // Get the latest cart
-    if ($asiakasID) {
-        $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
-        $stmt->execute(['asiakasID' => $asiakasID]);
-    } else {
-        $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
-        $stmt->execute(['guestToken' => $guestToken]);
+    if (!$cartID) {
+        if ($asiakasID) {
+            $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
+            $stmt->execute(['asiakasID' => $asiakasID]);
+        } else {
+            $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
+            $stmt->execute(['guestToken' => $guestToken]);
+        }
+
+        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$cart) {
+            error_log("No cart found for user");
+            echo json_encode(['success' => true, 'totalQuantity' => 0, 'items' => []]);
+            exit;
+        }
+
+        $cartID = $cart['OstoskoriID'];
+        $_SESSION['cartID'] = $cartID;
+        error_log("Found cart ID: $cartID");
     }
-
-    $cart = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$cart) {
-        error_log("No cart found for user");
-        echo json_encode(['success' => true, 'totalQuantity' => 0, 'items' => []]);
-        exit;
-    }
-
-    $cartID = $cart['OstoskoriID'];
-    error_log("Found cart ID: $cartID");
-
     // If only requesting count (for index page)
-    if (isset($_GET['count']) && $_GET['count'] == 1) {
+    if (($_GET['count'] ?? null) == 1) {
         $stmt = $pdo->prepare("SELECT SUM(Maara) AS kokonaisMaara FROM ostoskori_rivit WHERE OstoskoriID = :OstoskoriID");
         $stmt->execute(['OstoskoriID' => $cartID]);
         $total = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -91,11 +93,11 @@ try {
         exit;
     }
 
-    $formattedItems = array_map(function($item) {
+    $formattedItems = array_map(function ($item) {
         // The Hinta field now contains the total line price (unit price * quantity)
         $totalLinePrice = floatval($item['TotalLinePrice'] ?? 0);
         $quantity = intval($item['Maara'] ?? 1);
-        
+
         // Calculate unit price from total line price
         $unitPrice = $quantity > 0 ? $totalLinePrice / $quantity : 0;
 
@@ -131,10 +133,10 @@ try {
 } catch (Exception $e) {
     error_log("FetchCart error: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
-    
+
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => 'Unable to fetch cart at the moment. Please try again later.'
     ]);
 }
 ?>

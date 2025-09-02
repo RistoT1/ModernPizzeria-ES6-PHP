@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 31.08.2025 klo 18:50
+-- Generation Time: 02.09.2025 klo 06:28
 -- Palvelimen versio: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -85,7 +85,8 @@ CREATE TABLE `asiakkaat` (
 --
 
 INSERT INTO `asiakkaat` (`AsiakasID`, `Enimi`, `Snimi`, `Puh`, `Email`, `Osoite`, `PostiNum`, `PostiTp`, `LiitymisPvm`, `MuokattuvPvm`, `Aktiivinen`) VALUES
-(1, 'Testi', 'Käyttäjä', '+358401234567', 'testi@example.com', 'Testikatu 1', '48100', 'Kotka', '2025-08-31', '2025-08-31 15:38:11', 1);
+(1, 'Testi', 'Käyttäjä', '+358401234567', 'testi@example.com', 'Testikatu 1', '48100', 'Kotka', '2025-08-31', '2025-08-31 15:38:11', 1),
+(4, 'nimi', 'Toivanen', '0449787395', 'ristotoiv.rt@gmail.com', 'Huuhankatu 9 A 10', '70600', 'Kuopio', '2025-09-02', '2025-09-02 04:20:08', 1);
 
 -- --------------------------------------------------------
 
@@ -180,7 +181,10 @@ CREATE TABLE `ostoskori` (
 --
 
 INSERT INTO `ostoskori` (`OstoskoriID`, `GuestToken`, `AsiakasID`, `CreatedAt`, `UpdatedAt`) VALUES
-(2, '2b7cbb608fe25a6b3f2eff1d672b1756', NULL, '2025-08-31 16:05:54', '2025-08-31 16:18:24');
+(2, '2b7cbb608fe25a6b3f2eff1d672b1756', NULL, '2025-08-31 16:05:54', '2025-08-31 16:18:24'),
+(3, '88b0c5e80977b5e63fef02ee6093d1f9ad022a42682e8d2edd909932c5d79497', NULL, '2025-09-01 02:23:29', '2025-09-01 06:46:57'),
+(4, '012ab3111259ef28c6c114a7ec02b9839ffdeece5ad22ff8335f52eec89e2d07', NULL, '2025-09-01 15:50:41', '2025-09-02 04:23:06'),
+(5, '9065586f7980d0f74d9a9bbf1ee4874e9596a7e3a3409017a31680bfa6ff9cb2', NULL, '2025-09-02 04:23:49', '2025-09-02 04:23:49');
 
 -- --------------------------------------------------------
 
@@ -204,7 +208,19 @@ CREATE TABLE `ostoskori_rivit` (
 
 INSERT INTO `ostoskori_rivit` (`OstoskoriRivitID`, `OstoskoriID`, `PizzaID`, `LisaID`, `KokoID`, `Maara`, `Hinta`) VALUES
 (2, 2, 1, NULL, 2, 6, 0.00),
-(3, 2, 1, NULL, 3, 4, 9.75);
+(3, 2, 1, NULL, 3, 4, 9.75),
+(4, 3, 1, NULL, 3, 5, 48.75),
+(5, 3, 1, NULL, 2, 5, 7.50),
+(6, 3, 3, NULL, 2, 1, 8.50),
+(7, 3, 2, NULL, 3, 3, 11.70),
+(8, 3, 3, NULL, 3, 2, 11.05),
+(9, 3, 2, NULL, 2, 1, 9.00),
+(10, 4, 1, NULL, 2, 3, 22.50),
+(11, 4, 2, NULL, 3, 4, 46.80),
+(12, 4, 1, NULL, 3, 3, 29.25),
+(13, 4, 3, NULL, 2, 1, 8.50),
+(14, 4, 2, NULL, 2, 1, 9.00),
+(15, 5, 4, NULL, 2, 1, 8.00);
 
 -- --------------------------------------------------------
 
@@ -320,7 +336,7 @@ CREATE TABLE `tilaukset` (
 --
 
 INSERT INTO `tilaukset` (`TilausID`, `AsiakasID`, `KuljettajaID`, `TilausPvm`, `Status`, `Kokonaishinta`, `Kommentit`) VALUES
-(1, 1, 1, '2025-08-31 15:38:11', 'Odottaa', 19.40, NULL);
+(4, 4, NULL, '2025-09-02 04:20:08', 'Odottaa', 342.45, NULL);
 
 -- --------------------------------------------------------
 
@@ -335,13 +351,6 @@ CREATE TABLE `tilausrivit_lisat` (
   `Maara` tinyint(3) UNSIGNED NOT NULL,
   `Hinta` decimal(6,2) NOT NULL
 ) ;
-
---
--- Vedos taulusta `tilausrivit_lisat`
---
-
-INSERT INTO `tilausrivit_lisat` (`TilausrivitLisaID`, `TilausID`, `LisaID`, `Maara`, `Hinta`) VALUES
-(1, 1, 1, 1, 2.50);
 
 -- --------------------------------------------------------
 
@@ -363,8 +372,9 @@ CREATE TABLE `tilausrivit_pizzat` (
 --
 
 INSERT INTO `tilausrivit_pizzat` (`TilausrivitPizzaID`, `TilausID`, `PizzaID`, `KokoID`, `Maara`, `Hinta`) VALUES
-(1, 1, 1, 3, 1, 9.75),
-(2, 1, 2, 2, 1, 9.00);
+(3, 4, 1, 2, 3, 22.50),
+(4, 4, 2, 3, 4, 46.80),
+(5, 4, 1, 3, 3, 29.25);
 
 -- --------------------------------------------------------
 
@@ -543,7 +553,7 @@ ALTER TABLE `aineosat`
 -- AUTO_INCREMENT for table `asiakkaat`
 --
 ALTER TABLE `asiakkaat`
-  MODIFY `AsiakasID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `AsiakasID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `koot`
@@ -567,7 +577,7 @@ ALTER TABLE `lisat`
 -- AUTO_INCREMENT for table `ostoskori`
 --
 ALTER TABLE `ostoskori`
-  MODIFY `OstoskoriID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `OstoskoriID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `ostoskori_rivit`
@@ -591,7 +601,7 @@ ALTER TABLE `pizza_aineosat`
 -- AUTO_INCREMENT for table `tilaukset`
 --
 ALTER TABLE `tilaukset`
-  MODIFY `TilausID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `TilausID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tilausrivit_lisat`
