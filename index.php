@@ -23,7 +23,7 @@
                     <a href="#">Home</a>
                     <a href="#">Menu</a>
                     <a href="#">Contact</a>
-                    <a href="#">Kirjaudu</a>
+                    <a href="./pages/kirjaudu.php">Kirjaudu</a>
                     <a href="./pages/ostoskori.php" class="shopping-cart">
                         <i class="fa-solid fa-basket-shopping"></i>
                         <span class="cart-counter">0</span>

@@ -1,6 +1,6 @@
 /* Header */
 .header-container {
-    background-color: hsl(44, 100%, 50%);
+    background-color: var(--color-primary);
     padding: 1.5rem;
 }
 

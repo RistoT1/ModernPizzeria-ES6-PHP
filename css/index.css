@@ -1,6 +1,9 @@
 .container {
     margin: 0;
-    width: 100%;
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     overflow-x: hidden;
 }
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 02.09.2025 klo 06:28
+-- Generation Time: 02.09.2025 klo 17:50
 -- Palvelimen versio: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -77,16 +77,21 @@ CREATE TABLE `asiakkaat` (
   `PostiTp` varchar(50) DEFAULT NULL,
   `LiitymisPvm` date DEFAULT curdate(),
   `MuokattuvPvm` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `Aktiivinen` tinyint(1) DEFAULT 1
+  `Aktiivinen` tinyint(1) DEFAULT 1,
+  `PasswordHash` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Vedos taulusta `asiakkaat`
 --
 
-INSERT INTO `asiakkaat` (`AsiakasID`, `Enimi`, `Snimi`, `Puh`, `Email`, `Osoite`, `PostiNum`, `PostiTp`, `LiitymisPvm`, `MuokattuvPvm`, `Aktiivinen`) VALUES
-(1, 'Testi', 'Käyttäjä', '+358401234567', 'testi@example.com', 'Testikatu 1', '48100', 'Kotka', '2025-08-31', '2025-08-31 15:38:11', 1),
-(4, 'nimi', 'Toivanen', '0449787395', 'ristotoiv.rt@gmail.com', 'Huuhankatu 9 A 10', '70600', 'Kuopio', '2025-09-02', '2025-09-02 04:20:08', 1);
+INSERT INTO `asiakkaat` (`AsiakasID`, `Enimi`, `Snimi`, `Puh`, `Email`, `Osoite`, `PostiNum`, `PostiTp`, `LiitymisPvm`, `MuokattuvPvm`, `Aktiivinen`, `PasswordHash`) VALUES
+(1, 'Testi', 'Käyttäjä', '+358401234567', 'testi@example.com', 'Testikatu 1', '48100', 'Kotka', '2025-08-31', '2025-08-31 15:38:11', 1, NULL),
+(4, 'nimi', 'Toivanen', '0449787395', 'ristotoiv.rt@gmail.com', 'Huuhankatu 9 A 10', '70600', 'Kuopio', '2025-09-02', '2025-09-02 04:20:08', 1, NULL),
+(15, 'nimia', 'Toivanena', '0449787394', 'ristotoiv.rta@gmail.com', 'Huuhankatu 9 A 10a', '70600', 'Kuopioa', '2025-09-02', '2025-09-02 13:20:51', 1, NULL),
+(17, '', NULL, NULL, 'ristotoiav.rt@gmail.com', NULL, NULL, NULL, '2025-09-02', '2025-09-02 15:34:19', 1, '$2y$10$8ju/5TN/YLOm3oXCMVfiK.fa7T1ZyiSRx8R4QW/XsjgeRiUjBD6FG'),
+(18, '', NULL, NULL, 'ristotoiva.rt@gmail.com', NULL, NULL, NULL, '2025-09-02', '2025-09-02 15:36:32', 1, '$2y$10$ZDN74Fb3hbT5CPO.v1xdh.iiWOYZA6AOANGbwOa3VlSgUufR.NyIG'),
+(21, '', NULL, NULL, 'ristotoiv.rtaa@gmail.com', NULL, NULL, NULL, '2025-09-02', '2025-09-02 15:43:27', 1, '$2y$10$Wndf3OpXQ/3s1lXAc1yH/.qJ3ALRyrY8Pt/2egysDkNV6LmZnW7xa');
 
 -- --------------------------------------------------------
 
@@ -181,10 +186,7 @@ CREATE TABLE `ostoskori` (
 --
 
 INSERT INTO `ostoskori` (`OstoskoriID`, `GuestToken`, `AsiakasID`, `CreatedAt`, `UpdatedAt`) VALUES
-(2, '2b7cbb608fe25a6b3f2eff1d672b1756', NULL, '2025-08-31 16:05:54', '2025-08-31 16:18:24'),
-(3, '88b0c5e80977b5e63fef02ee6093d1f9ad022a42682e8d2edd909932c5d79497', NULL, '2025-09-01 02:23:29', '2025-09-01 06:46:57'),
-(4, '012ab3111259ef28c6c114a7ec02b9839ffdeece5ad22ff8335f52eec89e2d07', NULL, '2025-09-01 15:50:41', '2025-09-02 04:23:06'),
-(5, '9065586f7980d0f74d9a9bbf1ee4874e9596a7e3a3409017a31680bfa6ff9cb2', NULL, '2025-09-02 04:23:49', '2025-09-02 04:23:49');
+(12, 'e4b5c3a2a8ae17304e8ce3a6fa8a1375', NULL, '2025-09-02 13:20:52', '2025-09-02 14:27:26');
 
 -- --------------------------------------------------------
 
@@ -207,20 +209,9 @@ CREATE TABLE `ostoskori_rivit` (
 --
 
 INSERT INTO `ostoskori_rivit` (`OstoskoriRivitID`, `OstoskoriID`, `PizzaID`, `LisaID`, `KokoID`, `Maara`, `Hinta`) VALUES
-(2, 2, 1, NULL, 2, 6, 0.00),
-(3, 2, 1, NULL, 3, 4, 9.75),
-(4, 3, 1, NULL, 3, 5, 48.75),
-(5, 3, 1, NULL, 2, 5, 7.50),
-(6, 3, 3, NULL, 2, 1, 8.50),
-(7, 3, 2, NULL, 3, 3, 11.70),
-(8, 3, 3, NULL, 3, 2, 11.05),
-(9, 3, 2, NULL, 2, 1, 9.00),
-(10, 4, 1, NULL, 2, 3, 22.50),
-(11, 4, 2, NULL, 3, 4, 46.80),
-(12, 4, 1, NULL, 3, 3, 29.25),
-(13, 4, 3, NULL, 2, 1, 8.50),
-(14, 4, 2, NULL, 2, 1, 9.00),
-(15, 5, 4, NULL, 2, 1, 8.00);
+(22, 12, 3, NULL, 2, 2, 17.00),
+(23, 12, 2, NULL, 2, 1, 9.00),
+(24, 12, 1, NULL, 2, 1, 7.50);
 
 -- --------------------------------------------------------
 
@@ -336,7 +327,10 @@ CREATE TABLE `tilaukset` (
 --
 
 INSERT INTO `tilaukset` (`TilausID`, `AsiakasID`, `KuljettajaID`, `TilausPvm`, `Status`, `Kokonaishinta`, `Kommentit`) VALUES
-(4, 4, NULL, '2025-09-02 04:20:08', 'Odottaa', 342.45, NULL);
+(6, 4, NULL, '2025-09-02 13:17:43', 'Odottaa', 23.80, NULL),
+(7, 4, NULL, '2025-09-02 13:19:07', 'Odottaa', 7.50, NULL),
+(8, 4, NULL, '2025-09-02 13:19:32', 'Odottaa', 9.00, NULL),
+(9, 15, NULL, '2025-09-02 13:20:51', 'Odottaa', 7.50, NULL);
 
 -- --------------------------------------------------------
 
@@ -372,9 +366,11 @@ CREATE TABLE `tilausrivit_pizzat` (
 --
 
 INSERT INTO `tilausrivit_pizzat` (`TilausrivitPizzaID`, `TilausID`, `PizzaID`, `KokoID`, `Maara`, `Hinta`) VALUES
-(3, 4, 1, 2, 3, 22.50),
-(4, 4, 2, 3, 4, 46.80),
-(5, 4, 1, 3, 3, 29.25);
+(7, 6, 1, 2, 2, 15.00),
+(8, 6, 7, 1, 1, 8.80),
+(9, 7, 1, 2, 1, 7.50),
+(10, 8, 2, 2, 1, 9.00),
+(11, 9, 1, 2, 1, 7.50);
 
 -- --------------------------------------------------------
 
@@ -553,7 +549,7 @@ ALTER TABLE `aineosat`
 -- AUTO_INCREMENT for table `asiakkaat`
 --
 ALTER TABLE `asiakkaat`
-  MODIFY `AsiakasID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `AsiakasID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `koot`
@@ -577,7 +573,7 @@ ALTER TABLE `lisat`
 -- AUTO_INCREMENT for table `ostoskori`
 --
 ALTER TABLE `ostoskori`
-  MODIFY `OstoskoriID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `OstoskoriID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `ostoskori_rivit`
@@ -601,7 +597,7 @@ ALTER TABLE `pizza_aineosat`
 -- AUTO_INCREMENT for table `tilaukset`
 --
 ALTER TABLE `tilaukset`
-  MODIFY `TilausID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `TilausID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tilausrivit_lisat`
