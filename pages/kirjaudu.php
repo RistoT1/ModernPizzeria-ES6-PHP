@@ -22,9 +22,9 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="login-header">
             <h1 class="login-title">Tervetuloa</h1>
             <p class="login-subtitle">Kirjaudu sisään!</p>
+            <a href="../index.php" class="login-link">Takaisin menuun!</a>
         </div>
         <div class="login-form">
-            <a href="../index.php" class="login-link">Takaisin menuun!</a>
             <div id="errorMsg" class="login-message error" style="display:none;"></div>
 
             <form id="loginForm" class="login-form" action="../api/loginCheck.php" method="post" autocomplete="off">
@@ -45,7 +45,7 @@ if (empty($_SESSION['csrf_token'])) {
                         <input id="password" class="login-form-input with-icon" type="password" name="password" required
                             placeholder="Syötä salasana" autocomplete="current-password" />
                         <button type="button" class="password-toggle" id="passwordToggle">
-                            <i class="fa-solid fa-eye"></i>
+                            <i class="fa-solid fa-eye-slash"></i>
                         </button>
                     </div>
                 </div>

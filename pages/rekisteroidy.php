@@ -65,7 +65,7 @@ if (empty($_SESSION['csrf_token'])) {
                             <input id="password" class="signup-form-input" type="password" name="password" required
                                 autocomplete="new-password" placeholder="Luo vahva salasana" />
                             <button type="button" class="password-toggle" id="passwordToggle">
-                                <i class="fa-solid fa-eye"></i>
+                                <i class="fa-solid fa-eye-slash"></i>
                             </button>
                         </div>
                         <div class="password-strength">
@@ -99,7 +99,7 @@ if (empty($_SESSION['csrf_token'])) {
 
         <div class="login-link-wrapper">
             <p class="login-link-text">Onko sinulla jo tili?</p>
-            <a href="login.php" class="login-link">Kirjaudu sisään</a>
+            <a href="kirjaudu.php" class="login-link">Kirjaudu sisään</a>
         </div>
     </div>
 

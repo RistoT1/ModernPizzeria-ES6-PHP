@@ -1,6 +1,15 @@
 const form = document.getElementById('loginForm');
 const errorMsg = document.getElementById('errorMsg');
+const password = document.getElementById('password');
+const passwordToggle = document.getElementById('passwordToggle');
+const toggleIcon = passwordToggle.querySelector('i');
 
+passwordToggle.addEventListener('click', () => {
+    password.type = password.type === 'password' ? 'text' : 'password';
+
+    toggleIcon.classList.toggle('fa-eye');
+    toggleIcon.classList.toggle('fa-eye-slash');
+});
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();

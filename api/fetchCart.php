@@ -14,7 +14,7 @@ if (!isset($_SESSION['guestToken'])) {
         $_SESSION['guestToken'] = $_COOKIE['guestToken'];
     } else {
         $token = bin2hex(random_bytes(16));
-        setcookie('guestToken', $token, time() + 60*60*24*30, "/"); // 30 days
+        setcookie('guestToken', $token, time() + 60 * 60 * 24 * 30, "/"); // 30 days
         $_SESSION['guestToken'] = $token;
     }
 }
@@ -25,39 +25,37 @@ $cartID = $_SESSION['cartID'] ?? null;
 
 try {
 
-    if (!$cartID) {
-        if ($asiakasID) {
-            // Logged-in user
-            $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
-            $stmt->execute(['asiakasID' => $asiakasID]);
-            $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Always resolve cartID fresh
+    if ($asiakasID) {
+        // Logged-in user
+        $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
+        $stmt->execute(['asiakasID' => $asiakasID]);
+        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$cart) {
-                // Create new cart
-                $stmt = $pdo->prepare("INSERT INTO ostoskori (AsiakasID, CreatedAt, UpdatedAt) VALUES (:asiakasID, NOW(), NOW())");
-                $stmt->execute(['asiakasID' => $asiakasID]);
-                $cartID = $pdo->lastInsertId();
-            } else {
-                $cartID = $cart['OstoskoriID'];
-            }
+        if ($cart) {
+            $cartID = $cart['OstoskoriID'];
         } else {
-            // Guest user
-            $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
-            $stmt->execute(['guestToken' => $guestToken]);
-            $cart = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$cart) {
-                // Create new cart
-                $stmt = $pdo->prepare("INSERT INTO ostoskori (GuestToken, CreatedAt, UpdatedAt) VALUES (:guestToken, NOW(), NOW())");
-                $stmt->execute(['guestToken' => $guestToken]);
-                $cartID = $pdo->lastInsertId();
-            } else {
-                $cartID = $cart['OstoskoriID'];
-            }
+            $stmt = $pdo->prepare("INSERT INTO ostoskori (AsiakasID, CreatedAt, UpdatedAt) VALUES (:asiakasID, NOW(), NOW())");
+            $stmt->execute(['asiakasID' => $asiakasID]);
+            $cartID = $pdo->lastInsertId();
         }
+    } else {
+        // Guest user
+        $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
+        $stmt->execute(['guestToken' => $guestToken]);
+        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $_SESSION['cartID'] = $cartID;
+        if ($cart) {
+            $cartID = $cart['OstoskoriID'];
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO ostoskori (GuestToken, CreatedAt, UpdatedAt) VALUES (:guestToken, NOW(), NOW())");
+            $stmt->execute(['guestToken' => $guestToken]);
+            $cartID = $pdo->lastInsertId();
+        }
     }
+
+    // Always update session
+    $_SESSION['cartID'] = $cartID;
 
     if (($_GET['count'] ?? null) == 1) {
         $stmt = $pdo->prepare("SELECT SUM(Maara) AS kokonaisMaara FROM ostoskori_rivit WHERE OstoskoriID = :OstoskoriID");

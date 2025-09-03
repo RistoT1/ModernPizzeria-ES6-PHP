@@ -2,6 +2,10 @@
 session_start();
 require '../src/config.php';
 
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // 32 bytes = 64 hex chars
+}
+
 // Tarkista onko ostoskori olemassa ja siinä tuotteita
 if (!isset($_SESSION['cartID']) || empty($_SESSION['cartID'])) {
     header("Location: index.php");

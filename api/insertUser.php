@@ -61,8 +61,6 @@ try {
     $stmt = $pdo->prepare("INSERT INTO asiakkaat (Email, PasswordHash) VALUES (:email, :password)");
     $stmt->execute([':email' => $email, ':password' => $hashedPassword]);
 
-    $_SESSION['AsiakasID'] = $pdo->lastInsertId();
-
     http_response_code(201);
     echo json_encode([
         "success" => true,

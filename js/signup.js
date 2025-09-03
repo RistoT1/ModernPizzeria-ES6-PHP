@@ -87,9 +87,14 @@ const handleSignup = () => {
     const errorMessage = document.getElementById('error');
     const submitBtn = document.getElementById('submitBtn');
     const passwordToggle = document.getElementById('passwordToggle');
+    const toggleIcon = passwordToggle.querySelector('i');
+
 
     passwordToggle.addEventListener('click', () => {
         password.type = password.type === 'password' ? 'text' : 'password';
+
+        toggleIcon.classList.toggle('fa-eye');
+        toggleIcon.classList.toggle('fa-eye-slash');
     });
 
     form.addEventListener('submit', async (e) => {
