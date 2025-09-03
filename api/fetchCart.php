@@ -18,14 +18,10 @@ if (!isset($_SESSION['guestToken'])) {
         $_SESSION['guestToken'] = $token;
     }
 }
-$guestToken = $_SESSION['guestToken'] ?? null;
-$asiakasID = $_SESSION['userID'] ?? null;
-$cartID = $_SESSION['cartID'] ?? null;
 
-// Debug logs
-error_log("FetchCart - Guest token: " . ($guestToken ?? 'NULL'));
-error_log("FetchCart - Customer ID: " . ($asiakasID ?? 'NULL'));
-error_log("FetchCart - Cart ID from session: " . ($cartID ?? 'NULL'));
+$guestToken = $_SESSION['guestToken'] ?? null;
+$asiakasID = $_SESSION['AsiakasID'] ?? null;
+$cartID = $_SESSION['cartID'] ?? null;
 
 try {
 
@@ -61,7 +57,6 @@ try {
         }
 
         $_SESSION['cartID'] = $cartID;
-        error_log("Cart ID set in session: $cartID");
     }
 
     if (($_GET['count'] ?? null) == 1) {
@@ -70,7 +65,6 @@ try {
         $total = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $totalQuantity = (int) ($total['kokonaisMaara'] ?? 0);
-        error_log("Total quantity requested: $totalQuantity");
 
         echo json_encode([
             'success' => true,

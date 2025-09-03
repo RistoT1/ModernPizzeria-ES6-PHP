@@ -42,7 +42,42 @@ try {
 
     if (password_verify($password, $row['PasswordHash'])) {
         session_regenerate_id(true);
-        $_SESSION['Asiakas_ID'] = $row['AsiakasID'];
+        $_SESSION['AsiakasID'] = $row['AsiakasID'];
+
+        if (isset($_SESSION['guestToken'])) {
+            $guestToken = $_SESSION['guestToken'];
+
+            $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
+            $stmt->execute(['guestToken' => $guestToken]);
+            $guestCart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($guestCart) {
+                $guestCartID = $guestCart['OstoskoriID'];
+
+                $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
+                $stmt->execute(['asiakasID' => $asiakasID]);
+                $userCart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($userCart) {
+                    $userCartID = $userCart['OstoskoriID'];
+                } else {
+                    $stmt = $pdo->prepare("INSERT INTO ostoskori (AsiakasID, CreatedAt, UpdatedAt) VALUES (:asiakasID, NOW(), NOW())");
+                    $stmt->execute(['asiakasID' => $asiakasID]);
+                    $userCartID = $pdo->lastInsertId();
+                }
+
+                $stmt = $pdo->prepare("UPDATE ostoskori_rivit SET OstoskoriID = :userCartID WHERE OstoskoriID = :guestCartID");
+                $stmt->execute([
+                    'userCartID' => $userCartID,
+                    'guestCartID' => $guestCartID
+                ]);
+
+                $stmt = $pdo->prepare("DELETE FROM ostoskori WHERE OstoskoriID = :guestCartID");
+                $stmt->execute(['guestCartID' => $guestCartID]);
+                
+                $_SESSION['cartID'] = $userCartID;
+            }
+        }
 
         http_response_code(200);
         echo json_encode([

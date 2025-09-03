@@ -33,7 +33,7 @@ if ($quantity < 1 || $quantity > 99) {
 }
 
 // Get user info
-$asiakasID = $_SESSION['userID'] ?? null;
+$asiakasID = $_SESSION['AsiakasID'] ?? null;
 $guestToken = $_SESSION['guestToken'] ?? null;
 
 if (!$asiakasID) {

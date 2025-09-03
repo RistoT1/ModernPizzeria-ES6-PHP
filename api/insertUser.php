@@ -16,8 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // CSRF validation
-if (!isset($_POST['csrf_token'], $_SESSION['csrf_token']) ||
-    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+if (
+    !isset($_POST['csrf_token'], $_SESSION['csrf_token']) ||
+    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+) {
     http_response_code(403);
     echo json_encode(["error" => "Invalid CSRF token."]);
     exit;
@@ -90,7 +92,43 @@ try {
 
     $pdo->commit();
 
-    $_SESSION['Asiakas_ID'] = $user['AsiakasID'];
+    $_SESSION['AsiakasID'] = $user['AsiakasID'];
+
+    if (isset($_SESSION['guestToken'])) {
+        $guestToken = $_SESSION['guestToken'];
+
+        // Find guest cart
+        $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
+        $stmt->execute(['guestToken' => $guestToken]);
+        $guestCart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($guestCart) {
+            $guestCartID = $guestCart['OstoskoriID'];
+
+            // Create new user cart
+            $stmt = $pdo->prepare("INSERT INTO ostoskori (AsiakasID, CreatedAt, UpdatedAt) VALUES (:asiakasID, NOW(), NOW())");
+            $stmt->execute(['asiakasID' => $user['AsiakasID']]);
+            $userCartID = $pdo->lastInsertId();
+
+            // Move guest cart rows to user cart
+            $stmt = $pdo->prepare("UPDATE ostoskori_rivit SET OstoskoriID = :userCartID WHERE OstoskoriID = :guestCartID");
+            $stmt->execute([
+                'userCartID' => $userCartID,
+                'guestCartID' => $guestCartID
+            ]);
+
+            // Delete old guest cart
+            $stmt = $pdo->prepare("DELETE FROM ostoskori WHERE OstoskoriID = :guestCartID");
+            $stmt->execute(['guestCartID' => $guestCartID]);
+
+            // Update session
+            $_SESSION['cartID'] = $userCartID;
+
+            // Remove guestToken
+            unset($_SESSION['guestToken']);
+            setcookie('guestToken', '', time() - 3600, "/");
+        }
+    }
 
     http_response_code(201);
     echo json_encode([
