@@ -42,11 +42,13 @@ try {
 
     if (password_verify($password, $row['PasswordHash'])) {
         session_regenerate_id(true);
-        $_SESSION['AsiakasID'] = $row['AsiakasID'];
+        $asiakasID = $row['AsiakasID'];
+        $_SESSION['AsiakasID'] = $asiakasID;
 
         if (isset($_SESSION['guestToken'])) {
             $guestToken = $_SESSION['guestToken'];
 
+            // Get guest cart
             $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
             $stmt->execute(['guestToken' => $guestToken]);
             $guestCart = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -54,28 +56,52 @@ try {
             if ($guestCart) {
                 $guestCartID = $guestCart['OstoskoriID'];
 
-                $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
-                $stmt->execute(['asiakasID' => $asiakasID]);
-                $userCart = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Check if guest cart has items
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM ostoskori_rivit WHERE OstoskoriID = :guestCartID");
+                $stmt->execute(['guestCartID' => $guestCartID]);
+                $guestCartCount = (int) $stmt->fetchColumn();
 
-                if ($userCart) {
-                    $userCartID = $userCart['OstoskoriID'];
-                } else {
-                    $stmt = $pdo->prepare("INSERT INTO ostoskori (AsiakasID, CreatedAt, UpdatedAt) VALUES (:asiakasID, NOW(), NOW())");
+                if ($guestCartCount > 0) {
+                    // Get user cart
+                    $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
                     $stmt->execute(['asiakasID' => $asiakasID]);
-                    $userCartID = $pdo->lastInsertId();
+                    $userCart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    $replaceUserCart = false;
+
+                    if ($userCart) {
+                        // Check if user cart has items
+                        $stmt = $pdo->prepare("SELECT COUNT(*) FROM ostoskori_rivit WHERE OstoskoriID = :userCartID");
+                        $stmt->execute(['userCartID' => $userCart['OstoskoriID']]);
+                        $userCartCount = (int) $stmt->fetchColumn();
+
+                        // Only replace user cart if it has items
+                        if ($userCartCount > 0) {
+                            $replaceUserCart = true;
+                        }
+                    }
+
+                    if ($replaceUserCart) {
+                        // Delete old user cart
+                        $stmt = $pdo->prepare("DELETE FROM ostoskori_rivit WHERE OstoskoriID = :userCartID");
+                        $stmt->execute(['userCartID' => $userCart['OstoskoriID']]);
+
+                        $stmt = $pdo->prepare("DELETE FROM ostoskori WHERE OstoskoriID = :userCartID");
+                        $stmt->execute(['userCartID' => $userCart['OstoskoriID']]);
+                    }
+
+                    // Assign guest cart to user (regardless if we replaced or not)
+                    $stmt = $pdo->prepare("UPDATE ostoskori SET AsiakasID = :asiakasID, GuestToken = NULL, UpdatedAt = NOW() WHERE OstoskoriID = :guestCartID");
+                    $stmt->execute([
+                        'asiakasID' => $asiakasID,
+                        'guestCartID' => $guestCartID
+                    ]);
+
+                    $_SESSION['cartID'] = $guestCartID;
                 }
 
-                $stmt = $pdo->prepare("UPDATE ostoskori_rivit SET OstoskoriID = :userCartID WHERE OstoskoriID = :guestCartID");
-                $stmt->execute([
-                    'userCartID' => $userCartID,
-                    'guestCartID' => $guestCartID
-                ]);
-
-                $stmt = $pdo->prepare("DELETE FROM ostoskori WHERE OstoskoriID = :guestCartID");
-                $stmt->execute(['guestCartID' => $guestCartID]);
-                
-                $_SESSION['cartID'] = $userCartID;
+                // Remove guest token from session
+                unset($_SESSION['guestToken']);
             }
         }
 

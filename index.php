@@ -11,27 +11,8 @@
     <link rel="stylesheet" href="css/popup.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 </head>
-
 <body>
-    <nav>
-        <div class="header-container">
-            <div class="Header">
-                <div class="title">
-                    <h1>Sakky Pizzeria</h1>
-                </div>
-                <div class="header-links">
-                    <a href="#">Home</a>
-                    <a href="#">Menu</a>
-                    <a href="#">Contact</a>
-                    <a href="./pages/kirjaudu.php">Kirjaudu</a>
-                    <a href="./pages/ostoskori.php" class="shopping-cart">
-                        <i class="fa-solid fa-basket-shopping"></i>
-                        <span class="cart-counter">0</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <?php include_once('includes/nav.php'); ?>
     <main>
         <div class="container">
             <div class="hero">

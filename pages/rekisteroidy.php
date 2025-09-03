@@ -23,6 +23,7 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="signup-header">
             <h1 class="signup-title">Liity Sakky pizzeriaan</h1>
                 <p class="signup-subtitle">Luo käyttäjätili päästäksesi alkuun</p>
+                <a href="../index.php" class="login-link">Takaisin menuun!</a>
         </div>
 
         <div class="signup-form">
