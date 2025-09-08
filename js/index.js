@@ -50,7 +50,7 @@ const updatePrice = () => {
 };
 
 //klikattaessa popup tietojen lisäys
-const openPopup = (pizza) => {
+const openPopup = async (pizza) => {
     //tietojen lisäys
     selectedPizzaID = pizza.PizzaID;
     basePizzaPrice = parseFloat(pizza.Hinta) || 0;
@@ -66,13 +66,23 @@ const openPopup = (pizza) => {
 
     updatePrice();
 
-    //popup-kuva
+    const defaultBg = 'src/img/default-pizza.jpg';
     if (pizza.Kuva) {
-        popupHeader.style.backgroundImage = `url(src/img/${pizza.Kuva})`;
-        popupHeader.style.backgroundSize = "cover";
-        popupHeader.style.backgroundPosition = "center";
+        const imgUrl = `src/img/${pizza.Kuva}`;
+        try {
+            const res = await fetch(imgUrl, { method: 'HEAD' });
+            if (res.ok) {
+                popupHeader.style.backgroundImage = `url(${imgUrl})`;
+                popupHeader.style.backgroundSize = "cover";
+                popupHeader.style.backgroundPosition = "center";
+            } else {
+                popupHeader.style.backgroundImage = `url(${defaultBg})`;
+            }
+        } catch {
+            popupHeader.style.backgroundImage = `url(${defaultBg})`;
+        }
     } else {
-        popupHeader.style.backgroundImage = "none";
+        popupHeader.style.backgroundImage = `url(${defaultBg})`;
     }
 
     popup.classList.add('active');
@@ -200,50 +210,55 @@ const fetchCartQuantity = async () => {
     }
 };
 
-//pitsojen renderöinti
-const renderPizzas = (pizzas) => {
+const renderPizzas = async (pizzas) => {
     menu.innerHTML = '';
-    if (!pizzas.length) {
-        menu.innerHTML = '<p>Ei pizzoja saatavilla</p>';
-        return;
-    }
-    //vähentää sivun päivitystä
-    //on ns näkymätön laatikko
     const fragment = document.createDocumentFragment();
 
-    pizzas.forEach(pizza => {
+    for (const pizza of pizzas) {
         const menuItem = document.createElement('div');
         menuItem.className = "menuItem";
         menuItem.id = pizza.PizzaID;
         menuItem.addEventListener('click', () => openPopup(pizza));
 
-        const imgSrc = pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg';
+        const img = document.createElement('img');
+        img.className = "itemImg";
+        img.alt = pizza.Nimi || 'Pizza';
 
-        menuItem.innerHTML = `
-            <img class="itemImg" src="${imgSrc}" alt="${pizza.Nimi || 'Pizza'}">
-            <div class="itemContent">
-                <div class="itemHeader">
-                    <h3 class="itemTitle">${pizza.Nimi || 'Pizza'}</h3>
-                    <h3 class="itemPrice">${pizza.Hinta ? `€${pizza.Hinta}` : ''}</h3>
-                </div>
-                <p class="itemTiedot">${pizza.Tiedot || ''}</p>
+        const pizzaImgUrl = pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg';
+        const exists = await checkImageExists(pizzaImgUrl);
+        img.src = exists ? pizzaImgUrl : 'src/img/default-pizza.jpg';
+
+        const content = document.createElement('div');
+        content.className = 'itemContent';
+        content.innerHTML = `
+            <div class="itemHeader">
+                <h3 class="itemTitle">${pizza.Nimi || 'Pizza'}</h3>
+                <h3 class="itemPrice">${pizza.Hinta ? `€${pizza.Hinta}` : ''}</h3>
             </div>
+            <p class="itemTiedot">${pizza.Tiedot || ''}</p>
         `;
 
-        menuItem.querySelector('.itemImg').onerror = () => {
-            menuItem.querySelector('.itemImg').src = 'src/img/default-pizza.jpg';
-        };
-
+        menuItem.appendChild(img);
+        menuItem.appendChild(content);
         fragment.appendChild(menuItem);
-    });
+    }
 
     menu.appendChild(fragment);
+};
+
+const checkImageExists = async (url) => {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+    } catch (err) {
+        return false;
+    }
 };
 
 //fetchaa pizza
 const fetchPizza = async () => {
     try {
-        const response = await fetch('./api/fetchPizza.php');
+        const response = await fetch('./api/main.php?pizzat');
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error('Network response was not ok.', errorData.message || '');
