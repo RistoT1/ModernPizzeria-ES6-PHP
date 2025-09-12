@@ -1,37 +1,26 @@
 <?php
-header("Content-Type: application/json");
-
-if ($_SERVER["REQUEST_METHOD"] !== "GET") {
-    http_response_code(405);
-    echo json_encode(["error" => "Invalid request method"]);
-    exit;
-}
-
-require_once "../src/config.php";
-
-try {
+function fetchKoot($pdo)
+{
     $stmt = $pdo->prepare("
-        SELECT KokoID, Koko, HintaKerroin, Aktiivinen 
-        FROM koot 
-        WHERE Aktiivinen = 1 
-        ORDER BY KokoID
-    ");
-    $stmt->execute();
+            SELECT KokoID, Koko, HintaKerroin, Aktiivinen 
+            FROM koot 
+            WHERE Aktiivinen = :aktiivinen
+            ORDER BY KokoID
+        ");
+    $stmt->execute([':aktiivinen' => 1]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $data = [];
     foreach ($results as $row) {
         $data[] = [
-            'KokoID' => $row['KokoID'],
-            'Nimi' => $row['Koko'],
-            'HintaKerroin' => $row['HintaKerroin'],
-            'Aktiivinen' => $row['Aktiivinen']
+            'KokoID' => $row['KokoID'] ?? null,
+            'Nimi' => $row['Koko'] ?? '',
+            'HintaKerroin' => $row['HintaKerroin'] ?? 1,
+            'Aktiivinen' => $row['Aktiivinen'] ?? 0
         ];
     }
 
-    echo json_encode(["data" => $data]);
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(["error" => $e->getMessage()]);
+    return $data;
 }
+
 ?>

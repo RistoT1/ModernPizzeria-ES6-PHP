@@ -1,268 +1,363 @@
-//indexsivun objektit
-const menu = document.getElementById("menu");
-const popup = document.getElementById('pizzaPopup');
-const popupHeader = document.querySelector('.popup-header');
-const popupTitle = popup.querySelector('.popup-title');
-const popupPrice = popup.querySelector('.popup-price');
-const popupIncredient = popup.querySelector('.popup-ingredients');
-const popupInfo = popup.querySelector('.popup-info');
-const closeBtn = document.getElementById('closePopup');
-const sizeContainer = document.querySelector('.size-options');
-const sizeButtons = document.querySelectorAll(".size-btn");
-const quantityDisplay = document.getElementById("quantity");
-const qtyContainer = document.querySelector('.quantity-control'); // wrapper for qty buttons
-const addBtn = document.getElementById("addCart");
+// --- DOM elements validation ---
+const validateDOMElements = () => {
+    const elements = {
+        menu: document.getElementById("menu"),
+        popup: document.getElementById('pizzaPopup'),
+        popupHeader: document.querySelector('.popup-header'),
+        closeBtn: document.getElementById('closePopup'),
+        sizeContainer: document.querySelector('.size-options'),
+        quantityDisplay: document.getElementById("quantity"),
+        qtyContainer: document.querySelector('.quantity-control'),
+        addBtn: document.getElementById("addCart")
+    };
 
-//valittu pizza
+    for (const [name, element] of Object.entries(elements)) {
+        if (!element) {
+            console.error(`Required DOM element not found: ${name}`);
+            return false;
+        }
+    }
+    return elements;
+};
+
+// --- DOM elements ---
+let DOM = {};
+
+// --- State ---
 let selectedPizzaID = null;
-//pizza hinta
 let basePizzaPrice = 0;
-//koko ja koon hinnan kerroin (oikea hinta lasketaan käyttäjän ulottumattomissa)
+let selectedSizeID = "2";
 let sizeMultipliers = {};
-//valittu koko
-let selectedSizeID = "2"; // oletuskoko
 
-//Pizzakoko fetch
+// --- Fetch sizes ---
 const fetchSizes = async () => {
     try {
-        const response = await fetch('./api/fetchSize.php');
-        if (!response.ok) throw new Error('Network error fetching sizes');
-        const result = await response.json();
-        if (result.data) {
+        const res = await fetch('./api/main.php?koko');
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        const result = await res.json();
+        if (result.success && result.data && Array.isArray(result.data)) {
             result.data.forEach(size => {
                 sizeMultipliers[size.KokoID] = {
                     multiplier: parseFloat(size.HintaKerroin),
                     name: size.Nimi,
-                    description: size.Kuvaus
+                    description: size.Kuvaus || ''
                 };
             });
+            console.log('Sizes loaded:', Object.keys(sizeMultipliers).length);
+        } else {
+            throw new Error('Invalid sizes response format');
         }
     } catch (err) {
         console.error('Error fetching sizes:', err);
+        showNotification('Virhe ladattaessa kokoja', 'error');
     }
 };
 
-//hinnan päivitys
+// --- Update price ---
 const updatePrice = () => {
+    if (!DOM.popup) return;
+    const popupPrice = DOM.popup.querySelector('.popup-price');
+    if (!popupPrice) return;
+
     const multiplier = sizeMultipliers[selectedSizeID]?.multiplier || 1.0;
-    const finalPrice = basePizzaPrice * multiplier;
-    popupPrice.textContent = `€${finalPrice.toFixed(2)}`;
+    popupPrice.textContent = `€${(basePizzaPrice * multiplier).toFixed(2)}`;
 };
 
-//klikattaessa popup tietojen lisäys
+// --- Open popup ---
 const openPopup = (pizza) => {
-    //tietojen lisäys
+    if (!DOM.popup || !pizza) return;
+
+    const popupTitle = DOM.popup.querySelector('.popup-title');
+    const popupInfo = DOM.popup.querySelector('.popup-info');
+    const popupIngredients = DOM.popup.querySelector('.popup-ingredients');
+
+    if (!popupTitle || !popupInfo || !popupIngredients) {
+        console.error('Popup elements not found');
+        return;
+    }
+
     selectedPizzaID = pizza.PizzaID;
     basePizzaPrice = parseFloat(pizza.Hinta) || 0;
-    popupTitle.textContent = pizza.Nimi || "Pizza";
-    popupInfo.textContent = pizza.Tiedot || "";
-    popupIncredient.textContent = pizza.Ainesosat || "";
-    quantityDisplay.textContent = '1';
+    popupTitle.textContent = pizza.PizzaNimi || '';
+    popupInfo.textContent = pizza.Tiedot || '';
 
-    //poista active size
-    sizeButtons.forEach(btn => btn.classList.remove('active'));
-    const defaultSizeBtn = document.querySelector(`.size-btn[data-size="${selectedSizeID}"]`);
-    if (defaultSizeBtn) defaultSizeBtn.classList.add('active');
-
-    updatePrice();
-
-    //popup-kuva
-    if (pizza.Kuva) {
-        popupHeader.style.backgroundImage = `url(src/img/${pizza.Kuva})`;
-        popupHeader.style.backgroundSize = "cover";
-        popupHeader.style.backgroundPosition = "center";
+    // Safe handling of ingredients
+    const ingredients = pizza.Ainesosat;
+    if (Array.isArray(ingredients)) {
+        popupIngredients.textContent = ingredients.map(ing =>
+            typeof ing === 'string' ? ing : (ing.Aineosat || '')
+        ).filter(Boolean).join(', ');
+    } else if (typeof ingredients === 'string') {
+        popupIngredients.textContent = ingredients;
     } else {
-        popupHeader.style.backgroundImage = "none";
+        popupIngredients.textContent = '';
     }
 
-    popup.classList.add('active');
+    if (DOM.quantityDisplay) {
+        DOM.quantityDisplay.textContent = '1';
+    }
+
+    // Update size buttons
+    const sizeButtons = document.querySelectorAll(".size-btn");
+    sizeButtons.forEach(btn => btn.classList.remove('active'));
+    const defaultBtn = document.querySelector(`.size-btn[data-size="${selectedSizeID}"]`);
+    if (defaultBtn) defaultBtn.classList.add('active');
+
+    // Set background image
+    const imgUrl = pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg';
+    if (DOM.popupHeader) {
+        DOM.popupHeader.style.backgroundImage = `url(${imgUrl})`;
+    }
+
+    updatePrice();
+    DOM.popup.classList.add('active');
 };
 
-//sulje popup
 const closePopup = () => {
-    popup.classList.remove('active');
+    if (DOM.popup) {
+        DOM.popup.classList.remove('active');
+    }
 };
 
-//jos clickataan pelkästään popup overlayhin
-popup.addEventListener('click', (e) => {
-    if (e.target === popup) closePopup();
-});
-
-//sulku nappi
-closeBtn.addEventListener('click', closePopup);
-
-//kokonapit event delegation
-sizeContainer.addEventListener('click', e => {
+// --- Size change ---
+const handleSizeChange = (e) => {
     const btn = e.target.closest('.size-btn');
     if (!btn) return;
+
+    const sizeButtons = document.querySelectorAll(".size-btn");
     sizeButtons.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedSizeID = btn.dataset.size;
     updatePrice();
-});
+};
 
-//määränapit event delegation
-qtyContainer.addEventListener('click', e => {
+// --- Quantity buttons ---
+const handleQuantityChange = (e) => {
     const btn = e.target.closest('.qty-btn');
-    if (!btn) return;
-    let change = parseInt(btn.dataset.change);
-    let current = parseInt(quantityDisplay.textContent);
+    if (!btn || !DOM.quantityDisplay) return;
+
+    let current = parseInt(DOM.quantityDisplay.textContent) || 1;
+    const change = parseInt(btn.dataset.change) || 0;
     current = Math.max(1, Math.min(99, current + change));
-    quantityDisplay.textContent = current;
-});
+    DOM.quantityDisplay.textContent = current;
+};
 
-//korinlisäys
-addBtn.addEventListener('click', async () => {
-    const quantity = parseInt(quantityDisplay.textContent);
-    const size = selectedSizeID;
-    if (!selectedPizzaID) return;
+// --- Add to cart ---
+const addToCart = async () => {
+    if (!selectedPizzaID || !DOM.addBtn) return;
 
-    addBtn.disabled = true;
-    const originalText = addBtn.textContent;
-    addBtn.textContent = 'Lisätään...';
-
-    const data = { pizzaID: selectedPizzaID, quantity, size };
-    console.log('Sending to cart:', JSON.stringify(data));
+    DOM.addBtn.disabled = true;
+    const quantity = parseInt(DOM.quantityDisplay?.textContent) || 1;
+    const payload = {
+        addItem: true,
+        pizzaID: selectedPizzaID,
+        quantity: quantity,
+        size: selectedSizeID
+    };
+    console.log(payload);
 
     try {
-        const response = await fetch('api/addToCart.php', {
+        const res = await fetch('./api/main.php?addItem', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
         });
-        const result = await response.json();
 
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const result = await res.json();
         if (result.success) {
             showNotification('Lisätty koriin!', 'success');
-            fetchCartQuantity();
+            await fetchCartQuantity();
             closePopup();
         } else {
-            console.error('Failed to add to cart:', result.message);
             showNotification(result.message || 'Virhe lisättäessä koriin', 'error');
         }
-    } catch (err) {
-        console.error('Error sending data:', err);
-        showNotification('Verkkovirhe. Yritä uudelleen.', 'error');
+    } catch (error) {
+        console.error('Add to cart error:', error);
+        showNotification('Verkkovirhe.', 'error');
     } finally {
-        addBtn.disabled = false;
-        addBtn.textContent = originalText;
+        DOM.addBtn.disabled = false;
     }
-});
+};
 
-//ilmoitus 
-const showNotification = (message, type = 'info') => {
-    const existing = document.querySelectorAll('.notification');
-    existing.forEach(n => n.remove());
-
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
+// --- Notifications ---
+const showNotification = (msg, type = 'info') => {
+    const n = document.createElement('div');
+    n.className = `notification notification-${type}`;
+    n.textContent = msg;
+    document.body.appendChild(n);
     setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateY(0)';
-    }, 100);
-
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(-20px)';
-        setTimeout(() => {
-            if (notification.parentNode) notification.parentNode.removeChild(notification);
-        }, 300);
+        if (n.parentNode) {
+            n.parentNode.removeChild(n);
+        }
     }, 3000);
 };
 
-//päivitä korin counter
-const updateCartCounter = (totalQuantity) => {
+// --- Cart counter ---
+const updateCartCounter = (qty) => {
     const counter = document.querySelector('.cart-counter');
-    if (counter) {
-        counter.textContent = totalQuantity;
-        counter.style.display = totalQuantity > 0 ? 'inline-block' : 'none';
-    }
+    if (!counter) return;
+
+    const count = parseInt(qty) || 0;
+    counter.textContent = count;
+    counter.style.display = count > 0 ? 'inline-block' : 'none';
 };
 
-//fetchaa kori
+// --- Fetch cart ---
 const fetchCartQuantity = async () => {
     try {
-        const response = await fetch('api/fetchCart.php?count=1');
-        if (!response.ok) return updateCartCounter(0);
-
-        const result = await response.json();
-        if (result.success) {
-            updateCartCounter(result.totalQuantity || 0);
-        } else {
-            updateCartCounter(0);
+        const res = await fetch('./api/main.php?kori&includeItems=false');
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
         }
-    } catch (err) {
-        console.error('Error fetching cart quantity:', err);
+        const result = await res.json();
+        const quantity = result.success ? (result.data?.totalQuantity || result.totalQuantity || 0) : 0;
+        updateCartCounter(quantity);
+    } catch (error) {
+        console.error('Error fetching cart quantity:', error);
         updateCartCounter(0);
     }
 };
 
-//pitsojen renderöinti
+// --- Render pizzas ---
 const renderPizzas = (pizzas) => {
-    menu.innerHTML = '';
-    if (!pizzas.length) {
-        menu.innerHTML = '<p>Ei pizzoja saatavilla</p>';
+    if (!DOM.menu || !Array.isArray(pizzas)) {
+        console.error('Cannot render pizzas: invalid menu element or pizzas data');
         return;
     }
-    //vähentää sivun päivitystä
-    //on ns näkymätön laatikko
-    const fragment = document.createDocumentFragment();
+    console.log(pizzas)
+    DOM.menu.innerHTML = '';
+    const frag = document.createDocumentFragment();
 
     pizzas.forEach(pizza => {
-        const menuItem = document.createElement('div');
-        menuItem.className = "menuItem";
-        menuItem.id = pizza.PizzaID;
-        menuItem.addEventListener('click', () => openPopup(pizza));
-
-        const imgSrc = pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg';
-
-        menuItem.innerHTML = `
-            <img class="itemImg" src="${imgSrc}" alt="${pizza.Nimi || 'Pizza'}">
-            <div class="itemContent">
-                <div class="itemHeader">
-                    <h3 class="itemTitle">${pizza.Nimi || 'Pizza'}</h3>
-                    <h3 class="itemPrice">${pizza.Hinta ? `€${pizza.Hinta}` : ''}</h3>
-                </div>
-                <p class="itemTiedot">${pizza.Tiedot || ''}</p>
-            </div>
-        `;
-
-        menuItem.querySelector('.itemImg').onerror = () => {
-            menuItem.querySelector('.itemImg').src = 'src/img/default-pizza.jpg';
-        };
-
-        fragment.appendChild(menuItem);
-    });
-
-    menu.appendChild(fragment);
-};
-
-//fetchaa pizza
-const fetchPizza = async () => {
-    try {
-        const response = await fetch('./api/fetchPizza.php');
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('Network response was not ok.', errorData.message || '');
-            showNotification('Virhe ladattaessa pizzoja', 'error');
+        if (!pizza || !pizza.PizzaID) {
+            console.warn('Invalid pizza data:', pizza);
             return;
         }
-        const result = await response.json();
-        renderPizzas(result.data || []);
-    } catch (err) {
-        console.error("Error fetching pizzas:", err);
+
+        const div = document.createElement('div');
+        div.className = 'menuItem';
+        div.id = `pizza-${pizza.PizzaID}`;
+        div.addEventListener('click', () => openPopup(pizza));
+
+        const img = document.createElement('img');
+        img.className = 'itemImg';
+        img.alt = pizza.PizzaNimi || 'Pizza';
+        img.src = pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg';
+        img.onerror = function () {
+            this.src = 'src/img/default-pizza.jpg';
+        };
+
+        const content = document.createElement('div');
+        content.className = 'itemContent';
+        content.innerHTML = `
+            <div class="itemHeader">
+                <h3 class="itemTitle">${escapeHtml(pizza.PizzaNimi || 'Pizza')}</h3>
+                <h3 class="itemPrice">€${parseFloat(pizza.Hinta || 0).toFixed(2)}</h3>
+            </div>
+            <p class="itemTiedot">${escapeHtml(pizza.Tiedot || '')}</p>
+        `;
+
+        div.appendChild(img);
+        div.appendChild(content);
+        frag.appendChild(div);
+    });
+
+    DOM.menu.appendChild(frag);
+    console.log(`Rendered ${pizzas.length} pizzas`);
+};
+
+// --- Utility function to escape HTML ---
+const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+};
+
+// --- Fetch pizzas ---
+const fetchPizza = async () => {
+    try {
+        const res = await fetch('./api/main.php?pizzat');
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        const result = await res.json();
+
+        if (result.success && result.data && Array.isArray(result.data)) {
+            renderPizzas(result.data);
+        } else {
+            throw new Error('Invalid pizza data received');
+        }
+    } catch (error) {
+        console.error('Error fetching pizzas:', error);
+        if (DOM.menu) {
+            DOM.menu.innerHTML = '<p>Virhe ladattaessa pizzoja. <button onclick="location.reload()">Yritä uudelleen</button></p>';
+        }
         showNotification('Virhe ladattaessa pizzoja', 'error');
-        menu.innerHTML = '<p>Virhe ladattaessa pizzoja. Yritä päivittää sivu.</p>';
     }
 };
 
-//initialize page
-const initializePage = async () => {
-    await Promise.all([fetchSizes(), fetchPizza()]);
-    fetchCartQuantity();
+// --- Event listeners setup ---
+const setupEventListeners = () => {
+    // Popup events
+    if (DOM.popup) {
+        DOM.popup.addEventListener('click', e => {
+            if (e.target === DOM.popup) closePopup();
+        });
+    }
+
+    if (DOM.closeBtn) {
+        DOM.closeBtn.addEventListener('click', closePopup);
+    }
+
+    // Size change
+    if (DOM.sizeContainer) {
+        DOM.sizeContainer.addEventListener('click', handleSizeChange);
+    }
+
+    // Quantity change
+    if (DOM.qtyContainer) {
+        DOM.qtyContainer.addEventListener('click', handleQuantityChange);
+    }
+
+    // Add to cart
+    if (DOM.addBtn) {
+        DOM.addBtn.addEventListener('click', addToCart);
+    }
 };
 
-initializePage();
+// --- Init ---
+const initializePage = async () => {
+    try {
+        // Validate DOM elements first
+        DOM = validateDOMElements();
+        if (!DOM) {
+            throw new Error('Required DOM elements not found');
+        }
+
+        // Setup event listeners
+        setupEventListeners();
+
+        // Fetch data
+        console.log('Initializing page...');
+        await Promise.all([fetchSizes(), fetchPizza()]);
+        await fetchCartQuantity();
+        console.log('Page initialization complete');
+
+    } catch (error) {
+        console.error('Initialization failed:', error);
+        showNotification('Sivun lataus epäonnistui', 'error');
+    }
+};
+
+// --- Start initialization when DOM is ready ---
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePage);
+} else {
+    initializePage();
+}

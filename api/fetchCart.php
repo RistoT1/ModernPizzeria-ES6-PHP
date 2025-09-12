@@ -1,82 +1,45 @@
 <?php
-session_start();
-header('Content-Type: application/json');
-require '../src/config.php';
 
-// Only allow GET requests
-if ($_SERVER["REQUEST_METHOD"] !== "GET") {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method!']);
-    exit;
-}
-
-if (!isset($_SESSION['guestToken'])) {
-    if (isset($_COOKIE['guestToken'])) {
-        $_SESSION['guestToken'] = $_COOKIE['guestToken'];
-    } else {
-        $token = bin2hex(random_bytes(16));
-        setcookie('guestToken', $token, time() + 60 * 60 * 24 * 30, "/"); // 30 days
-        $_SESSION['guestToken'] = $token;
+function fetchCart($pdo)
+{
+    if (!isset($_SESSION['guestToken'])) {
+        $_SESSION['guestToken'] = bin2hex(random_bytes(16));
     }
-}
-
-$guestToken = $_SESSION['guestToken'] ?? null;
-$asiakasID = $_SESSION['AsiakasID'] ?? null;
-$cartID = $_SESSION['cartID'] ?? null;
-
-try {
-
-    // Always resolve cartID fresh
+    $asiakasID = $_SESSION['AsiakasID'] ?? null;
+    $guestToken = $_SESSION['guestToken'] ?? null;
+    
     if ($asiakasID) {
-        // Logged-in user
-        $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE AsiakasID = :asiakasID ORDER BY UpdatedAt DESC LIMIT 1");
-        $stmt->execute(['asiakasID' => $asiakasID]);
-        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($cart) {
-            $cartID = $cart['OstoskoriID'];
-        } else {
-            $stmt = $pdo->prepare("INSERT INTO ostoskori (AsiakasID, CreatedAt, UpdatedAt) VALUES (:asiakasID, NOW(), NOW())");
-            $stmt->execute(['asiakasID' => $asiakasID]);
-            $cartID = $pdo->lastInsertId();
-        }
+        $cartID = fetchAsiakasCart($pdo, $asiakasID);
     } else {
-        // Guest user
-        $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken = :guestToken ORDER BY UpdatedAt DESC LIMIT 1");
-        $stmt->execute(['guestToken' => $guestToken]);
-        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($cart) {
-            $cartID = $cart['OstoskoriID'];
-        } else {
-            $stmt = $pdo->prepare("INSERT INTO ostoskori (GuestToken, CreatedAt, UpdatedAt) VALUES (:guestToken, NOW(), NOW())");
-            $stmt->execute(['guestToken' => $guestToken]);
-            $cartID = $pdo->lastInsertId();
-        }
+        $cartID = fetchGuestCart($pdo, $guestToken);
     }
 
-    // Always update session
-    $_SESSION['cartID'] = $cartID;
-
-    if (($_GET['count'] ?? null) == 1) {
-        $stmt = $pdo->prepare("SELECT SUM(Maara) AS kokonaisMaara FROM ostoskori_rivit WHERE OstoskoriID = :OstoskoriID");
-        $stmt->execute(['OstoskoriID' => $cartID]);
-        $total = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $totalQuantity = (int) ($total['kokonaisMaara'] ?? 0);
-
-        echo json_encode([
-            'success' => true,
-            'totalQuantity' => $totalQuantity
-        ]);
-        exit;
+    if (!$cartID) {
+        return ['totalQuantity' => 0, 'items' => []];
     }
 
+
+    $totalQuantity = fetchCount($pdo, $cartID);
+    $includeItems = filter_var($_GET['includeItems'] ?? true, FILTER_VALIDATE_BOOLEAN);
+    if (!$includeItems) {
+        return ['totalQuantity' => $totalQuantity];
+    }
+    $cartItems = [];
+    $cartItems = fetchCartItems($pdo, $cartID);
+
+    return [
+        'totalQuantity' => $totalQuantity,
+        'items' => $cartItems
+    ];
+}
+
+function fetchCartItems($pdo, $cartID)
+{
     $stmt = $pdo->prepare("
         SELECT 
             r.OstoskoriRivitID,
             r.OstoskoriID,
             r.PizzaID,
-            r.LisaID,
             r.KokoID,
             r.Maara,
             r.Hinta AS TotalLinePrice,
@@ -91,22 +54,21 @@ try {
         WHERE r.OstoskoriID = :OstoskoriID
         ORDER BY r.OstoskoriRivitID ASC
     ");
-
     $stmt->execute(['OstoskoriID' => $cartID]);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $formattedItems = formatItems($items);
+    return $formattedItems;
+}
 
-    if (empty($items)) {
-        echo json_encode(['success' => true, 'totalQuantity' => 0, 'items' => []]);
-        exit;
-    }
-
+function formatItems($items)
+{
     $formattedItems = array_map(function ($item) {
         $totalLinePrice = floatval($item['TotalLinePrice'] ?? 0);
         $quantity = intval($item['Maara'] ?? 1);
         $unitPrice = $quantity > 0 ? $totalLinePrice / $quantity : 0;
 
         return [
-            'cartID' => $item['OstoskoriRivitID'],
+            'cartRowID' => $item['OstoskoriRivitID'],
             'PizzaID' => $item['PizzaID'],
             'Nimi' => $item['Nimi'] ?? 'Unknown Pizza',
             'Kuva' => $item['Kuva'],
@@ -114,25 +76,86 @@ try {
             'sizeID' => $item['KokoID'],
             'sizeName' => $item['KokoNimi'] ?? '-',
             'unitPrice' => $unitPrice,
-            'totalPrice' => $totalLinePrice,
-            'price' => $totalLinePrice
+            'totalPrice' => $totalLinePrice
         ];
     }, $items);
 
-    $totalQuantity = array_sum(array_column($formattedItems, 'quantity'));
 
-    echo json_encode([
-        'success' => true,
-        'totalQuantity' => $totalQuantity,
-        'items' => $formattedItems
-    ]);
-
-} catch (Exception $e) {
-    error_log("FetchCart error: " . $e->getMessage());
-    error_log("Stack trace: " . $e->getTraceAsString());
-
-    echo json_encode([
-        'success' => false,
-        'message' => 'Unable to fetch cart at the moment. Please try again later.'
-    ]);
+    return $formattedItems;
 }
+function fetchCount($pdo, $cartID)
+{
+    $stmt = $pdo->prepare("SELECT SUM(Maara) AS kokonaisMaara FROM ostoskori_rivit WHERE OstoskoriID = :OstoskoriID");
+    $stmt->execute(['OstoskoriID' => $cartID]);
+    $total = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return intval($total['kokonaisMaara'] ?? 0);
+}
+
+function fetchAsiakasCart($pdo, $asiakasID)
+{
+    $cartID = fetchCartID($pdo, $asiakasID, null);
+    $_SESSION['cartID'] = $cartID;
+    return $cartID;
+}
+
+
+function fetchGuestCart($pdo, $guestToken)
+{
+    // Pass guestToken correctly as second parameter
+    $cartID = fetchCartID($pdo, null, $guestToken);
+    $_SESSION['cartID'] = $cartID;
+    return $cartID;
+}
+
+function fetchCartID($pdo, $asiakasID = null, $guestToken = null)
+{
+    if ($asiakasID) {
+        // Logged-in user
+        $stmt = $pdo->prepare("
+            SELECT OstoskoriID 
+            FROM ostoskori 
+            WHERE AsiakasID = :asiakasID 
+            ORDER BY UpdatedAt DESC 
+            LIMIT 1
+        ");
+        $stmt->execute(['asiakasID' => $asiakasID]);
+        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($cart) {
+            return $cart['OstoskoriID'];
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO ostoskori (AsiakasID, CreatedAt, UpdatedAt) 
+                VALUES (:asiakasID, NOW(), NOW())
+            ");
+            $stmt->execute(['asiakasID' => $asiakasID]);
+            return $pdo->lastInsertId();
+        }
+    } elseif ($guestToken) {
+        // Guest user
+        $stmt = $pdo->prepare("
+            SELECT OstoskoriID 
+            FROM ostoskori 
+            WHERE GuestToken = :guestToken 
+            ORDER BY UpdatedAt DESC 
+            LIMIT 1
+        ");
+        $stmt->execute(['guestToken' => $guestToken]);
+        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($cart) {
+            return $cart['OstoskoriID'];
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO ostoskori (GuestToken, CreatedAt, UpdatedAt) 
+                VALUES (:guestToken, NOW(), NOW())
+            ");
+            $stmt->execute(['guestToken' => $guestToken]);
+            return $pdo->lastInsertId();
+        }
+    } else {
+        throw new Exception("Either asiakasID or guestToken must be provided");
+    }
+}
+

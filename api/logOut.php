@@ -1,23 +1,33 @@
 <?php
-// logOut.php
-session_start();
+function handleLogout($pdo, $input = []) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-// Check if the user is actually logged in
-if (!isset($_SESSION['AsiakasID'])) {
-    // Optionally, redirect to login page or return a message
-    header('Location: ../pages/kirjaudu.php');
-    exit();
+    if (!isset($_SESSION['AsiakasID'])) {
+        http_response_code(401);
+        return ["error" => "User not logged in."];
+    }
+
+    // Clear session variables
+    $_SESSION = [];
+
+    // Destroy session cookie
+    setcookie(session_name(), '', [
+        'expires' => time() - 3600,
+        'path' => '/',
+        'domain' => '', 
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+
+    // Destroy session
+    session_destroy();
+
+    return [
+        "success" => true,
+        "message" => "Logout successful."
+    ];
 }
 
-// Unset all session variables
-$_SESSION = [];
-
-// Destroy the session
-if (session_id() != "" || isset($_COOKIE[session_name()])) {
-    setcookie(session_name(), '', time() - 3600, '/');
-}
-session_destroy();
-
-// Optionally, redirect to home page after logout
-header('Location: ../index.php');
-exit();

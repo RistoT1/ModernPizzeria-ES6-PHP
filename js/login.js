@@ -11,32 +11,34 @@ passwordToggle.addEventListener('click', () => {
     toggleIcon.classList.toggle('fa-eye-slash');
 });
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', async e => {
     e.preventDefault();
-
-    if (!errorMsg) return;
     errorMsg.style.display = 'none';
-    errorMsg.textContent = '';
+
+    const payload = {
+        login: true,
+        email: form.email.value,
+        password: form.password.value
+    };
 
     try {
-        const formData = new URLSearchParams(new FormData(form));
-
-        const response = await fetch('../api/loginCheck.php', {
+        const res = await fetch('../api/main.php', {
             method: 'POST',
-            body: formData,
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
+        const data = await res.json();
 
         if (data.success) {
-            window.location.href = data.redirect || 'dashboard.php';
+            window.location.href = data.data.redirect || '../index.php';
         } else {
-            errorMsg.textContent = data.error || 'Login failed.';
+            errorMsg.textContent = data.error || 'Login failed';
             errorMsg.style.display = 'block';
         }
     } catch (err) {
-        errorMsg.textContent = 'Network error, please try again.';
+        errorMsg.textContent = 'Network error: ' + err.message;
         errorMsg.style.display = 'block';
     }
 });
