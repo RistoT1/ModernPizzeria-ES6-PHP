@@ -1,71 +1,92 @@
 <?php
-// Generic function to fetch items and map them depending on table
-function fetchitems($pdo, $table, $whereClause = "") {
-    try {
-        $sql = "SELECT * FROM $table" . ($whereClause ? " WHERE $whereClause" : "");
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+function fetchitems($pdo, $table, $whereParams = [], $whereClause = "")
+{
+    $allowedTables = ['v_pizzat_aineosat', 'aineosat'];
+    if (!in_array($table, $allowedTables)) {
+        throw new Exception("Invalid table: $table");
+    }
 
-        $data = [];
+    $sql = "SELECT * FROM $table";
+    if ($whereClause) {
+        $sql .= " WHERE $whereClause";
+    }
 
-        if ($table === 'v_pizzat_aineosat') {
-            foreach ($results as $row) {
-                $data[] = [
-                    'PizzaID' => $row['PizzaID'] ?? null,
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($whereParams);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $data = [];
+
+    if ($table === 'v_pizzat_aineosat') {
+        foreach ($results as $row) {
+            $pizzaID = $row['PizzaID'] ?? null;
+            if ($pizzaID === null) continue;
+
+            if (!isset($data[$pizzaID])) {
+                $data[$pizzaID] = [
+                    'PizzaID' => $pizzaID,
                     'PizzaNimi' => $row['PizzaNimi'] ?? '',
                     'Pohja' => $row['Pohja'] ?? '',
                     'Tiedot' => $row['Tiedot'] ?? '',
                     'Hinta' => $row['Hinta'] ?? 0,
                     'Kuva' => $row['Kuva'] ?? '',
                     'Aktiivinen' => $row['Aktiivinen'] ?? 0,
+                    'Aineosat' => []
+                ];
+            }
+
+            if (!empty($row['Aineosat'])) {
+                $data[$pizzaID]['Aineosat'][] = [
                     'Aineosat' => $row['Aineosat'] ?? '',
                     'AinesosaMaara' => $row['AinesosaMaara'] ?? 0
                 ];
             }
-        } elseif ($table === 'aineosat') {
-            foreach ($results as $row) {
-                $data[] = [
-                    'AinesosaID' => $row['AinesosatID'] ?? null,
-                    'Nimi' => $row['Nimi'] ?? '',
-                    'Hinta' => $row['Hinta'] ?? 0,
-                    'Yksikko' => $row['Yksikko'],
-                    'Kuvaus' => $row['Kuvaus'],
-                    'Kuva' =>  $row['Kuva'],
-                    'Aktiivinen' => $row['Aktiivinen']
-                ];
-            }
-        } else {
-            $data = $results; // fallback: return raw
         }
-
-        return $data;
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(["error" => $e->getMessage()]);
-        exit;
+        $data = array_values($data);
+    } elseif ($table === 'aineosat') {
+        foreach ($results as $row) {
+            $data[] = [
+                'AinesosaID' => $row['AinesosaID'] ?? null,
+                'Nimi' => $row['Nimi'] ?? '',
+                'Hinta' => $row['Hinta'] ?? 0,
+                'Yksikko' => $row['Yksikko'] ?? '',
+                'Kuvaus' => $row['Kuvaus'] ?? '',
+                'Kuva' => $row['Kuva'] ?? '',
+                'Aktiivinen' => $row['Aktiivinen'] ?? 0
+            ];
+        }
+    } else {
+        $data = $results;
     }
+
+    return $data;
 }
 
 // Fetch pizzas
-function fetchPizzat($pdo) {
+function fetchPizzat($pdo)
+{
     $data = fetchitems($pdo, 'v_pizzat_aineosat');
-    echo json_encode(["pizzat" => $data]);
+    return $data;
 }
 
 // Fetch extras
-function fetchLisat($pdo) {
-    $data = fetchitems($pdo, 'aineosat', "tyyppi = 'extra'");
-    echo json_encode(["lisat" => $data]);
+function fetchLisat($pdo)
+{
+    $data = fetchitems(
+        $pdo,
+        'aineosat',
+        [':tyyppi' => 'extra'],
+        "tyyppi = :tyyppi"
+    );
+    return $data;
 }
 
-// Fetch both pizzas and extras
-function fetchKaikki($pdo) {
-    $pizzat = fetchitems($pdo, 'v_pizzat_aineosat');
-    $lisat = fetchitems($pdo, 'aineosat', "tyyppi = 'extra'");
-    echo json_encode([
-        "pizzat" => $pizzat,
-        "lisat" => $lisat
-    ]);
+// Fetch everything
+function fetchKaikki($pdo)
+{
+    return [
+        "pizzat" => fetchitems($pdo, 'v_pizzat_aineosat'),
+        "lisat"  => fetchitems($pdo, 'aineosat', [':tyyppi' => 'extra'], "tyyppi = :tyyppi")
+    ];
 }
 ?>
