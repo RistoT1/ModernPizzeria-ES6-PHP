@@ -10,15 +10,19 @@
         }
 
         // Fetch cart items from PHP
-        const res = await fetch("../api/fetchCart.php");
-        const data = await res.json();
-
-        if (!data.success || !data.items || data.items.length === 0) {
+        const res = await fetch("../api/main.php?kori&includeItems=true");
+        const result = await res.json();
+        if (!result.success) {
+            orderSummary.innerHTML = "<p>Tilauksen saaminen epäonnistui.</p>";
+            return;
+        }
+        console.log(result);
+        if (!result.data.items || result.data.items.length === 0) {
             orderSummary.innerHTML = "<p>Ostoskorisi on tyhjä.</p>";
             return;
         }
 
-        const cartItems = data.items;
+        const cartItems = result.data.items;
 
         // Build order summary
         let html = `<h2>Asiakas</h2>
@@ -28,7 +32,9 @@
             <h2>Tuotteet</h2><ul>`;
 
         cartItems.forEach(item => {
-            html += `<li>${item.Nimi} (${item.sizeName}) × ${item.quantity} — €${item.price.toFixed(2)}</li>`;
+            html += `<li>${item.Nimi} (${item.sizeName}) × ${item.quantity} -  ${item.quantity === 1
+                ? `Yksilöhinta ${item.unitPrice.toFixed(2)}€`
+                : `Kokonaishinta ${item.totalPrice.toFixed(2)}€`}</li>`;
         });
 
         html += "</ul>";
@@ -39,14 +45,16 @@
             // Haetaan CSRF-token meta-tagista
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            const response = await fetch("../api/insertTilaus.php", {
+            const payload = {
+                addTilaus: true,
+                ...customerData,   
+                csrf_token: csrfToken
+            };
+            const response = await fetch("../api/main.php?addTilaus", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "same-origin",
-                body: JSON.stringify({ 
-                    ...customerData,
-                    csrf_token: csrfToken // lähetetään token serverille
-                })
+                body: JSON.stringify(payload)
             });
 
             const result = await response.json();

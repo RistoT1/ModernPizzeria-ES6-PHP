@@ -30,6 +30,7 @@ require_once "addToCart.php";
 require_once "loginCheck.php";
 require_once "insertUser.php";
 require_once "logOut.php";
+require_once "insertTilaus.php";
 require_once "statusHelpper.php";
 
 // Handle request
@@ -55,6 +56,7 @@ $routes = [
         "kori" => "fetchCart"
     ],
     "POST" => [
+        "addTilaus" => "createOrder",
         "addItem" => "addCartItem",
         "login" => "handleLogin",
         "register" => "handleRegister",
