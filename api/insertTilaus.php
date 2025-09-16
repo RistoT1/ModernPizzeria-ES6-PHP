@@ -1,6 +1,6 @@
 <?php
 function createOrder($pdo, $input)
-{
+{ 
     $cartID = null;
     $asiakasID = $_SESSION['AsiakasID'] ?? null;
 
@@ -17,6 +17,7 @@ function createOrder($pdo, $input)
         [$tilausID, $totalPrice] = insertOrder($pdo, $asiakasID, $cartID);
 
         return [
+            "success" => true,
             "tilausID" => $tilausID,
             "asiakasID" => $asiakasID,
             "totalPrice" => $totalPrice
@@ -27,7 +28,10 @@ function createOrder($pdo, $input)
             $pdo->rollBack();
         }
         error_log("Tilausvirhe: " . $e->getMessage());
-        throw new Exception("Tilaus epäonnistui: " . $e->getMessage());
+        return [
+            "success" => false,
+            "error" => $e->getMessage()
+        ];
     }
 }
 
@@ -54,7 +58,8 @@ function getGuestInput($input)
         throw new Exception("CSRF-tarkistus epäonnistui", 403);
     }
 
-    $requiredFields = ["Enimi", "Snimi", "email", "puhelin", "osoite", "posti", "kaupunki"];
+    // Fixed field names to match what's being sent from frontend
+    $requiredFields = ["Enimi", "Snimi", "Email", "Puh", "Osoite", "PostiNum", "PostiTp"];
     foreach ($requiredFields as $field) {
         if (!isset($input[$field]) || trim($input[$field]) === "") {
             throw new Exception("Kenttiä puuttuu: $field");
@@ -64,11 +69,11 @@ function getGuestInput($input)
     return [
         "Enimi" => htmlspecialchars(trim($input["Enimi"])),
         "Snimi" => htmlspecialchars(trim($input["Snimi"])),
-        "email" => htmlspecialchars(trim($input["email"])),
-        "puhelin" => htmlspecialchars(trim($input["puhelin"])),
-        "osoite" => htmlspecialchars(trim($input["osoite"])),
-        "posti" => htmlspecialchars(trim($input["posti"])),
-        "kaupunki" => htmlspecialchars(trim($input["kaupunki"]))
+        "Email" => htmlspecialchars(trim($input["Email"])),  // Fixed: was "email"
+        "Puh" => htmlspecialchars(trim($input["Puh"])),     // Fixed: was "puhelin"
+        "Osoite" => htmlspecialchars(trim($input["Osoite"])),
+        "PostiNum" => htmlspecialchars(trim($input["PostiNum"])), // Fixed: was "posti"
+        "PostiTp" => htmlspecialchars(trim($input["PostiTp"]))    // Fixed: was "kaupunki"
     ];
 }
 
@@ -95,7 +100,7 @@ function getOrCreateCustomer($pdo, $asiakasID, $guestData = null)
     }
 
     $stmt = $pdo->prepare("SELECT AsiakasID FROM asiakkaat WHERE Email = ? AND Aktiivinen = 1");
-    $stmt->execute([$guestData["email"]]);
+    $stmt->execute([$guestData["Email"]]); // Fixed: was $guestData["email"]
     $existingCustomer = $stmt->fetchColumn();
 
     if ($existingCustomer) {
@@ -109,11 +114,11 @@ function getOrCreateCustomer($pdo, $asiakasID, $guestData = null)
     $stmt->execute([
         $guestData["Enimi"],
         $guestData["Snimi"],
-        $guestData["puhelin"],
-        $guestData["email"],
-        $guestData["osoite"],
-        $guestData["posti"],
-        $guestData["kaupunki"]
+        $guestData["Puh"],     // Fixed: was $guestData["puhelin"]
+        $guestData["Email"],   // Fixed: was $guestData["email"]
+        $guestData["Osoite"],  // Fixed: was $guestData["osoite"]
+        $guestData["PostiNum"], // Fixed: was $guestData["posti"]
+        $guestData["PostiTp"]   // Fixed: was $guestData["kaupunki"]
     ]);
 
     $newId = $pdo->lastInsertId();
@@ -176,3 +181,4 @@ function insertOrder($pdo, $asiakasID, $cartID)
 
     return [$tilausID, $totalPrice];
 }
+?>

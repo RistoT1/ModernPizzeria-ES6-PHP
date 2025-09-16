@@ -5,7 +5,7 @@ function handleRegister($pdo, $input) {
     }
 
     // Read input
-    $email = trim($input['email'] ?? '');
+    $email = strtolower(trim($input['email'] ?? ''));
     $password = $input['password'] ?? '';
     $confirmPassword = $input['confirm_password'] ?? '';
     $csrfToken = $input['csrf_token'] ?? '';

@@ -8,7 +8,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
 // Tarkista onko ostoskori olemassa ja siinä tuotteita
 if (!isset($_SESSION['cartID']) || empty($_SESSION['cartID'])) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
 }
 

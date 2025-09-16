@@ -1,7 +1,7 @@
 // kassa.js
 (async () => {
     try {
-        const customerData = JSON.parse(sessionStorage.getItem("customerData"));
+        let customerData = JSON.parse(sessionStorage.getItem("customerData"));
         const orderSummary = document.getElementById("orderSummary");
 
         if (!customerData) {
@@ -9,26 +9,30 @@
             return;
         }
 
-        // Fetch cart items from PHP
-        const res = await fetch("../api/main.php?kori&includeItems=true");
-        const result = await res.json();
-        if (!result.success) {
-            orderSummary.innerHTML = "<p>Tilauksen saaminen epäonnistui.</p>";
-            return;
-        }
-        console.log(result);
-        if (!result.data.items || result.data.items.length === 0) {
-            orderSummary.innerHTML = "<p>Ostoskorisi on tyhjä.</p>";
-            return;
-        }
+        // Fetch customer info from server if logged in
+        if (customerData.loggedIn) {
+            const res = await fetch("../api/main.php?asiakas", {
+                method: "GET",
+                credentials: "same-origin"
+            });
+            const result = await res.json();
+            console.log(result);
 
-        const cartItems = result.data.items;
+            if (result.success && result.data) {
+                customerData = { ...customerData, ...result.data };
+                console.log(customerData);
+            } else {
+                console.warn("Asiakastietojen haku epäonnistui, käytetään sessionDataa.");
+            }
+        }
 
         // Build order summary
+        const cartItems = JSON.parse(sessionStorage.getItem("cartItems")) || [];
+
         let html = `<h2>Asiakas</h2>
             <p>${customerData.Enimi} ${customerData.Snimi}</p>
-            <p>${customerData.email}, ${customerData.puhelin}</p>
-            <p>${customerData.osoite}, ${customerData.posti} ${customerData.kaupunki}</p>
+            <p>${customerData.Email}, ${customerData.Puh}</p>
+            <p>${customerData.Osoite}, ${customerData.PostiNum} ${customerData.PostiTp}</p>
             <h2>Tuotteet</h2><ul>`;
 
         cartItems.forEach(item => {
@@ -42,14 +46,14 @@
 
         // Handle payment button
         document.getElementById("payBtn").addEventListener("click", async () => {
-            // Haetaan CSRF-token meta-tagista
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             const payload = {
                 addTilaus: true,
-                ...customerData,   
+                ...customerData,
                 csrf_token: csrfToken
             };
+
             const response = await fetch("../api/main.php?addTilaus", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -58,12 +62,13 @@
             });
 
             const result = await response.json();
-            if (result.success) {
+            console.log(result);
+            if (result.success === true) {
                 alert("Tilaus vastaanotettu! Kiitos.");
                 sessionStorage.removeItem("customerData");
                 window.location.href = "../index.php";
             } else {
-                alert("Virhe: " + result.message);
+                alert("Virhe: " + result.error);
             }
         });
 

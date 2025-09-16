@@ -5,7 +5,6 @@ function handleLogin($pdo, $input)
         session_start();
     }
 
-    // Read input
     $email = trim($input['email'] ?? '');
     $password = $input['password'] ?? '';
 
@@ -13,7 +12,7 @@ function handleLogin($pdo, $input)
         throw new Exception("Email and password are required.", 400);
     }
 
-    // Login logic (same as your previous secure API)
+    //fetch
     $stmt = $pdo->prepare("SELECT AsiakasID, PasswordHash FROM asiakkaat WHERE Email = ? AND PasswordHash IS NOT NULL LIMIT 1");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);

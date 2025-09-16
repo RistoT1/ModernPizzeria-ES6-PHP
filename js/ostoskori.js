@@ -3,8 +3,8 @@ const validateDOMElements = () => {
     const elements = {
         cartItemContainer: document.getElementById("cartItems"),
         cartEmptyContainer: document.getElementById("cartEmpty"),
-        form: document.getElementById("info-form"),
-        inputs: document.querySelectorAll("#info-form input[required]"),
+        formGuest: document.getElementById("info-form-guest"),
+        formLoggedIn: document.getElementById("info-form-loggedin"),
         addressModal: document.getElementById("addressModal"),
         openAddressBtn: document.getElementById("openAddressModalBtn"),
         editAddressBtn: document.getElementById("editAddressBtn"),
@@ -18,22 +18,23 @@ const validateDOMElements = () => {
     };
 
     for (const [name, element] of Object.entries(elements)) {
-        if (!element) {
+        if (!element && !["formGuest","formLoggedIn"].includes(name)) {
             console.error(`Required DOM element not found: ${name}`);
             return false;
         }
     }
+
     return elements;
 };
 
-// --- DOM ---
-let DOM = {};
-
 // --- State ---
+let DOM = {};
 let savedAddress = null;
 
 // --- Render cart items ---
 const renderCartItems = (items) => {
+    if (!DOM.cartItemContainer) return;
+
     DOM.cartItemContainer.innerHTML = "";
 
     if (!items?.length) {
@@ -83,17 +84,18 @@ const fetchCartItems = async () => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const result = await response.json();
-        if (!result.success) throw new Error(result.message || "API palautti success: false");
+        if (!result.success) throw new Error(result.message || "API returned success: false");
         renderCartItems(result.data?.items || []);
-
     } catch (err) {
         console.error("Error fetching cart items:", err);
-        DOM.cartItemContainer.innerHTML = `
-            <div class="error-message">
-                <p>Virhe ladattaessa ostoskoria.</p>
-                <button onclick="location.reload()">Yritä uudelleen</button>
-            </div>
-        `;
+        if (DOM.cartItemContainer) {
+            DOM.cartItemContainer.innerHTML = `
+                <div class="error-message">
+                    <p>Virhe ladattaessa ostoskoria.</p>
+                    <button onclick="location.reload()">Yritä uudelleen</button>
+                </div>
+            `;
+        }
         DOM.cartEmptyContainer.style.display = "none";
     }
 };
@@ -119,7 +121,9 @@ const removeCartItem = async (cartId) => {
 
 // --- Address modal ---
 const openAddressModal = () => {
+    if (!DOM.addressModal) return;
     DOM.addressModal.style.display = "block";
+
     if (savedAddress) {
         DOM.streetInput.value = savedAddress.street;
         DOM.cityInput.value = savedAddress.city;
@@ -128,6 +132,7 @@ const openAddressModal = () => {
 };
 
 const closeAddressModal = () => {
+    if (!DOM.addressModal) return;
     DOM.addressModal.style.display = "none";
 };
 
@@ -142,92 +147,86 @@ const saveAddress = () => {
     }
 
     savedAddress = { street, city, postal };
-    DOM.addressInput.innerHTML = `
-        <div class="saved-address">
-            <strong>${street}</strong><br>
-            ${postal} ${city}
-        </div>
-    `;
+    if (DOM.addressInput) {
+        DOM.addressInput.innerHTML = `
+            <div class="saved-address">
+                <strong>${street}</strong><br>
+                ${postal} ${city}
+            </div>
+        `;
+    }
 
-    DOM.openAddressBtn.style.display = "none";
-    DOM.addressSection.style.display = "block";
+    if (DOM.openAddressBtn) DOM.openAddressBtn.style.display = "none";
+    if (DOM.addressSection) DOM.addressSection.style.display = "block";
     closeAddressModal();
 };
 
 // --- Form submit ---
 const handleFormSubmit = (e) => {
     e.preventDefault();
+    const isLoggedIn = document.getElementById("isLoggedIn")?.value === "1";
+    let customerData = {};
 
-    const customerData = {
-        Enimi: document.getElementById("Enimi").value.trim(),
-        Snimi: document.getElementById("Snimi").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        puhelin: document.getElementById("puhelin").value.trim(),
-        osoite: savedAddress ? savedAddress.street : "",
-        kaupunki: savedAddress ? savedAddress.city : "",
-        posti: savedAddress ? savedAddress.postal : "",
-    };
+    if (!isLoggedIn) {
+        customerData = {
+            Enimi: document.getElementById("Enimi")?.value.trim() || "",
+            Snimi: document.getElementById("Snimi")?.value.trim() || "",
+            Email: document.getElementById("email")?.value.trim() || "",
+            Puh: document.getElementById("puhelin")?.value.trim() || "",
+            Osoite: savedAddress?.street || "",
+            PostiNum: savedAddress?.postal || "",  
+            PostiTp: savedAddress?.city || "",     
+        };
+    } else {
+        customerData = { loggedIn: true };
+    }
 
     sessionStorage.setItem("customerData", JSON.stringify(customerData));
     window.location.href = "kassa.php";
 };
 
-// --- Notifications ---
-const showNotification = (msg, type = "info") => {
-    const n = document.createElement("div");
-    n.className = `notification notification-${type}`;
-    n.textContent = msg;
-    document.body.appendChild(n);
-    setTimeout(() => {
-        if (n.parentNode) n.parentNode.removeChild(n);
-    }, 3000);
-};
-
-// --- Cart counter ---
-const updateCartCounter = (qty) => {
-    const counter = document.querySelector(".cart-counter");
-    if (!counter) return;
-
-    const count = parseInt(qty) || 0;
-    counter.textContent = count;
-    counter.style.display = count > 0 ? "inline-block" : "none";
-};
-
-// --- Event listeners ---
+// --- Setup event listeners ---
 const setupEventListeners = () => {
-    // Remove from cart
-    DOM.cartItemContainer.addEventListener("click", (e) => {
-        const btn = e.target.closest(".cart-item-remove");
-        if (btn && confirm("Haluatko varmasti poistaa tämän tuotteen korista?")) {
-            removeCartItem(btn.dataset.cartId);
-        }
-    });
+    if (DOM.cartItemContainer) {
+        DOM.cartItemContainer.addEventListener("click", (e) => {
+            const btn = e.target.closest(".cart-item-remove");
+            if (btn && confirm("Haluatko varmasti poistaa tämän tuotteen korista?")) {
+                removeCartItem(btn.dataset.cartId);
+            }
+        });
+    }
 
-    // Address modal
-    DOM.openAddressBtn.addEventListener("click", openAddressModal);
-    DOM.editAddressBtn.addEventListener("click", openAddressModal);
-    DOM.closeModalBtn.addEventListener("click", closeAddressModal);
-    DOM.saveAddressBtn.addEventListener("click", saveAddress);
+    if (DOM.openAddressBtn) DOM.openAddressBtn.addEventListener("click", openAddressModal);
+    if (DOM.editAddressBtn) DOM.editAddressBtn.addEventListener("click", openAddressModal);
+    if (DOM.closeModalBtn) DOM.closeModalBtn.addEventListener("click", closeAddressModal);
+    if (DOM.saveAddressBtn) DOM.saveAddressBtn.addEventListener("click", saveAddress);
 
     window.addEventListener("click", (e) => {
         if (e.target === DOM.addressModal) closeAddressModal();
     });
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && DOM.addressModal.style.display === "block") closeAddressModal();
+        if (e.key === "Escape" && DOM.addressModal?.style.display === "block") closeAddressModal();
     });
 
-    // Input validation
-    DOM.inputs.forEach((input) => {
-        input.addEventListener("blur", function () {
-            this.style.borderColor = this.value.trim() ? "#28a745" : "#dc3545";
+    // Guest form inputs validation
+    if (DOM.formGuest) {
+        const inputs = DOM.formGuest.querySelectorAll("input[required]");
+        inputs.forEach((input) => {
+            input.addEventListener("blur", () => {
+                input.style.borderColor = input.value.trim() ? "#28a745" : "#dc3545";
+            });
         });
-    });
 
-    // Form submission
-    DOM.form.addEventListener("submit", handleFormSubmit);
+        DOM.formGuest.addEventListener("submit", handleFormSubmit);
+    }
+
+    // Logged-in form
+    if (DOM.formLoggedIn) {
+        DOM.formLoggedIn.addEventListener("submit", handleFormSubmit);
+    }
 };
 
-// --- Init ---
+// --- Initialize page ---
 const initializePage = async () => {
     try {
         DOM = validateDOMElements();
@@ -236,14 +235,14 @@ const initializePage = async () => {
         setupEventListeners();
         await fetchCartItems();
 
-        console.log("Cart page initialization complete");
+        console.log("Cart page initialized successfully");
     } catch (error) {
         console.error("Initialization failed:", error);
-        showNotification("Sivun lataus epäonnistui", "error");
+        alert("Sivun lataus epäonnistui");
     }
 };
 
-// --- Start when DOM is ready ---
+// --- Start ---
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializePage);
 } else {
