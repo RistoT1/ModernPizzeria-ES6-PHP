@@ -12,29 +12,38 @@ function handleRegister($pdo, $input) {
 
     // CSRF check
     if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
-        http_response_code(403);
-        return ["error" => "Invalid CSRF token."];
+        throw new Exception("Invalid CSRF token.", 403);
     }
 
     // Validate inputs
     if (!$email || !$password || !$confirmPassword) {
-        http_response_code(400);
-        return ["error" => "Missing form data."];
+        throw new Exception("Missing form data.", 400);
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        http_response_code(400);
-        return ["error" => "Invalid email format."];
+        throw new Exception("Invalid email format.", 400);
     }
 
     if ($password !== $confirmPassword) {
-        http_response_code(400);
-        return ["error" => "Passwords do not match."];
+        throw new Exception("Passwords do not match.", 400);
     }
 
-    if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/", $password)) {
-        http_response_code(400);
-        return ["error" => "Password does not meet strength requirements."];
+    if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,128}$/", $password)) {
+        throw new Exception("Password does not meet strength requirements lenght 8-128.", 400);
+    }
+
+    // Check if email already exists BEFORE hashing password
+    try {
+        $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM asiakkaat WHERE Email = :email");
+        $checkStmt->execute([':email' => $email]);
+        $emailExists = $checkStmt->fetchColumn() > 0;
+        
+        if ($emailExists) {
+            throw new Exception("Email already registered.", 409);
+        }
+    } catch (PDOException $e) {
+        error_log("Database error checking email: " . $e->getMessage());
+        throw new Exception("Database error.", 500);
     }
 
     // Hash password
@@ -47,19 +56,16 @@ function handleRegister($pdo, $input) {
             ':password' => $hashedPassword
         ]);
 
-        http_response_code(201);
         return [
             "message" => "Account created successfully!",
             "redirect" => "../index.php"
         ];
     } catch (PDOException $e) {
-        if ($e->getCode() == 23000) { // Duplicate email
-            http_response_code(409);
-            return ["error" => "Email already registered."];
+        if ($e->getCode() == 23000) { // Duplicate email (backup check)
+            throw new Exception("Email already registered.", 409);
         }
-        http_response_code(500);
         error_log("Database error: " . $e->getMessage());
-        return ["error" => "Database error."];
+        throw new Exception("Database error.", 500);
     }
 }
 ?>

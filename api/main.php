@@ -42,10 +42,11 @@ if ($method === 'POST') {
     $input = $_GET;
 }
 
+// Enhanced debug logging
 $debugFile = __DIR__ . '/debug.log';
-file_put_contents(__DIR__ . '/debug.log', "[" . date("Y-m-d H:i:s") . "] SESSION: " . json_encode($_SESSION) . "\n", FILE_APPEND);
-
-
+file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] METHOD: $method\n", FILE_APPEND);
+file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] INPUT: " . json_encode($input) . "\n", FILE_APPEND);
+file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] SESSION: " . json_encode($_SESSION) . "\n", FILE_APPEND);
 
 // Define routes
 $routes = [
@@ -69,7 +70,14 @@ $routes = [
 try {
     $handled = false;
 
-    foreach ($routes[$method] ?? [] as $param => $function) {
+    // Check if we have routes for this method
+    if (!isset($routes[$method])) {
+        http_response_code(405);
+        echo json_encode(apiError("Method $method not allowed"));
+        exit;
+    }
+
+    foreach ($routes[$method] as $param => $function) {
         if (array_key_exists($param, $input)) {
             if (!function_exists($function)) {
                 http_response_code(500);
@@ -86,8 +94,13 @@ try {
 
     if (!$handled) {
         http_response_code(404);
-        echo json_encode(apiError("Unknown endpoint"));
+        // Add more debug info
+        $availableParams = implode(', ', array_keys($routes[$method]));
+        $receivedParams = implode(', ', array_keys($input));
+        echo json_encode(apiError("Unknown endpoint. Available: [$availableParams]. Received: [$receivedParams]"));
     }
 } catch (Exception $e) {
-    echo json_encode(apiError($e->getMessage(), $e->getCode() ?: 500));
+    http_response_code($e->getCode() ?: 500);
+    echo json_encode(apiError($e->getMessage()));
 }
+?>
