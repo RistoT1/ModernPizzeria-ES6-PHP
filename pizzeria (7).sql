@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 02.09.2025 klo 17:50
+-- Generation Time: 16.09.2025 klo 17:02
 -- Palvelimen versio: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -30,35 +30,49 @@ SET time_zone = "+00:00";
 CREATE TABLE `aineosat` (
   `AinesosaID` smallint(5) UNSIGNED NOT NULL,
   `Nimi` varchar(100) NOT NULL,
-  `Hinta` decimal(4,2) DEFAULT 0.00,
-  `Aktiivinen` tinyint(1) DEFAULT 1
+  `Tyyppi` enum('pizza','extra','both') DEFAULT 'both',
+  `Hinta` decimal(6,2) DEFAULT 0.00,
+  `Yksikko` varchar(20) DEFAULT 'kpl',
+  `Kuvaus` varchar(200) DEFAULT NULL,
+  `Kuva` varchar(255) DEFAULT NULL,
+  `Aktiivinen` tinyint(1) DEFAULT 1,
+  `Jarjestys` smallint(5) UNSIGNED DEFAULT 999
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Vedos taulusta `aineosat`
 --
 
-INSERT INTO `aineosat` (`AinesosaID`, `Nimi`, `Hinta`, `Aktiivinen`) VALUES
-(1, 'Mozzarella', 0.00, 1),
-(2, 'Tomaattikastike', 0.00, 1),
-(3, 'Pepperoni', 0.00, 1),
-(4, 'Herkkusieni', 0.00, 1),
-(5, 'Sipuli', 0.00, 1),
-(6, 'Vihreä paprika', 0.00, 1),
-(7, 'Mustat oliivit', 0.00, 1),
-(8, 'Basilika', 0.00, 1),
-(9, 'Oregano', 0.00, 1),
-(10, 'Parmesaani', 0.00, 1),
-(11, 'Kinkku', 0.00, 1),
-(12, 'Ananas', 0.00, 1),
-(13, 'Pinaatti', 0.00, 1),
-(14, 'Valkosipuli', 0.00, 1),
-(15, 'Anjovis', 0.00, 1),
-(16, 'Makkara', 0.00, 1),
-(17, 'Kirsikkatomaatti', 0.00, 1),
-(18, 'Latva-artisokka', 0.00, 1),
-(19, 'Ricotta', 0.00, 1),
-(20, 'Chilihiutaleet', 0.00, 1);
+INSERT INTO `aineosat` (`AinesosaID`, `Nimi`, `Tyyppi`, `Hinta`, `Yksikko`, `Kuvaus`, `Kuva`, `Aktiivinen`, `Jarjestys`) VALUES
+(1, 'Mozzarella', 'pizza', 0.00, 'g', 'Klassinen pizzajuusto', NULL, 1, 1),
+(2, 'Tomaattikastike', 'pizza', 0.00, 'ml', 'Perinteinen pizzapohja', NULL, 1, 2),
+(3, 'Pepperoni', 'pizza', 0.00, 'g', 'Maukas makkaratäyte', NULL, 1, 10),
+(4, 'Herkkusieni', 'pizza', 0.00, 'g', 'Tuoreita sieniä', NULL, 1, 20),
+(5, 'Sipuli', 'pizza', 0.00, 'g', 'Kuutioitua sipulia', NULL, 1, 21),
+(6, 'Vihreä paprika', 'pizza', 0.00, 'g', 'Raikasta paprikaa', NULL, 1, 22),
+(7, 'Mustat oliivit', 'pizza', 0.00, 'g', 'Välimerellisiä makuja', NULL, 1, 23),
+(8, 'Basilika', 'pizza', 0.00, 'g', 'Tuoretta basilikaa', NULL, 1, 3),
+(9, 'Oregano', 'pizza', 0.00, 'g', 'Kuivattua oreganoa', NULL, 1, 4),
+(10, 'Parmesaani', 'pizza', 0.00, 'g', 'Raastettua parmesaania', NULL, 1, 5),
+(11, 'Kinkku', 'pizza', 0.00, 'g', 'Hienoa kinkkua', NULL, 1, 11),
+(12, 'Ananas', 'pizza', 0.00, 'g', 'Makeaa ananasta', NULL, 1, 24),
+(13, 'Pinaatti', 'pizza', 0.00, 'g', 'Tuoretta pinaattia', NULL, 1, 25),
+(14, 'Valkosipuli', 'pizza', 0.00, 'g', 'Aromikasta valkosipulia', NULL, 1, 6),
+(15, 'Anjovis', 'pizza', 0.00, 'g', 'Suolaista anjovista', NULL, 1, 26),
+(16, 'Makkara', 'pizza', 0.00, 'g', 'Grillimakkaraa', NULL, 1, 12),
+(17, 'Kirsikkatomaatti', 'pizza', 0.00, 'g', 'Pieniä kirsikkatomaatteja', NULL, 1, 27),
+(18, 'Latva-artisokka', 'pizza', 0.00, 'g', 'Gourmet-täytettä', NULL, 1, 28),
+(19, 'Ricotta', 'pizza', 0.00, 'g', 'Pehmeää ricotta-juustoa', NULL, 1, 7),
+(20, 'Chilihiutaleet', 'pizza', 0.00, 'g', 'Tulista chiliä', NULL, 1, 8),
+(100, 'Coca-Cola 0,5l', 'extra', 2.50, 'kpl', 'Virvoke', 'coca_cola.jpg', 1, 100),
+(101, 'Vesi 0,5l', 'extra', 1.50, 'kpl', 'Kivennäisvesi', 'water.jpg', 1, 101),
+(102, 'Valkosipulileipä', 'extra', 4.00, 'kpl', 'Tuoretta leipää valkosipulivoidetta', 'garlic_bread.jpg', 1, 102),
+(103, 'Salaatti', 'extra', 3.50, 'kpl', 'Sekavihannes salaatti', 'salad.jpg', 1, 103),
+(104, 'Tiramisu', 'extra', 5.50, 'kpl', 'Klassinen italialainen jälkiruoka', 'tiramisu.jpg', 1, 104),
+(105, 'Ranskalaiset perunat', 'extra', 3.00, 'kpl', 'Rapeat ranskalaiset', 'fries.jpg', 1, 105),
+(106, 'Sipulirenkaat', 'extra', 3.50, 'kpl', 'Paneroidut sipulirenkaat', 'onion_rings.jpg', 1, 106),
+(107, 'Mozzarella sticks', 'extra', 4.50, 'kpl', 'Friteerattuja juustotikkuja', 'mozzarella_sticks.jpg', 1, 107),
+(108, 'Chicken wings', 'extra', 6.00, 'kpl', 'BBQ-marinoidut siivet', 'chicken_wings.jpg', 1, 108);
 
 -- --------------------------------------------------------
 
@@ -68,7 +82,7 @@ INSERT INTO `aineosat` (`AinesosaID`, `Nimi`, `Hinta`, `Aktiivinen`) VALUES
 
 CREATE TABLE `asiakkaat` (
   `AsiakasID` int(10) UNSIGNED NOT NULL,
-  `Enimi` varchar(100) NOT NULL,
+  `Enimi` varchar(50) DEFAULT NULL,
   `Snimi` varchar(50) DEFAULT NULL,
   `Puh` varchar(20) DEFAULT NULL,
   `Email` varchar(100) DEFAULT NULL,
@@ -87,11 +101,12 @@ CREATE TABLE `asiakkaat` (
 
 INSERT INTO `asiakkaat` (`AsiakasID`, `Enimi`, `Snimi`, `Puh`, `Email`, `Osoite`, `PostiNum`, `PostiTp`, `LiitymisPvm`, `MuokattuvPvm`, `Aktiivinen`, `PasswordHash`) VALUES
 (1, 'Testi', 'Käyttäjä', '+358401234567', 'testi@example.com', 'Testikatu 1', '48100', 'Kotka', '2025-08-31', '2025-08-31 15:38:11', 1, NULL),
-(4, 'nimi', 'Toivanen', '0449787395', 'ristotoiv.rt@gmail.com', 'Huuhankatu 9 A 10', '70600', 'Kuopio', '2025-09-02', '2025-09-02 04:20:08', 1, NULL),
-(15, 'nimia', 'Toivanena', '0449787394', 'ristotoiv.rta@gmail.com', 'Huuhankatu 9 A 10a', '70600', 'Kuopioa', '2025-09-02', '2025-09-02 13:20:51', 1, NULL),
-(17, '', NULL, NULL, 'ristotoiav.rt@gmail.com', NULL, NULL, NULL, '2025-09-02', '2025-09-02 15:34:19', 1, '$2y$10$8ju/5TN/YLOm3oXCMVfiK.fa7T1ZyiSRx8R4QW/XsjgeRiUjBD6FG'),
-(18, '', NULL, NULL, 'ristotoiva.rt@gmail.com', NULL, NULL, NULL, '2025-09-02', '2025-09-02 15:36:32', 1, '$2y$10$ZDN74Fb3hbT5CPO.v1xdh.iiWOYZA6AOANGbwOa3VlSgUufR.NyIG'),
-(21, '', NULL, NULL, 'ristotoiv.rtaa@gmail.com', NULL, NULL, NULL, '2025-09-02', '2025-09-02 15:43:27', 1, '$2y$10$Wndf3OpXQ/3s1lXAc1yH/.qJ3ALRyrY8Pt/2egysDkNV6LmZnW7xa');
+(4, 'Risto', 'Toivanen', '0449787395', 'risto.toivanen@gmail.com', 'Huuhankatu 9 A 10', '70600', 'Kuopio', '2025-09-02', '2025-09-02 04:20:08', 1, '$2y$10$example_hash_here'),
+(15, 'Marja', 'Virtanen', '0401234567', 'marja.virtanen@gmail.com', 'Keskuskatu 5', '00100', 'Helsinki', '2025-09-02', '2025-09-02 13:20:51', 1, '$2y$10$example_hash_here2'),
+(26, NULL, NULL, NULL, 'ristotoiva.rt@gmail.com', NULL, NULL, NULL, '2025-09-10', '2025-09-16 11:12:19', 1, '$2y$10$SGbCNUqW6q8uJmixiTm74ezsWzVaLPabvbIDjqksYKuzfi3CWdlI2'),
+(27, 'nimi', 'Toivanen', '0449787395', 'ristotoiv.rt@gmail.com', 'Huuhankatu 9 A 10', '70600', 'Kuopio', '2025-09-15', '2025-09-15 10:33:20', 1, NULL),
+(34, NULL, NULL, NULL, 'ristotoivaa.rt@gmail.com', NULL, NULL, NULL, '2025-09-16', '2025-09-16 14:46:52', 1, '$2y$10$1enjkD7KW2c494zzEEVJyete9EwTdy4u5q2VX2/4J5Xar9C83kTIu'),
+(35, NULL, NULL, NULL, 'ristotoivaaa.rt@gmail.com', NULL, NULL, NULL, '2025-09-16', '2025-09-16 14:47:31', 1, '$2y$10$gKaKlNDqSVFd7MhgRIY7oOLmhXCUezY6nhs1OTA4lmKOJQo65TovK');
 
 -- --------------------------------------------------------
 
@@ -146,30 +161,6 @@ INSERT INTO `kuljettajat` (`KuljettajaID`, `Enimi`, `Snimi`, `Puh`, `Email`, `Os
 -- --------------------------------------------------------
 
 --
--- Rakenne taululle `lisat`
---
-
-CREATE TABLE `lisat` (
-  `LisaID` smallint(5) UNSIGNED NOT NULL,
-  `Nimi` varchar(100) NOT NULL,
-  `Hinta` decimal(8,2) DEFAULT NULL,
-  `Aktiivinen` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Vedos taulusta `lisat`
---
-
-INSERT INTO `lisat` (`LisaID`, `Nimi`, `Hinta`, `Aktiivinen`) VALUES
-(1, 'Coca-Cola 0,5l', 2.50, 1),
-(2, 'Vesi 0,5l', 1.50, 1),
-(3, 'Valkosipulileipä', 4.00, 1),
-(4, 'Salaatti', 3.50, 1),
-(5, 'Tiramisu', 5.50, 1);
-
--- --------------------------------------------------------
-
---
 -- Rakenne taululle `ostoskori`
 --
 
@@ -186,7 +177,14 @@ CREATE TABLE `ostoskori` (
 --
 
 INSERT INTO `ostoskori` (`OstoskoriID`, `GuestToken`, `AsiakasID`, `CreatedAt`, `UpdatedAt`) VALUES
-(12, 'e4b5c3a2a8ae17304e8ce3a6fa8a1375', NULL, '2025-09-02 13:20:52', '2025-09-02 14:27:26');
+(20, NULL, 1, '2025-09-03 03:31:06', '2025-09-03 03:31:06'),
+(38, NULL, 4, '2025-09-03 16:00:19', '2025-09-03 16:00:42'),
+(48, 'e4b5c3a2a8ae17304e8ce3a6fa8a1375', NULL, '2025-09-11 11:16:43', '2025-09-11 11:17:25'),
+(52, 'ba5c84f904f940de6244cb21d9f2ab16', NULL, '2025-09-12 09:26:27', '2025-09-12 09:26:27'),
+(54, NULL, 27, '2025-09-15 10:33:22', '2025-09-15 10:33:22'),
+(56, '7367213cd89a841844bb424d4d2a232c', NULL, '2025-09-15 10:33:50', '2025-09-15 10:33:50'),
+(70, NULL, 26, '2025-09-16 14:39:47', '2025-09-16 14:39:47'),
+(73, NULL, 34, '2025-09-16 14:48:03', '2025-09-16 14:48:06');
 
 -- --------------------------------------------------------
 
@@ -198,20 +196,19 @@ CREATE TABLE `ostoskori_rivit` (
   `OstoskoriRivitID` int(10) UNSIGNED NOT NULL,
   `OstoskoriID` int(10) UNSIGNED NOT NULL,
   `PizzaID` smallint(5) UNSIGNED DEFAULT NULL,
-  `LisaID` smallint(5) UNSIGNED DEFAULT NULL,
+  `AinesosaID` smallint(5) UNSIGNED DEFAULT NULL,
   `KokoID` tinyint(3) UNSIGNED DEFAULT NULL,
   `Maara` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
   `Hinta` decimal(10,2) NOT NULL DEFAULT 0.00
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Vedos taulusta `ostoskori_rivit`
 --
 
-INSERT INTO `ostoskori_rivit` (`OstoskoriRivitID`, `OstoskoriID`, `PizzaID`, `LisaID`, `KokoID`, `Maara`, `Hinta`) VALUES
-(22, 12, 3, NULL, 2, 2, 17.00),
-(23, 12, 2, NULL, 2, 1, 9.00),
-(24, 12, 1, NULL, 2, 1, 7.50);
+INSERT INTO `ostoskori_rivit` (`OstoskoriRivitID`, `OstoskoriID`, `PizzaID`, `AinesosaID`, `KokoID`, `Maara`, `Hinta`) VALUES
+(53, 48, 2, NULL, 2, 2, 18.00),
+(72, 73, 2, NULL, 2, 1, 9.00);
 
 -- --------------------------------------------------------
 
@@ -236,15 +233,15 @@ CREATE TABLE `pizzat` (
 
 INSERT INTO `pizzat` (`PizzaID`, `Nimi`, `Pohja`, `Tiedot`, `Hinta`, `Kuva`, `Aktiivinen`, `Suosio`) VALUES
 (1, 'Margherita', 'Ohut', 'Tomaatin ja juuston klassikko', 7.50, 'margherita.jpg', 1, 0),
-(2, 'Pepperoni', 'Ohut', 'Pepperoni, juusto ja tomaattikastike', 9.00, 'margherita.jpg', 1, 0),
-(3, 'Hawaii', 'Paksu', 'Kinkku ja ananas', 8.50, 'margherita.jpg', 1, 0),
-(4, 'Veggie', 'Ohut', 'Kasviksia ja juustoa', 8.00, 'margherita.jpg', 1, 0),
-(5, 'BBQ Chicken', 'Paksu', 'BBQ-kanaa ja juustoa', 10.00, 'margherita.jpg', 1, 0),
-(6, 'Four Cheese', 'Ohut', 'Neljä erilaista juustoa', 9.50, 'margherita.jpg', 1, 0),
-(7, 'Meat Lovers', 'Paksu', 'Sekoitus lihaa', 11.00, 'margherita.jpg', 1, 0),
-(8, 'Seafood', 'Ohut', 'Katkarapuja ja tonnikalaa', 12.00, 'margherita.jpg', 1, 0),
-(9, 'Mushroom', 'Ohut', 'Sieniä ja juustoa', 8.00, 'margherita.jpg', 1, 0),
-(10, 'Spicy Italian', 'Paksu', 'Tulinen salami ja paprika', 9.50, 'margherita.jpg', 1, 0);
+(2, 'Pepperoni', 'Ohut', 'Pepperoni, juusto ja tomaattikastike', 9.00, 'pepperoni.jpg', 1, 0),
+(3, 'Hawaii', 'Paksu', 'Kinkku ja ananas', 8.50, 'hawaii.jpg', 1, 0),
+(4, 'Veggie', 'Ohut', 'Kasviksia ja juustoa', 8.00, 'veggie.jpg', 1, 0),
+(5, 'BBQ Chicken', 'Paksu', 'BBQ-kanaa ja juustoa', 10.00, 'bbq_chicken.jpg', 1, 0),
+(6, 'Four Cheese', 'Ohut', 'Neljä erilaista juustoa', 9.50, 'four_cheese.jpg', 1, 0),
+(7, 'Meat Lovers', 'Paksu', 'Sekoitus lihaa', 11.00, 'meat_lovers.jpg', 1, 0),
+(8, 'Seafood', 'Ohut', 'Katkarapuja ja tonnikalaa', 12.00, 'seafood.jpg', 1, 0),
+(9, 'Mushroom', 'Ohut', 'Sieniä ja juustoa', 8.00, 'mushroom.jpg', 1, 0),
+(10, 'Spicy Italian', 'Paksu', 'Tulinen salami ja paprika', 9.50, 'spicy_italian.jpg', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -265,45 +262,45 @@ CREATE TABLE `pizza_aineosat` (
 INSERT INTO `pizza_aineosat` (`palID`, `PizzaID`, `AinesosaID`) VALUES
 (1, 1, 1),
 (2, 1, 2),
-(3, 1, 18),
-(4, 1, 19),
+(3, 1, 8),
+(4, 1, 9),
 (5, 2, 1),
 (6, 2, 2),
 (7, 2, 3),
 (8, 3, 1),
 (9, 3, 2),
-(10, 3, 4),
-(11, 3, 5),
+(10, 3, 11),
+(11, 3, 12),
 (12, 4, 1),
 (13, 4, 2),
-(14, 4, 6),
-(15, 4, 7),
-(16, 4, 8),
-(17, 4, 16),
+(14, 4, 4),
+(15, 4, 5),
+(16, 4, 6),
+(17, 4, 7),
 (18, 5, 1),
-(20, 5, 7),
-(21, 5, 8),
-(19, 5, 9),
+(19, 5, 2),
+(20, 5, 5),
+(21, 5, 6),
 (22, 6, 1),
-(25, 6, 2),
-(23, 6, 10),
-(24, 6, 11),
+(23, 6, 2),
+(24, 6, 10),
+(25, 6, 19),
 (26, 7, 1),
 (27, 7, 2),
 (28, 7, 3),
-(29, 7, 4),
-(30, 7, 12),
+(29, 7, 11),
+(30, 7, 16),
 (31, 8, 1),
 (32, 8, 2),
-(33, 8, 13),
-(34, 8, 14),
+(34, 8, 7),
+(33, 8, 15),
 (35, 9, 1),
 (36, 9, 2),
-(37, 9, 6),
+(37, 9, 4),
 (38, 10, 1),
 (39, 10, 2),
-(41, 10, 8),
-(40, 10, 12),
+(40, 10, 3),
+(41, 10, 6),
 (42, 10, 20);
 
 -- --------------------------------------------------------
@@ -327,24 +324,24 @@ CREATE TABLE `tilaukset` (
 --
 
 INSERT INTO `tilaukset` (`TilausID`, `AsiakasID`, `KuljettajaID`, `TilausPvm`, `Status`, `Kokonaishinta`, `Kommentit`) VALUES
-(6, 4, NULL, '2025-09-02 13:17:43', 'Odottaa', 23.80, NULL),
-(7, 4, NULL, '2025-09-02 13:19:07', 'Odottaa', 7.50, NULL),
-(8, 4, NULL, '2025-09-02 13:19:32', 'Odottaa', 9.00, NULL),
-(9, 15, NULL, '2025-09-02 13:20:51', 'Odottaa', 7.50, NULL);
+(30, 27, NULL, '2025-09-16 12:00:09', 'Odottaa', 9.00, NULL),
+(31, 27, NULL, '2025-09-16 12:01:53', 'Odottaa', 76.80, NULL),
+(32, 26, NULL, '2025-09-16 14:39:46', 'Odottaa', 8.50, NULL),
+(33, 34, NULL, '2025-09-16 14:48:02', 'Odottaa', 9.00, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Rakenne taululle `tilausrivit_lisat`
+-- Rakenne taululle `tilausrivit_aineosat`
 --
 
-CREATE TABLE `tilausrivit_lisat` (
-  `TilausrivitLisaID` int(10) UNSIGNED NOT NULL,
+CREATE TABLE `tilausrivit_aineosat` (
+  `TilausrivitAinesosaID` int(10) UNSIGNED NOT NULL,
   `TilausID` int(10) UNSIGNED NOT NULL,
-  `LisaID` smallint(5) UNSIGNED NOT NULL,
+  `AinesosaID` smallint(5) UNSIGNED NOT NULL,
   `Maara` tinyint(3) UNSIGNED NOT NULL,
   `Hinta` decimal(6,2) NOT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -359,18 +356,37 @@ CREATE TABLE `tilausrivit_pizzat` (
   `KokoID` tinyint(3) UNSIGNED NOT NULL,
   `Maara` tinyint(3) UNSIGNED NOT NULL,
   `Hinta` decimal(6,2) NOT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Vedos taulusta `tilausrivit_pizzat`
 --
 
 INSERT INTO `tilausrivit_pizzat` (`TilausrivitPizzaID`, `TilausID`, `PizzaID`, `KokoID`, `Maara`, `Hinta`) VALUES
-(7, 6, 1, 2, 2, 15.00),
-(8, 6, 7, 1, 1, 8.80),
-(9, 7, 1, 2, 1, 7.50),
-(10, 8, 2, 2, 1, 9.00),
-(11, 9, 1, 2, 1, 7.50);
+(34, 30, 2, 2, 1, 9.00),
+(35, 31, 1, 2, 4, 30.00),
+(36, 31, 2, 3, 4, 46.80),
+(37, 32, 3, 2, 1, 8.50),
+(38, 33, 2, 2, 1, 9.00);
+
+-- --------------------------------------------------------
+
+--
+-- Näkymän vararakenne `v_aineosat_tyypeittain`
+-- (See below for the actual view)
+--
+CREATE TABLE `v_aineosat_tyypeittain` (
+`AinesosaID` smallint(5) unsigned
+,`Nimi` varchar(100)
+,`Tyyppi` enum('pizza','extra','both')
+,`Hinta` decimal(6,2)
+,`Yksikko` varchar(20)
+,`Kuvaus` varchar(200)
+,`Kuva` varchar(255)
+,`Aktiivinen` tinyint(1)
+,`Jarjestys` smallint(5) unsigned
+,`TyyppiKuvaus` varchar(14)
+);
 
 -- --------------------------------------------------------
 
@@ -400,7 +416,7 @@ CREATE TABLE `v_tilaukset_yhteenveto` (
 `TilausID` int(10) unsigned
 ,`TilausPvm` timestamp
 ,`Status` enum('Odottaa','Vahvistettu','Valmistuksessa','Kuljetuksessa','Toimitettu','Peruutettu')
-,`AsiakasNimi` varchar(151)
+,`AsiakasNimi` varchar(101)
 ,`AsiakasPuh` varchar(20)
 ,`AsiakasEmail` varchar(100)
 ,`KuljettajaNimi` varchar(151)
@@ -411,11 +427,20 @@ CREATE TABLE `v_tilaukset_yhteenveto` (
 -- --------------------------------------------------------
 
 --
+-- Näkymän rakenne `v_aineosat_tyypeittain`
+--
+DROP TABLE IF EXISTS `v_aineosat_tyypeittain`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_aineosat_tyypeittain`  AS SELECT `aineosat`.`AinesosaID` AS `AinesosaID`, `aineosat`.`Nimi` AS `Nimi`, `aineosat`.`Tyyppi` AS `Tyyppi`, `aineosat`.`Hinta` AS `Hinta`, `aineosat`.`Yksikko` AS `Yksikko`, `aineosat`.`Kuvaus` AS `Kuvaus`, `aineosat`.`Kuva` AS `Kuva`, `aineosat`.`Aktiivinen` AS `Aktiivinen`, `aineosat`.`Jarjestys` AS `Jarjestys`, CASE WHEN `aineosat`.`Tyyppi` = 'pizza' THEN 'Pizza-aineosat' WHEN `aineosat`.`Tyyppi` = 'extra' THEN 'Lisätuotteet' ELSE 'Molemmat' END AS `TyyppiKuvaus` FROM `aineosat` WHERE `aineosat`.`Aktiivinen` = 1 ORDER BY `aineosat`.`Tyyppi` ASC, `aineosat`.`Jarjestys` ASC, `aineosat`.`Nimi` ASC ;
+
+-- --------------------------------------------------------
+
+--
 -- Näkymän rakenne `v_pizzat_aineosat`
 --
 DROP TABLE IF EXISTS `v_pizzat_aineosat`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_pizzat_aineosat`  AS SELECT `p`.`PizzaID` AS `PizzaID`, `p`.`Nimi` AS `PizzaNimi`, `p`.`Pohja` AS `Pohja`, `p`.`Tiedot` AS `Tiedot`, `p`.`Hinta` AS `Hinta`, `p`.`Kuva` AS `Kuva`, `p`.`Aktiivinen` AS `Aktiivinen`, group_concat(`a`.`Nimi` order by `a`.`Nimi` ASC separator ', ') AS `Aineosat`, count(`pa`.`AinesosaID`) AS `AinesosaMaara` FROM ((`pizzat` `p` left join `pizza_aineosat` `pa` on(`p`.`PizzaID` = `pa`.`PizzaID`)) left join `aineosat` `a` on(`pa`.`AinesosaID` = `a`.`AinesosaID` and `a`.`Aktiivinen` = 1)) WHERE `p`.`Aktiivinen` = 1 GROUP BY `p`.`PizzaID` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_pizzat_aineosat`  AS SELECT `p`.`PizzaID` AS `PizzaID`, `p`.`Nimi` AS `PizzaNimi`, `p`.`Pohja` AS `Pohja`, `p`.`Tiedot` AS `Tiedot`, `p`.`Hinta` AS `Hinta`, `p`.`Kuva` AS `Kuva`, `p`.`Aktiivinen` AS `Aktiivinen`, group_concat(`a`.`Nimi` order by `a`.`Jarjestys` ASC,`a`.`Nimi` ASC separator ', ') AS `Aineosat`, count(`pa`.`AinesosaID`) AS `AinesosaMaara` FROM ((`pizzat` `p` left join `pizza_aineosat` `pa` on(`p`.`PizzaID` = `pa`.`PizzaID`)) left join `aineosat` `a` on(`pa`.`AinesosaID` = `a`.`AinesosaID` and `a`.`Aktiivinen` = 1)) WHERE `p`.`Aktiivinen` = 1 GROUP BY `p`.`PizzaID` ;
 
 -- --------------------------------------------------------
 
@@ -424,7 +449,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v_tilaukset_yhteenveto`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_tilaukset_yhteenveto`  AS SELECT `t`.`TilausID` AS `TilausID`, `t`.`TilausPvm` AS `TilausPvm`, `t`.`Status` AS `Status`, concat(`a`.`Enimi`,coalesce(concat(' ',`a`.`Snimi`),'')) AS `AsiakasNimi`, `a`.`Puh` AS `AsiakasPuh`, `a`.`Email` AS `AsiakasEmail`, coalesce(concat(`k`.`Enimi`,' ',`k`.`Snimi`),'Ei määritetty') AS `KuljettajaNimi`, `t`.`Kokonaishinta` AS `Kokonaishinta`, (select count(0) from `tilausrivit_pizzat` `tp` where `tp`.`TilausID` = `t`.`TilausID`) + (select count(0) from `tilausrivit_lisat` `tl` where `tl`.`TilausID` = `t`.`TilausID`) AS `TuoteMaara` FROM ((`tilaukset` `t` join `asiakkaat` `a` on(`t`.`AsiakasID` = `a`.`AsiakasID`)) left join `kuljettajat` `k` on(`t`.`KuljettajaID` = `k`.`KuljettajaID`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_tilaukset_yhteenveto`  AS SELECT `t`.`TilausID` AS `TilausID`, `t`.`TilausPvm` AS `TilausPvm`, `t`.`Status` AS `Status`, concat(`a`.`Enimi`,coalesce(concat(' ',`a`.`Snimi`),'')) AS `AsiakasNimi`, `a`.`Puh` AS `AsiakasPuh`, `a`.`Email` AS `AsiakasEmail`, coalesce(concat(`k`.`Enimi`,' ',`k`.`Snimi`),'Ei määritetty') AS `KuljettajaNimi`, `t`.`Kokonaishinta` AS `Kokonaishinta`, (select count(0) from `tilausrivit_pizzat` `tp` where `tp`.`TilausID` = `t`.`TilausID`) + (select count(0) from `tilausrivit_aineosat` `ta` where `ta`.`TilausID` = `t`.`TilausID`) AS `TuoteMaara` FROM ((`tilaukset` `t` join `asiakkaat` `a` on(`t`.`AsiakasID` = `a`.`AsiakasID`)) left join `kuljettajat` `k` on(`t`.`KuljettajaID` = `k`.`KuljettajaID`)) ;
 
 --
 -- Indexes for dumped tables
@@ -436,7 +461,9 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 ALTER TABLE `aineosat`
   ADD PRIMARY KEY (`AinesosaID`),
   ADD UNIQUE KEY `uk_aineosat_nimi` (`Nimi`),
-  ADD KEY `idx_aineosat_aktiivinen` (`Aktiivinen`);
+  ADD KEY `idx_aineosat_tyyppi` (`Tyyppi`),
+  ADD KEY `idx_aineosat_aktiivinen` (`Aktiivinen`),
+  ADD KEY `idx_aineosat_jarjestys` (`Jarjestys`);
 
 --
 -- Indexes for table `asiakkaat`
@@ -465,13 +492,6 @@ ALTER TABLE `kuljettajat`
   ADD KEY `idx_kuljettajat_aktiivinen` (`Aktiivinen`);
 
 --
--- Indexes for table `lisat`
---
-ALTER TABLE `lisat`
-  ADD PRIMARY KEY (`LisaID`),
-  ADD KEY `idx_lisat_aktiivinen` (`Aktiivinen`);
-
---
 -- Indexes for table `ostoskori`
 --
 ALTER TABLE `ostoskori`
@@ -487,7 +507,7 @@ ALTER TABLE `ostoskori_rivit`
   ADD PRIMARY KEY (`OstoskoriRivitID`),
   ADD KEY `idx_ostoskori_rivit_kori` (`OstoskoriID`),
   ADD KEY `idx_ostoskori_rivit_pizza` (`PizzaID`),
-  ADD KEY `idx_ostoskori_rivit_lisa` (`LisaID`),
+  ADD KEY `idx_ostoskori_rivit_ainesosa` (`AinesosaID`),
   ADD KEY `idx_ostoskori_rivit_koko` (`KokoID`);
 
 --
@@ -519,12 +539,12 @@ ALTER TABLE `tilaukset`
   ADD KEY `idx_tilaukset_pvm` (`TilausPvm`);
 
 --
--- Indexes for table `tilausrivit_lisat`
+-- Indexes for table `tilausrivit_aineosat`
 --
-ALTER TABLE `tilausrivit_lisat`
-  ADD PRIMARY KEY (`TilausrivitLisaID`),
-  ADD KEY `idx_tilausrivit_lisat_tilaus` (`TilausID`),
-  ADD KEY `idx_tilausrivit_lisat_lisa` (`LisaID`);
+ALTER TABLE `tilausrivit_aineosat`
+  ADD PRIMARY KEY (`TilausrivitAinesosaID`),
+  ADD KEY `idx_tilausrivit_aineosat_tilaus` (`TilausID`),
+  ADD KEY `idx_tilausrivit_aineosat_ainesosa` (`AinesosaID`);
 
 --
 -- Indexes for table `tilausrivit_pizzat`
@@ -543,13 +563,13 @@ ALTER TABLE `tilausrivit_pizzat`
 -- AUTO_INCREMENT for table `aineosat`
 --
 ALTER TABLE `aineosat`
-  MODIFY `AinesosaID` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `AinesosaID` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `asiakkaat`
 --
 ALTER TABLE `asiakkaat`
-  MODIFY `AsiakasID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `AsiakasID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `koot`
@@ -564,22 +584,16 @@ ALTER TABLE `kuljettajat`
   MODIFY `KuljettajaID` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `lisat`
---
-ALTER TABLE `lisat`
-  MODIFY `LisaID` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
 -- AUTO_INCREMENT for table `ostoskori`
 --
 ALTER TABLE `ostoskori`
-  MODIFY `OstoskoriID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `OstoskoriID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT for table `ostoskori_rivit`
 --
 ALTER TABLE `ostoskori_rivit`
-  MODIFY `OstoskoriRivitID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `OstoskoriRivitID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `pizzat`
@@ -597,19 +611,19 @@ ALTER TABLE `pizza_aineosat`
 -- AUTO_INCREMENT for table `tilaukset`
 --
 ALTER TABLE `tilaukset`
-  MODIFY `TilausID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `TilausID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
--- AUTO_INCREMENT for table `tilausrivit_lisat`
+-- AUTO_INCREMENT for table `tilausrivit_aineosat`
 --
-ALTER TABLE `tilausrivit_lisat`
-  MODIFY `TilausrivitLisaID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tilausrivit_aineosat`
+  MODIFY `TilausrivitAinesosaID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tilausrivit_pizzat`
 --
 ALTER TABLE `tilausrivit_pizzat`
-  MODIFY `TilausrivitPizzaID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `TilausrivitPizzaID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- Rajoitteet vedostauluille
@@ -625,9 +639,9 @@ ALTER TABLE `ostoskori`
 -- Rajoitteet taululle `ostoskori_rivit`
 --
 ALTER TABLE `ostoskori_rivit`
+  ADD CONSTRAINT `fk_ostoskori_rivit_ainesosa` FOREIGN KEY (`AinesosaID`) REFERENCES `aineosat` (`AinesosaID`),
   ADD CONSTRAINT `fk_ostoskori_rivit_koko` FOREIGN KEY (`KokoID`) REFERENCES `koot` (`KokoID`),
   ADD CONSTRAINT `fk_ostoskori_rivit_kori` FOREIGN KEY (`OstoskoriID`) REFERENCES `ostoskori` (`OstoskoriID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_ostoskori_rivit_lisa` FOREIGN KEY (`LisaID`) REFERENCES `lisat` (`LisaID`),
   ADD CONSTRAINT `fk_ostoskori_rivit_pizza` FOREIGN KEY (`PizzaID`) REFERENCES `pizzat` (`PizzaID`);
 
 --
@@ -645,11 +659,11 @@ ALTER TABLE `tilaukset`
   ADD CONSTRAINT `fk_tilaukset_kuljettaja` FOREIGN KEY (`KuljettajaID`) REFERENCES `kuljettajat` (`KuljettajaID`);
 
 --
--- Rajoitteet taululle `tilausrivit_lisat`
+-- Rajoitteet taululle `tilausrivit_aineosat`
 --
-ALTER TABLE `tilausrivit_lisat`
-  ADD CONSTRAINT `fk_tilausrivit_lisat_lisa` FOREIGN KEY (`LisaID`) REFERENCES `lisat` (`LisaID`),
-  ADD CONSTRAINT `fk_tilausrivit_lisat_tilaus` FOREIGN KEY (`TilausID`) REFERENCES `tilaukset` (`TilausID`) ON DELETE CASCADE;
+ALTER TABLE `tilausrivit_aineosat`
+  ADD CONSTRAINT `fk_tilausrivit_aineosat_ainesosa` FOREIGN KEY (`AinesosaID`) REFERENCES `aineosat` (`AinesosaID`),
+  ADD CONSTRAINT `fk_tilausrivit_aineosat_tilaus` FOREIGN KEY (`TilausID`) REFERENCES `tilaukset` (`TilausID`) ON DELETE CASCADE;
 
 --
 -- Rajoitteet taululle `tilausrivit_pizzat`
