@@ -1,0 +1,6 @@
+﻿# Treat JS and PHP files as main languages
+*.js linguist-language=JavaScript
+*.php linguist-language=PHP
+
+# Treat CSS files as documentation (won't count toward main language stats)
+*.css linguist-documentation
