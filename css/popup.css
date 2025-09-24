@@ -273,7 +273,7 @@
 /* === Add to Cart Button === */
 .add-to-cart-btn {
     width: 100%;
-    background: #2e7d32;
+    background: var(--color-primary);
     color: #fff;
     border: none;
     padding: 15px;
@@ -289,23 +289,25 @@
 }
 
 .add-to-cart-btn:hover {
-    background: #1b5e20;
+    background: var(--color-gray-900);
 }
 
 .notification {
     position: fixed;
     top: 20px;
     right: 20px;
-    padding: 12px 20px;
-    border-radius: 6px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
     font-weight: 500;
-    color: #fff;
+    z-index: 1001;
+    transform: translateX(300px);
+    transition: transform 0.3s ease;
     max-width: 300px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 10000;
+}
+
+.notification.show {
+    transform: translateX(0);
 }
 
 .notification-success { background: #4CAF50; }
