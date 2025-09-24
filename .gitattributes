@@ -1,6 +1,6 @@
-﻿# Force all JS files to be counted as JavaScript
-*.js linguist-language=JavaScript
-
-# Treat both PHP and CSS as documentation (excluded from stats)
-*.php linguist-documentation
+﻿# Exclude CSS from language statistics
 *.css linguist-documentation
+
+# Keep JavaScript and PHP counting normally
+*.js linguist-language=JavaScript
+*.php linguist-language=PHP
