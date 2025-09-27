@@ -1,5 +1,5 @@
 import { AddToCartButton } from './AddToCartButton.js';
-import { escapeHtml } from '../utils.js';
+import { escapeHtml } from '../../helpers/utils.js';
 
 export class Recommended {
     constructor({ container, pizzas }) {

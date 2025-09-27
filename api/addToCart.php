@@ -1,22 +1,24 @@
 <?php
-function addCartItem($pdo, $input) {
-    $pizzaID = intval($input['pizzaID'] ?? 0);
-    $quantity = intval($input['quantity'] ?? 1);
-    $sizeID = intval($input['size'] ?? 2);
+function addCartItem($pdo, $input)
+{
+    $pizzaID = intval($input['PizzaID'] ?? 0);
+    $quantity = intval($input['Quantity'] ?? 1);
+    $sizeID = intval($input['KokoID'] ?? 2);
 
-    file_put_contents(__DIR__ . '/debug.log', "[" . date("Y-m-d H:i:s") . "] SESSIoooaaaON: " . json_encode($_SESSION) . json_encode($input)."\n", FILE_APPEND);
-    if (!$pizzaID || !$quantity) {
-        return apiError('Missing required fields: pizzaID and quantity');
+    file_put_contents(__DIR__ . '/debug.log', "[" . date("Y-m-d H:i:s") . "] SESSION: " . json_encode($_SESSION) . json_encode($input) . "\n", FILE_APPEND);
+    if (!$pizzaID || !$quantity || !$sizeID) {
+        throw new Exception("Missing required fields: pizzaid, quantity or sizeid", 400);
     }
+
     if ($quantity < 1 || $quantity > 99) {
-        return apiError('Quantity must be between 1 and 99');
+        throw new Exception('Quantity must be between 1 and 99', 400);
     }
 
     $user = getUser(); // registered or guest
     $cartID = getOrCreateCart($pdo, $user);
 
     $pizza = getPizza($pdo, $pizzaID);
-    $size  = getSize($pdo, $sizeID);
+    $size = getSize($pdo, $sizeID);
 
     $unitPrice = floatval($pizza['Hinta']) * floatval($size['HintaKerroin']);
 
@@ -35,7 +37,8 @@ function addCartItem($pdo, $input) {
     ];
 }
 
-function getUser() {
+function getUser()
+{
     $asiakasID = $_SESSION['AsiakasID'] ?? null;
     $guestToken = $_SESSION['guestToken'] ?? null;
 
@@ -46,14 +49,15 @@ function getUser() {
         }
         if (!$guestToken) {
             $guestToken = bin2hex(random_bytes(32));
-            setcookie('guestToken', $guestToken, time() + 30*24*60*60, '/');
+            setcookie('guestToken', $guestToken, time() + 30 * 24 * 60 * 60, '/');
             $_SESSION['guestToken'] = $guestToken;
         }
     }
     return ['asiakasID' => $asiakasID, 'guestToken' => $guestToken];
 }
 
-function getOrCreateCart($pdo, $user) {
+function getOrCreateCart($pdo, $user)
+{
     $asiakasID = $user['asiakasID'];
     $guestToken = $user['guestToken'];
 
@@ -85,15 +89,18 @@ function getOrCreateCart($pdo, $user) {
     return $cartID;
 }
 
-function getPizza($pdo, $pizzaID) {
+function getPizza($pdo, $pizzaID)
+{
     $stmt = $pdo->prepare("SELECT PizzaID,Nimi,Hinta FROM pizzat WHERE PizzaID=:id AND Aktiivinen=1");
     $stmt->execute(['id' => $pizzaID]);
     $pizza = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$pizza) return apiError('Pizza not found');
+    if (!$pizza)
+        return apiError('Pizza not found');
     return $pizza;
 }
 
-function getSize($pdo, $sizeID) {
+function getSize($pdo, $sizeID)
+{
     $stmt = $pdo->prepare("SELECT KokoID,Koko,HintaKerroin FROM koot WHERE KokoID=:id AND Aktiivinen=1");
     $stmt->execute(['id' => $sizeID]);
     $size = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -103,12 +110,14 @@ function getSize($pdo, $sizeID) {
         $stmt = $pdo->prepare("SELECT KokoID,Koko,HintaKerroin FROM koot WHERE KokoID=2 AND Aktiivinen=1");
         $stmt->execute();
         $size = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$size) throw new Exception('No valid pizza sizes available');
+        if (!$size)
+            throw new Exception('No valid pizza sizes available');
     }
     return $size;
 }
 
-function addOrUpdateCartItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitPrice) {
+function addOrUpdateCartItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitPrice)
+{
     $pdo->beginTransaction();
 
     $stmt = $pdo->prepare("
@@ -117,18 +126,19 @@ function addOrUpdateCartItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitP
         WHERE OstoskoriID=:cartID AND PizzaID=:pizzaID AND KokoID=:sizeID
     ");
     $stmt->execute([
-        'cartID'=>$cartID,
-        'pizzaID'=>$pizzaID,
-        'sizeID'=>$sizeID
+        'cartID' => $cartID,
+        'pizzaID' => $pizzaID,
+        'sizeID' => $sizeID
     ]);
     $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($item) {
         $newQty = $item['Maara'] + $quantity;
-        if ($newQty > 99) throw new Exception('Maximum quantity exceeded');
+        if ($newQty > 99)
+            throw new Exception('Maximum quantity exceeded');
 
         $stmt = $pdo->prepare("UPDATE ostoskori_rivit SET Maara=:q, Hinta=:price WHERE OstoskoriRivitID=:id");
-        $stmt->execute(['q'=>$newQty,'price'=>$unitPrice*$newQty,'id'=>$item['OstoskoriRivitID']]);
+        $stmt->execute(['q' => $newQty, 'price' => $unitPrice * $newQty, 'id' => $item['OstoskoriRivitID']]);
         $cartItemID = $item['OstoskoriRivitID'];
     } else {
         $totalPrice = $unitPrice * $quantity;
@@ -136,7 +146,7 @@ function addOrUpdateCartItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitP
             INSERT INTO ostoskori_rivit (OstoskoriID,PizzaID,KokoID,Maara,Hinta)
             VALUES (:cartID,:pizzaID,:sizeID,:qty,:price)
         ");
-        $stmt->execute(['cartID'=>$cartID,'pizzaID'=>$pizzaID,'sizeID'=>$sizeID,'qty'=>$quantity,'price'=>$totalPrice]);
+        $stmt->execute(['cartID' => $cartID, 'pizzaID' => $pizzaID, 'sizeID' => $sizeID, 'qty' => $quantity, 'price' => $totalPrice]);
         $cartItemID = $pdo->lastInsertId();
     }
 

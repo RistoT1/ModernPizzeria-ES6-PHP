@@ -82,7 +82,7 @@
             </div>
         </div>
     </main>
-    <script type="module" src="js/index.js"></script>
+    <script type="module" src="js/pages/index.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-import { escapeHtml } from '../utils.js';
+import { escapeHtml } from '../../helpers/utils.js';
 
 export class PizzaItem {
     constructor({ pizza, container, openPopupCallback }) {
@@ -41,7 +41,6 @@ export class PizzaItem {
         <p class="itemTiedot">${escapeHtml(this.pizza.Tiedot || '')}</p>
         `;
 
-        // Append container (not img directly) and content
         div.appendChild(imgContainer);
         div.appendChild(content);
         div.addEventListener('click', () => this.openPopupCallback(this.pizza));

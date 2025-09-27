@@ -98,7 +98,7 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
             </div>
         </div>
 
-        <script src="../js/ostoskori.js"></script>
+        <script type="module" src="../js/pages/ostoskori.js"></script>
 
     </main>
 </body>
