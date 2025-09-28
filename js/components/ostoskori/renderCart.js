@@ -44,11 +44,12 @@ export class renderCartItem {
         
         deleteBtn.addEventListener("click", () => {
             el.remove();
+              //so now i can use this event in renderCart to update the cart
             dispatchEvent(new CustomEvent("cartItemDeleted", { detail: this.item.cartRowID }));
         });
         
-
-        //so now i can use this event in renderCart to update the cart
+        
+      
 
 
         this.container.appendChild(fragment);

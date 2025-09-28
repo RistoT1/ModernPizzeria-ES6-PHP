@@ -1,4 +1,4 @@
-import { buildCartItem, showNotification, updateCartCounter } from '../../helpers/utils.js';
+import { buildCartItem, checkQuantityLimit, showNotification, updateCartCounter } from '../../helpers/utils.js';
 import { fetchCartQuantity, addItemToCart } from '../../helpers/api.js';
 import { CartBackup } from './cartBackup.js';
 
@@ -28,18 +28,14 @@ export class AddToCartButton {
 
         this.setLoadingState(true);
 
+        const limitExceeded = await checkQuantityLimit(
+            this.getQuantity,
+            fetchCartQuantity,
+            showNotification,
+            this.setLoadingState.bind(this)
+        );
 
-        const quantityToAdd = this.getQuantity();
-        const MAX_QUANTITY = 99;
-
-        const cartQty = await fetchCartQuantity(); // lowercase 'cartQty' for convention
-        const newTotalQty = cartQty + quantityToAdd;
-
-        if (newTotalQty > MAX_QUANTITY) {
-            showNotification(`Et voi lisätä yli ${MAX_QUANTITY} kappaletta koriin.`, 'error');
-            this.setLoadingState(false);
-            return;
-        }
+        if (limitExceeded) return;
 
         try {
             const pizzaToSave = buildCartItem(this.pizzaID, this.getSizeID, this.getQuantity);
