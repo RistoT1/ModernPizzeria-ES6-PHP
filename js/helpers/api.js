@@ -77,12 +77,17 @@ export const fetchCartQuantity = async ({ includeItems = false } = {}) => {
 export const deleteItemFromCart = async (item) => {
     try {
         const guestToken = CartBackup.loadGuestToken();
-        const res = await fetch(`${getApiPath()}?kori&id=${item.cartRowID}`, {
+        const res = await fetch(`${getApiPath()}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Guest-Token': guestToken || ''
-            }
+            }, 
+            body: JSON.stringify(
+            { 
+                deleteItem: true,
+                cartRowID: item.cartRowID 
+            })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const result = await res.json();
@@ -132,14 +137,12 @@ export const addItemToCart = async (item) => {
                 Quantity: item.Quantity || 1
             })
         });
-
         console.log('adding product in api', item); // Debug
         const result = await res.json();
         console.log('add to cart response', result); // Debug
         if (result.data?.guestToken) {
             CartBackup.saveGuestToken(result.data.guestToken);
         }
-
         if (result.success) {
             return true;
         } else {

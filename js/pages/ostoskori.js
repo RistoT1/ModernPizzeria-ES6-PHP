@@ -18,6 +18,19 @@ const initializePage = async () => {
             DOM.cartEmptyContainer.style.display = "none";
             DOM.cartItemContainer.style.display = "block";
         }
+        window.addEventListener("cartItemChanged", async () => {
+            const { items: updatedItems } = await fetchCartQuantity({ includeItems: true });
+            if (updatedItems.length > 0) {
+                new Cart({ container: DOM.cartItemContainer, items: updatedItems });
+                DOM.cartEmptyContainer.style.display = "none";
+                DOM.cartItemContainer.style.display = "block";
+            } else {
+                DOM.cartItemContainer.innerHTML = "";
+                DOM.cartItemContainer.style.display = "none";
+                DOM.cartEmptyContainer.style.display = "block";
+            }
+        });
+
 
     } catch (error) {
         console.error("Initialization failed:", error);

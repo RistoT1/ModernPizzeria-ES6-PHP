@@ -22,11 +22,12 @@ if (session_status() === PHP_SESSION_NONE) {
 
 header("Content-Type: application/json");
 
-require_once "../src/config.php";   // your PDO connection
+require_once "../src/config.php";   //PDO connection
 require_once "fetchMenu.php";
 require_once "fetchSize.php";
 require_once "fetchCart.php";
 require_once "addToCart.php";
+require_once "deleteItem.php";
 require_once "loginCheck.php";
 require_once "insertUser.php";
 require_once "logOut.php";
@@ -36,18 +37,19 @@ require_once "statusHelpper.php";
 
 // Handle request
 $method = $_SERVER["REQUEST_METHOD"];
-if ($method === 'POST') {
+if (in_array($method, ['POST', 'DELETE', 'PUT'])) {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
 } else {
     $input = $_GET;
 }
 
 // Enhanced debug logging
-$debugFile = __DIR__ . '/debug.log';
-file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] METHOD: $method\n", FILE_APPEND);
-file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] INPUT: " . json_encode($input) . "\n", FILE_APPEND);
-file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] SESSION: " . json_encode($_SESSION) . "\n", FILE_APPEND);
-
+if (true) {
+    $debugFile = __DIR__ . '/debug.log';
+    file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] METHOD: $method\n", FILE_APPEND);
+    file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] INPUT: " . json_encode($input) . "\n", FILE_APPEND);
+    file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] SESSION: " . json_encode($_SESSION) . "\n", FILE_APPEND);
+}
 // Define routes
 $routes = [
     "GET" => [
@@ -64,7 +66,14 @@ $routes = [
         "login" => "handleLogin",
         "register" => "handleRegister",
         "logout" => "handleLogout"
+    ],
+    "DELETE" => [
+        "deleteItem" => "deleteCartItem"
+    ],
+    "PUT" => [
+        "updateItemQuantity" => "updateCartItemQuantity"
     ]
+
 ];
 
 try {

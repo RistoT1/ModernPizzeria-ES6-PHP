@@ -1,8 +1,63 @@
+import { deleteItemFromCart, updateCartItemQuantity,fetchCartQuantity } from "../../helpers/api.js";
+import { checkQuantityLimit, showNotification } from "../../helpers/utils.js";
+
 export class renderCartItem {
-    constructor({ item, container}) {
+    constructor({ item, container }) {
         this.item = item;
         this.container = container;
         this.render();
+        this.setupEventListeners();
+        console.log("Rendered cart item:", this.item);
+    }
+
+    setupEventListeners() {
+        const el = this.container.querySelector(`.cart-item[data-cart-id="${this.item.cartRowID}"]`);
+        if (!el) return;
+        const decreaseBtn = el.querySelector(".decrease");
+        const increaseBtn = el.querySelector(".increase");
+        const quantitySpan = el.querySelector(".cartItemQuantity");
+        const deleteBtn = el.querySelector(".delete");
+
+        decreaseBtn.addEventListener("click", async () => {
+            console.log("Decrease clicked for item:", this.item);
+            if (this.item.quantity > 1) {
+                const newQuantity = this.item.quantity - 1;
+                const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity);
+                if (success) {
+                    this.item.quantity = newQuantity;
+                    quantitySpan.textContent = this.item.quantity;
+                    dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
+                }
+            }
+        });
+
+        increaseBtn.addEventListener("click", async () => {
+            const limitExceeded = await checkQuantityLimit(
+                () => 1, //getCurrentQuantity
+                fetchCartQuantity,  //fetchCartQuantity,
+                showNotification, //notifyUser,
+                () => { } //loadingstate 
+            );
+
+            if (limitExceeded) return;
+            console.log("Increase clicked for item:", this.item);
+            if (success) {
+                this.item.quantity = newQuantity;
+                quantitySpan.textContent = this.item.quantity;
+                dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
+            }
+        });
+        deleteBtn.addEventListener("click", async () => {
+            const success = await deleteItemFromCart(this.item);
+            if (success) {
+                console.log("Item deleted successfully");
+                el.remove();
+                dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item.cartRowID }));
+            }
+            else {
+                console.error("Failed to delete item from backend");
+            }
+        });
     }
 
     render() {
@@ -17,12 +72,11 @@ export class renderCartItem {
                 <div class="cart-item-content">
                     <h4 class="cart-item-title">${this.item.Nimi ?? 'Tuote'}</h4>
                     <p class="cart-item-size">Koko: ${this.item.sizeName ?? '-'}</p>
-                    <p class="cart-item-price">${
-                        new Intl.NumberFormat("fi-FI", {
-                            style: "currency",
-                            currency: "EUR",
-                        }).format(this.item.totalPrice ?? 0)
-                    }</p>
+                    <p class="cart-item-price">${new Intl.NumberFormat("fi-FI", {
+            style: "currency",
+            currency: "EUR",
+        }).format(this.item.totalPrice ?? 0)
+            }</p>
                     
                     <div class="cartItemActions">
                         <button class="decrease">−</button>
@@ -34,22 +88,14 @@ export class renderCartItem {
             </div>
         `;
 
-
-
         const fragment = document.createRange().createContextualFragment(template);
 
         // Attach events
         const el = fragment.querySelector(".cart-item");
         const deleteBtn = el.querySelector(".delete");
-        
-        deleteBtn.addEventListener("click", () => {
-            el.remove();
-              //so now i can use this event in renderCart to update the cart
-            dispatchEvent(new CustomEvent("cartItemDeleted", { detail: this.item.cartRowID }));
-        });
-        
-        
-      
+
+
+
 
 
         this.container.appendChild(fragment);
