@@ -121,7 +121,10 @@ export const addItemToCart = async (item) => {
 
         const res = await fetch(`${getApiPath()}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+                , 'X-Guest-Token': guestToken || ''
+            },
             body: JSON.stringify({
                 addItem: true,
                 PizzaID: item.PizzaID,
@@ -140,13 +143,11 @@ export const addItemToCart = async (item) => {
         if (result.success) {
             return true;
         } else {
-            console.warn('API error:', result.message);
-            CartBackup.addItem(item); // fallback
+            console.warn('API error:', result.error || 'Unknown error');
             return false;
         }
     } catch (error) {
         console.error('Error adding item to cart:', error);
-        CartBackup.addItem(item); // fallback
         return false;
     }
 };

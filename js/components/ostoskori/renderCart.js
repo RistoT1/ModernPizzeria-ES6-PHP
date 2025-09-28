@@ -9,15 +9,15 @@ export class renderCartItem {
         if (!this.item || !this.container) return;
 
         const template = `
-            <div class="cartItem" data-cart-id="${this.item.cartRowID}">
+            <div class="cart-item" data-cart-id="${this.item.cartRowID}">
                 <img 
                     src="../src/img/${this.item.Kuva ?? 'default-pizza.jpg'}"
                     alt="${this.item.PizzaNimi ?? 'Tuote'}"
                 />
-                <div class="cartItemContent">
-                    <h4 class="cartItemTitle">${this.item.Nimi ?? 'Tuote'}</h4>
-                    <p class="cartItemSize">Koko: ${this.item.sizeName ?? '-'}</p>
-                    <p class="cartItemPrice">${
+                <div class="cart-item-content">
+                    <h4 class="cart-item-title">${this.item.Nimi ?? 'Tuote'}</h4>
+                    <p class="cart-item-size">Koko: ${this.item.sizeName ?? '-'}</p>
+                    <p class="cart-item-price">${
                         new Intl.NumberFormat("fi-FI", {
                             style: "currency",
                             currency: "EUR",
@@ -39,7 +39,7 @@ export class renderCartItem {
         const fragment = document.createRange().createContextualFragment(template);
 
         // Attach events
-        const el = fragment.querySelector(".cartItem");
+        const el = fragment.querySelector(".cart-item");
         const deleteBtn = el.querySelector(".delete");
         
         deleteBtn.addEventListener("click", () => {

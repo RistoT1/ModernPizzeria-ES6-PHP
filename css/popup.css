@@ -1,7 +1,8 @@
 /* === Popup Overlay === */
 .popup {
     position: fixed;
-    inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0; */
+    inset: 0;
+    /* shorthand for top:0; right:0; bottom:0; left:0; */
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: flex-end;
@@ -292,30 +293,59 @@
     background: var(--color-gray-900);
 }
 
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+
 .notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
     padding: 15px 20px;
     border-radius: 8px;
     color: white;
     font-weight: 500;
-    z-index: 1001;
     transform: translateX(300px);
-    transition: transform 0.3s ease;
     max-width: 300px;
+    opacity: 1;
+    transform: translateX(0);
+    transition: transform 0.4s ease, opacity 0.4s ease;
 }
+
 
 .notification.show {
     transform: translateX(0);
 }
+.notification.hide {
+  opacity: 0;
+  transform: translateX(400px); 
+}
 
-.notification-success { background: #4CAF50; }
-.notification-error { background: #f44336; }
-.notification-info { background: #2196F3; }
+
+.notification-success {
+    background: #4CAF50;
+}
+
+.notification-error {
+    background: #f44336;
+}
+
+.notification-info {
+    background: #2196F3;
+}
 
 /* === Responsive === */
 @media (max-width: 768px) {
-    .toppings-grid { grid-template-columns: 1fr; }
-    .popup-content { border-radius: 15px 15px 0 0; }
+    .toppings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .popup-content {
+        border-radius: 15px 15px 0 0;
+    }
 }

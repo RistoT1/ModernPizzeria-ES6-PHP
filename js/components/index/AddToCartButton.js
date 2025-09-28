@@ -1,4 +1,4 @@
-import { showNotification, updateCartCounter } from '../../helpers/utils.js';
+import { buildCartItem, showNotification, updateCartCounter } from '../../helpers/utils.js';
 import { fetchCartQuantity, addItemToCart } from '../../helpers/api.js';
 import { CartBackup } from './cartBackup.js';
 
@@ -18,20 +18,32 @@ export class AddToCartButton {
 
         this.button.addEventListener('click', () => this.addToCart());
     }
+    setLoadingState(isLoading) {
+        this.button.disabled = isLoading;
+        this.button.textContent = isLoading ? 'Lisätään...' : 'Lisää koriin';
+    }
 
     async addToCart() {
         console.log('AddToCart clicked'); // Debug
 
-        this.button.disabled = true;
-        this.button.textContent = 'Lisätään...';
+        this.setLoadingState(true);
+
+
+        const quantityToAdd = this.getQuantity();
+        const MAX_QUANTITY = 99;
+
+        const cartQty = await fetchCartQuantity(); // lowercase 'cartQty' for convention
+        const newTotalQty = cartQty + quantityToAdd;
+
+        if (newTotalQty > MAX_QUANTITY) {
+            showNotification(`Et voi lisätä yli ${MAX_QUANTITY} kappaletta koriin.`, 'error');
+            this.setLoadingState(false);
+            return;
+        }
 
         try {
-            const pizzaToSave = {
-                PizzaID: this.pizzaID,
-                KokoID: this.getSizeID(),
-                Quantity: this.getQuantity()
-            };
-
+            const pizzaToSave = buildCartItem(this.pizzaID, this.getSizeID, this.getQuantity);
+            console.log('Pizza to add:', pizzaToSave); // Debug
             const success = await addItemToCart(pizzaToSave);
 
             if (success) {

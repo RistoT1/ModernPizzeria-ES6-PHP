@@ -15,6 +15,7 @@
 <body>
     <?php include_once('includes/nav.php'); ?>
     <main>
+        <div class="notification-container"></div>
         <div class="container" id="mainContainer">
             <div class="header">
                 <div class="hero-container">

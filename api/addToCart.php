@@ -134,8 +134,9 @@ function addOrUpdateCartItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitP
 
     if ($item) {
         $newQty = $item['Maara'] + $quantity;
-        if ($newQty > 99)
+        if ($newQty > 99) {
             throw new Exception('Maximum quantity exceeded');
+        }
 
         $stmt = $pdo->prepare("UPDATE ostoskori_rivit SET Maara=:q, Hinta=:price WHERE OstoskoriRivitID=:id");
         $stmt->execute(['q' => $newQty, 'price' => $unitPrice * $newQty, 'id' => $item['OstoskoriRivitID']]);
