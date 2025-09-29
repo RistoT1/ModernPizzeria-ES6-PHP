@@ -1,4 +1,4 @@
-import { deleteItemFromCart, updateCartItemQuantity,fetchCartQuantity } from "../../helpers/api.js";
+import { deleteItemFromCart, updateCartItemQuantity, fetchCartQuantity } from "../../helpers/api.js";
 import { checkQuantityLimit, showNotification } from "../../helpers/utils.js";
 
 export class renderCartItem {
@@ -32,15 +32,24 @@ export class renderCartItem {
         });
 
         increaseBtn.addEventListener("click", async () => {
+            console.log('clicked');
+
+            const quantityToAdd = 1;
+            const currentQuantity = this.item.quantity; // existing quantity
+            const newQuantity = currentQuantity + quantityToAdd;
+
             const limitExceeded = await checkQuantityLimit(
-                () => 1, //getCurrentQuantity
-                fetchCartQuantity,  //fetchCartQuantity,
-                showNotification, //notifyUser,
-                () => { } //loadingstate 
+                () => quantityToAdd, // only the quantity we want to add
+                fetchCartQuantity,
+                showNotification,
+                () => { }
             );
 
+            console.log(limitExceeded);
             if (limitExceeded) return;
-            console.log("Increase clicked for item:", this.item);
+
+            const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity)
+            console.log(this.item.cartRowID, newQuantity);
             if (success) {
                 this.item.quantity = newQuantity;
                 quantitySpan.textContent = this.item.quantity;

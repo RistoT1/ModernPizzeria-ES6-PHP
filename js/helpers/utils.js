@@ -6,9 +6,17 @@ export const escapeHtml = (text) => {
 
 const queue = [];
 let activeCount = 0;
-const maxVisible = 5;
+const maxVisible = 3;    // Max notifications shown at the same time
+const MAX_QUEUE = 10;    // Max notifications in the queue
 
 export function showNotification(msg, type = 'info') {
+  // Prevent duplicate messages in the queue
+  console.log('notification in que');
+  if (queue.some(n => n.msg === msg && n.type === type)) return;
+
+  // Prevent queue from growing too large
+  if (queue.length >= MAX_QUEUE) return;
+
   queue.push({ msg, type });
   processQueue();
 }
@@ -21,9 +29,13 @@ function processQueue() {
   el.className = `notification notification-${type}`;
   el.textContent = msg;
 
-  document.querySelector('.notification-container').appendChild(el);
+  const container = document.querySelector('.notification-container');
+  if (!container) return;
+
+  container.appendChild(el);
   activeCount++;
 
+  // Show notification for 3s, then hide + remove
   setTimeout(() => {
     el.classList.add('hide');
     setTimeout(() => {
@@ -56,6 +68,7 @@ export const checkQuantityLimit = async (getQuantity, fetchCartQuantity, showNot
   const MAX_QUANTITY = 99;
 
   const cartQty = await fetchCartQuantity();
+  console.log("lyuvut",cartQty, quantityToAdd)
   const newTotalQty = cartQty + quantityToAdd;
 
   if (newTotalQty > MAX_QUANTITY) {

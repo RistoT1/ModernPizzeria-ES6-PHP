@@ -28,6 +28,7 @@ require_once "fetchSize.php";
 require_once "fetchCart.php";
 require_once "addToCart.php";
 require_once "deleteItem.php";
+require_once "updateItemQuantity.php";
 require_once "loginCheck.php";
 require_once "insertUser.php";
 require_once "logOut.php";

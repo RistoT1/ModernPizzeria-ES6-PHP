@@ -30,6 +30,7 @@ $apiPath = $in_pages_folder ? '../api/main.php' : './api/main.php';
         </div>
     </div>
 </nav>
+<div class="notification-container"></div>
 
 <?php if ($isLoggedIn): ?>
 <script>

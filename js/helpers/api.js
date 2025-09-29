@@ -99,16 +99,18 @@ export const deleteItemFromCart = async (item) => {
 };
 
 export const updateCartItemQuantity = async (cartRowID, newQuantity) => {
+    console.log('aaaa',cartRowID)
     try {
         const guestToken = CartBackup.loadGuestToken();
-        const res = await fetch(`${getApiPath()}?kori`, {
+        const res = await fetch(`${getApiPath()}?`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Guest-Token': guestToken || ''
             },
             body: JSON.stringify({
-                cartRowID,
+                updateItemQuantity:  true,
+                cartRowID: cartRowID,
                 quantity: newQuantity
             })
         });
