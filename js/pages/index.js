@@ -20,7 +20,6 @@ const initializePage = async () => {
         const [sizeMultipliers, pizzas, cartQty] = await Promise.all([
             fetchSizes(),
             fetchPizza(),
-            fetchCartQuantity()
         ]);
 
         console.log('Data fetched:', { 
@@ -43,10 +42,6 @@ const initializePage = async () => {
             new Recommended({ container: recommendedContainer, pizzas });
             console.log('Recommended section initialized');
         }
-
-
-        updateCartCounter(cartQty);
-        console.log('Cart quantity updated:', cartQty);
 
         // Show success notification
         showNotification('Sivun lataus onnistui!', 'success');

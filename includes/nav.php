@@ -1,9 +1,11 @@
 <?php 
 include_once 'session.php';
+
 $current_page = basename($_SERVER['PHP_SELF']);
 $isLoggedIn = isset($_SESSION['AsiakasID']);
 $in_pages_folder = strpos($_SERVER['PHP_SELF'], '/pages/') !== false;
 $apiPath = $in_pages_folder ? '../api/main.php' : './api/main.php';
+$jsPath = $in_pages_folder ? '../js/includes/nav.js' : './js/includes/nav.js';
 ?>
 <nav class="navbar">
     <div class="navbar-container">
@@ -32,29 +34,4 @@ $apiPath = $in_pages_folder ? '../api/main.php' : './api/main.php';
 </nav>
 <div class="notification-container"></div>
 
-<?php if ($isLoggedIn): ?>
-<script>
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-    if (!confirm('Are you sure you want to logout?')) return;
-
-    try {
-        const response = await fetch('<?php echo $apiPath; ?>', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: JSON.stringify({ logout: true })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            // redirect after successful logout
-            window.location.href = '<?php echo $in_pages_folder ? "../index.php" : "./index.php"; ?>';
-        } else {
-            alert(data.error || 'Logout failed.');
-        }
-    } catch (err) {
-        alert('Network error: ' + err.message);
-    }
-});
-</script>
-<?php endif; ?>
+<script type="module" src="<?php echo $jsPath; ?>"></script>

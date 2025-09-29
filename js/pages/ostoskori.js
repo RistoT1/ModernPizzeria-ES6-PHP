@@ -5,6 +5,8 @@ import { Cart } from '../components/ostoskori/Cart.js';
 // --- Initialize page ---
 const initializePage = async () => {
     try {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const DOM = validateCartDom();
         if (!DOM) throw new Error("Required DOM elements not found");
 

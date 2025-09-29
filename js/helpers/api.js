@@ -156,4 +156,20 @@ export const addItemToCart = async (item) => {
         return false;
     }
 };
+export const logoutUser = async () => {
+    try {
+        const res = await fetch(`${getApiPath()}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ logout: true })
+        });
 
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const result = await res.json();
+        return result.success;
+    } catch (err) {
+        console.error('Logout API error:', err);
+        return false;
+    }
+};

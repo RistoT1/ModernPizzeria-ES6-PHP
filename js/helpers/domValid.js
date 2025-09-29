@@ -42,6 +42,14 @@ export const validateCartDom = () => {
     return elements;
 };
 
+export const validateNavDom = () => {
+    const elements = {
+        logoutBtn: document.getElementById('logoutBtn')
+    };
+
+    return elements;
+}
+
 const checkMissingElements = (elements) => {
     const missing = [];
     for (const [name, el] of Object.entries(elements)) {
@@ -57,3 +65,4 @@ const checkMissingElements = (elements) => {
 
     return true;
 };
+
