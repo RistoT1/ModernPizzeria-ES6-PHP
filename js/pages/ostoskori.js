@@ -1,176 +1,136 @@
 import { validateCartDom } from '../helpers/domValid.js';
 import { fetchCartQuantity } from '../helpers/api.js';
+import { showNotification } from '../helpers/utils.js';
 import { Cart } from '../components/ostoskori/Cart.js';
+import { CheckoutForm } from '../components/ostoskori/CheckoutForm.js';
+import { AddressModal } from '../components/ostoskori/AddressModal.js';
 
-// --- Initialize page ---
-const initializePage = async () => {
-    try {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const DOM = validateCartDom();
-        if (!DOM) throw new Error("Required DOM elements not found");
+class CartPage {
+    constructor() {
+        this.DOM = null;
+        this.cart = null;
+        this.checkoutForm = null;
+        this.addressModal = null;
+    }
 
-        DOM.cartEmptyContainer.style.display = "block";
-        DOM.cartItemContainer.style.display = "none";
+    async init() {
+        try {
+            // Wait for DOM to be ready
+            await new Promise(resolve => setTimeout(resolve, 100));
 
-        const { items: cartItems } = await fetchCartQuantity({ includeItems: true });
-        console.log("Fetched cart items:", cartItems);
-        if (cartItems.length > 0) {
-            new Cart({ container: DOM.cartItemContainer, items: cartItems });
-            DOM.cartEmptyContainer.style.display = "none";
-            DOM.cartItemContainer.style.display = "block";
+            // Validate DOM elements
+            this.DOM = validateCartDom();
+            if (!this.DOM) {
+                throw new Error('Required DOM elements not found');
+            }
+
+            // Initialize components
+            await this.initializeCart();
+            this.initializeAddressModal();
+            this.initializeCheckoutForm();
+            this.setupCartListener();
+
+            console.log('Cart page initialized successfully');
+
+        } catch (error) {
+            console.error('Cart page initialization failed:', error);
+            showNotification('Sivun lataus epäonnistui', 'error');
         }
-        window.addEventListener("cartItemChanged", async () => {
+    }
+
+    async initializeCart() {
+        // Show empty state by default
+        this.DOM.cartEmptyContainer.style.display = 'block';
+        this.DOM.cartItemContainer.style.display = 'none';
+
+        // Fetch cart items
+        const { items: cartItems } = await fetchCartQuantity({ includeItems: true });
+        console.log('Fetched cart items:', cartItems);
+
+        // Display cart if items exist
+        if (cartItems && cartItems.length > 0) {
+            this.renderCart(cartItems);
+        }
+    }
+
+    renderCart(items) {
+        if (!items || items.length === 0) {
+            this.showEmptyCart();
+            return;
+        }
+
+        this.cart = new Cart({
+            container: this.DOM.cartItemContainer,
+            items: items
+        });
+
+        this.DOM.cartEmptyContainer.style.display = 'none';
+        this.DOM.cartItemContainer.style.display = 'block';
+    }
+
+    showEmptyCart() {
+        this.DOM.cartItemContainer.innerHTML = '';
+        this.DOM.cartItemContainer.style.display = 'none';
+        this.DOM.cartEmptyContainer.style.display = 'block';
+    }
+
+    setupCartListener() {
+        window.addEventListener('cartItemChanged', async () => {
+            console.log('Cart changed, refreshing...');
+
             const { items: updatedItems } = await fetchCartQuantity({ includeItems: true });
-            if (updatedItems.length > 0) {
-                new Cart({ container: DOM.cartItemContainer, items: updatedItems });
-                DOM.cartEmptyContainer.style.display = "none";
-                DOM.cartItemContainer.style.display = "block";
-            } else {
-                DOM.cartItemContainer.innerHTML = "";
-                DOM.cartItemContainer.style.display = "none";
-                DOM.cartEmptyContainer.style.display = "block";
-            }
+            this.renderCart(updatedItems);
         });
-
-
-    } catch (error) {
-        console.error("Initialization failed:", error);
-        alert("Sivun lataus epäonnistui");
-    }
-};
-/* --- DOM Elements ---
-const DOM = {
-    cartItemContainer: document.getElementById("cartItemContainer"),
-let savedAddress = null;
-
-// --- Remove cart item ---
-const removeCartItem = async (cartId) => {
-    try {
-        const response = await fetch("../api/removeFromCart.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cartItemID: cartId }),
-        });
-
-        const result = await response.json();
-        if (!result.success) throw new Error(result.message || "Failed to remove item");
-
-        fetchCartItems();
-    } catch (err) {
-        console.error("Error removing item:", err);
-        alert("Virhe poistettaessa tuotetta. Yritä uudelleen.");
-    }
-};
-
-// --- Address modal ---
-const openAddressModal = () => {
-    if (!DOM.addressModal) return;
-    DOM.addressModal.style.display = "block";
-
-    if (savedAddress) {
-        DOM.streetInput.value = savedAddress.street;
-        DOM.cityInput.value = savedAddress.city;
-        DOM.postalInput.value = savedAddress.postal;
-    }
-};
-
-const closeAddressModal = () => {
-    if (!DOM.addressModal) return;
-    DOM.addressModal.style.display = "none";
-};
-
-const saveAddress = () => {
-    const street = DOM.streetInput.value.trim();
-    const city = DOM.cityInput.value.trim();
-    const postal = DOM.postalInput.value.trim();
-
-    if (!street || !city || !postal) {
-        alert("Täytä kaikki osoitekentät");
-        return;
     }
 
-    savedAddress = { street, city, postal };
-    if (DOM.addressInput) {
-        DOM.addressInput.innerHTML = `
-            <div class="saved-address">
-                <strong>${street}</strong><br>
-                ${postal} ${city}
-            </div>
-        `;
-    }
-
-    if (DOM.openAddressBtn) DOM.openAddressBtn.style.display = "none";
-    if (DOM.addressSection) DOM.addressSection.style.display = "block";
-    closeAddressModal();
-};
-
-// --- Form submit ---
-const handleFormSubmit = (e) => {
-    e.preventDefault();
-    const isLoggedIn = document.getElementById("isLoggedIn")?.value === "1";
-    let customerData = {};
-
-    if (!isLoggedIn) {
-        customerData = {
-            Enimi: document.getElementById("Enimi")?.value.trim() || "",
-            Snimi: document.getElementById("Snimi")?.value.trim() || "",
-            Email: document.getElementById("email")?.value.trim() || "",
-            Puh: document.getElementById("puhelin")?.value.trim() || "",
-            Osoite: savedAddress?.street || "",
-            PostiNum: savedAddress?.postal || "",
-            PostiTp: savedAddress?.city || "",
-        };
-    } else {
-        customerData = { loggedIn: true };
-    }
-
-    sessionStorage.setItem("customerData", JSON.stringify(customerData));
-    window.location.href = "kassa.php";
-};
-
-// --- Setup event listeners ---
-const setupEventListeners = () => {
-    if (DOM.cartItemContainer) {
-        DOM.cartItemContainer.addEventListener("click", (e) => {
-            const btn = e.target.closest(".cart-item-remove");
-            if (btn && confirm("Haluatko varmasti poistaa tämän tuotteen korista?")) {
-                removeCartItem(btn.dataset.cartId);
+    initializeAddressModal() {
+        this.addressModal = new AddressModal({
+            modalElement: this.DOM.addressModal,
+            openBtn: this.DOM.openAddressBtn,
+            editBtn: this.DOM.editAddressBtn,
+            closeBtn: this.DOM.closeModalBtn,
+            saveBtn: this.DOM.saveAddressBtn,
+            addressSection: this.DOM.addressSection,
+            addressDisplayElement: this.DOM.addressInput,
+            streetInput: this.DOM.streetInput,
+            cityInput: this.DOM.cityInput,
+            postalInput: this.DOM.postalInput,
+            onAddressSaved: (address) => {
+                console.log('Address saved:', address);
+                // Update checkout form with new address
+                if (this.checkoutForm) {
+                    this.checkoutForm.updateAddress(address);
+                }
             }
         });
     }
 
-    if (DOM.openAddressBtn) DOM.openAddressBtn.addEventListener("click", openAddressModal);
-    if (DOM.editAddressBtn) DOM.editAddressBtn.addEventListener("click", openAddressModal);
-    if (DOM.closeModalBtn) DOM.closeModalBtn.addEventListener("click", closeAddressModal);
-    if (DOM.saveAddressBtn) DOM.saveAddressBtn.addEventListener("click", saveAddress);
+    initializeCheckoutForm() {
+        // Determine if user is logged in
+        const isLoggedInField = document.getElementById('isLoggedIn');
+        const isLoggedIn = isLoggedInField?.value === '1';
 
-    window.addEventListener("click", (e) => {
-        if (e.target === DOM.addressModal) closeAddressModal();
-    });
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && DOM.addressModal?.style.display === "block") closeAddressModal();
-    });
+        // Get the appropriate form
+        const formElement = isLoggedIn ? this.DOM.formLoggedIn : this.DOM.formGuest;
 
-    // Guest form inputs validation
-    if (DOM.formGuest) {
-        const inputs = DOM.formGuest.querySelectorAll("input[required]");
-        inputs.forEach((input) => {
-            input.addEventListener("blur", () => {
-                input.style.borderColor = input.value.trim() ? "#28a745" : "#dc3545";
-            });
+        if (!formElement) {
+            console.warn('No checkout form found');
+            return;
+        }
+
+        this.checkoutForm = new CheckoutForm({
+            formElement: formElement,
+            isLoggedIn: isLoggedIn,
+            onSubmitSuccess: (customerData, cartItems) => {
+                console.log('Checkout submitted:', { customerData, cartItems });
+                // Redirect after successful checkout
+                window.location.href = '../pages/kassa.php';
+            }
         });
-
-        DOM.formGuest.addEventListener("submit", handleFormSubmit);
     }
+}
 
-    // Logged-in form
-    if (DOM.formLoggedIn) {
-        DOM.formLoggedIn.addEventListener("submit", handleFormSubmit);
-    }
-}; */
-
-
+// Initialize page when DOM is ready
 const waitForDOM = () => {
     return new Promise(resolve => {
         if (document.readyState === 'loading') {
@@ -181,4 +141,8 @@ const waitForDOM = () => {
     });
 };
 
-waitForDOM().then(initializePage);
+// Start the application
+waitForDOM().then(() => {
+    const cartPage = new CartPage();
+    cartPage.init();
+});

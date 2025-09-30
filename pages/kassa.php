@@ -35,6 +35,6 @@ if (!$cartItemCount) {
     <div id="orderSummary"></div>
     <button id="payBtn">Maksa nyt</button>
 
-    <script src="../js/kassa.js"></script>
+    <script src="../js/pages/kassa.js"></script>
 </body>
 </html>

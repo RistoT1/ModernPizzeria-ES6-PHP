@@ -1,5 +1,5 @@
 import { deleteItemFromCart, updateCartItemQuantity, fetchCartQuantity } from "../../helpers/api.js";
-import { checkQuantityLimit, showNotification } from "../../helpers/utils.js";
+import { checkQuantityLimit, showNotification, updateCartCounter } from "../../helpers/utils.js";
 
 export class renderCartItem {
     constructor({ item, container }) {
@@ -13,60 +13,98 @@ export class renderCartItem {
     setupEventListeners() {
         const el = this.container.querySelector(`.cart-item[data-cart-id="${this.item.cartRowID}"]`);
         if (!el) return;
+
         const decreaseBtn = el.querySelector(".decrease");
         const increaseBtn = el.querySelector(".increase");
         const quantitySpan = el.querySelector(".cartItemQuantity");
         const deleteBtn = el.querySelector(".delete");
 
-        decreaseBtn.addEventListener("click", async () => {
-            console.log("Decrease clicked for item:", this.item);
-            if (this.item.quantity > 1) {
-                const newQuantity = this.item.quantity - 1;
+        if (decreaseBtn) {
+            decreaseBtn.addEventListener("click", async () => {
+                console.log("Decrease clicked for item:", this.item);
+                if (this.item.quantity > 1) {
+                    const newQuantity = this.item.quantity - 1;
+                    const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity);
+                    if (success) {
+                        this.item.quantity = newQuantity;
+                        quantitySpan.textContent = this.item.quantity;
+                        
+                        // Update cart counter
+                        const cartQty = await fetchCartQuantity();
+                        updateCartCounter(cartQty);
+                        
+                        // Dispatch event for cart refresh
+                        window.dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
+                    } else {
+                        showNotification('Virhe päivitettäessä määrää', 'error');
+                    }
+                }
+            });
+        }
+
+        if (increaseBtn) {
+            increaseBtn.addEventListener("click", async () => {
+                console.log('Increase clicked');
+
+                const quantityToAdd = 1;
+                const currentQuantity = this.item.quantity;
+                const newQuantity = currentQuantity + quantityToAdd;
+
+                // Check quantity limit
+                const limitExceeded = await checkQuantityLimit(
+                    () => quantityToAdd,
+                    fetchCartQuantity,
+                    showNotification,
+                    () => { }
+                );
+
+                console.log('Limit exceeded:', limitExceeded);
+                if (limitExceeded) return;
+
                 const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity);
+                console.log('Update result:', success);
+                
                 if (success) {
                     this.item.quantity = newQuantity;
                     quantitySpan.textContent = this.item.quantity;
-                    dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
+                    
+                    // Update cart counter
+                    const cartQty = await fetchCartQuantity();
+                    updateCartCounter(cartQty);
+                    
+                    // Dispatch event for cart refresh
+                    window.dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
+                } else {
+                    showNotification('Virhe päivitettäessä määrää', 'error');
                 }
-            }
-        });
+            });
+        }
 
-        increaseBtn.addEventListener("click", async () => {
-            console.log('clicked');
+        if (deleteBtn) {
+            deleteBtn.addEventListener("click", async () => {
+                if (!confirm('Haluatko varmasti poistaa tämän tuotteen?')) {
+                    return;
+                }
 
-            const quantityToAdd = 1;
-            const currentQuantity = this.item.quantity; // existing quantity
-            const newQuantity = currentQuantity + quantityToAdd;
-
-            const limitExceeded = await checkQuantityLimit(
-                () => quantityToAdd, // only the quantity we want to add
-                fetchCartQuantity,
-                showNotification,
-                () => { }
-            );
-
-            console.log(limitExceeded);
-            if (limitExceeded) return;
-
-            const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity)
-            console.log(this.item.cartRowID, newQuantity);
-            if (success) {
-                this.item.quantity = newQuantity;
-                quantitySpan.textContent = this.item.quantity;
-                dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
-            }
-        });
-        deleteBtn.addEventListener("click", async () => {
-            const success = await deleteItemFromCart(this.item);
-            if (success) {
-                console.log("Item deleted successfully");
-                el.remove();
-                dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item.cartRowID }));
-            }
-            else {
-                console.error("Failed to delete item from backend");
-            }
-        });
+                const success = await deleteItemFromCart(this.item);
+                if (success) {
+                    console.log("Item deleted successfully");
+                    el.remove();
+                    
+                    // Update cart counter
+                    const cartQty = await fetchCartQuantity();
+                    updateCartCounter(cartQty);
+                    
+                    showNotification('Tuote poistettu', 'success');
+                    
+                    // Dispatch event for cart refresh
+                    window.dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item.cartRowID }));
+                } else {
+                    console.error("Failed to delete item from backend");
+                    showNotification('Virhe poistettaessa tuotetta', 'error');
+                }
+            });
+        }
     }
 
     render() {
@@ -77,36 +115,24 @@ export class renderCartItem {
                 <img 
                     src="../src/img/${this.item.Kuva ?? 'default-pizza.jpg'}"
                     alt="${this.item.PizzaNimi ?? 'Tuote'}"
+                    onerror="this.src='../src/img/default-pizza.jpg'"
                 />
                 <div class="cart-item-content">
                     <h4 class="cart-item-title">${this.item.Nimi ?? 'Tuote'}</h4>
                     <p class="cart-item-size">Koko: ${this.item.sizeName ?? '-'}</p>
-                    <p class="cart-item-price">${new Intl.NumberFormat("fi-FI", {
-            style: "currency",
-            currency: "EUR",
-        }).format(this.item.totalPrice ?? 0)
-            }</p>
+                    <p class="cart-item-price">${this.item.totalPrice * this.item.quantity + ' €'}</p>
                     
                     <div class="cartItemActions">
-                        <button class="decrease">−</button>
+                        <button class="decrease" aria-label="Vähennä määrää">−</button>
                         <span class="cartItemQuantity">${this.item.quantity ?? 0}</span>
-                        <button class="increase">+</button>
-                        <button class="delete">🗑</button>
+                        <button class="increase" aria-label="Lisää määrää">+</button>
+                        <button class="delete" aria-label="Poista tuote">🗑</button>
                     </div>
                 </div>
             </div>
         `;
 
         const fragment = document.createRange().createContextualFragment(template);
-
-        // Attach events
-        const el = fragment.querySelector(".cart-item");
-        const deleteBtn = el.querySelector(".delete");
-
-
-
-
-
         this.container.appendChild(fragment);
     }
 }
