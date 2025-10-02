@@ -22,23 +22,24 @@ export class renderCartItem {
         if (decreaseBtn) {
             decreaseBtn.addEventListener("click", async () => {
                 console.log("Decrease clicked for item:", this.item);
-                if (this.item.quantity > 1) {
-                    const newQuantity = this.item.quantity - 1;
-                    const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity);
-                    if (success) {
-                        this.item.quantity = newQuantity;
-                        quantitySpan.textContent = this.item.quantity;
-                        
-                        // Update cart counter
-                        const cartQty = await fetchCartQuantity();
-                        updateCartCounter(cartQty);
-                        
-                        // Dispatch event for cart refresh
-                        window.dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
-                    } else {
-                        showNotification('Virhe päivitettäessä määrää', 'error');
-                    }
+                if (this.item.quantity < 1) { return; }
+                
+                const newQuantity = this.item.quantity - 1;
+                const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity);
+                if (success) {
+                    this.item.quantity = newQuantity;
+                    quantitySpan.textContent = this.item.quantity;
+
+                    // Update cart counter
+                    const cartQty = await fetchCartQuantity();
+                    updateCartCounter(cartQty);
+
+                    // Dispatch event for cart refresh
+                    window.dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
+                } else {
+                    showNotification('Virhe päivitettäessä määrää', 'error');
                 }
+
             });
         }
 
@@ -63,15 +64,15 @@ export class renderCartItem {
 
                 const success = await updateCartItemQuantity(this.item.cartRowID, newQuantity);
                 console.log('Update result:', success);
-                
+
                 if (success) {
                     this.item.quantity = newQuantity;
                     quantitySpan.textContent = this.item.quantity;
-                    
+
                     // Update cart counter
                     const cartQty = await fetchCartQuantity();
                     updateCartCounter(cartQty);
-                    
+
                     // Dispatch event for cart refresh
                     window.dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item }));
                 } else {
@@ -90,13 +91,13 @@ export class renderCartItem {
                 if (success) {
                     console.log("Item deleted successfully");
                     el.remove();
-                    
+
                     // Update cart counter
                     const cartQty = await fetchCartQuantity();
                     updateCartCounter(cartQty);
-                    
+
                     showNotification('Tuote poistettu', 'success');
-                    
+
                     // Dispatch event for cart refresh
                     window.dispatchEvent(new CustomEvent("cartItemChanged", { detail: this.item.cartRowID }));
                 } else {
@@ -120,7 +121,7 @@ export class renderCartItem {
                 <div class="cart-item-content">
                     <h4 class="cart-item-title">${this.item.Nimi ?? 'Tuote'}</h4>
                     <p class="cart-item-size">Koko: ${this.item.sizeName ?? '-'}</p>
-                    <p class="cart-item-price">${this.item.totalPrice * this.item.quantity + ' €'}</p>
+                    <p class="cart-item-price">${this.item.totalPrice}€</p>
                     
                     <div class="cartItemActions">
                         <button class="decrease" aria-label="Vähennä määrää">−</button>

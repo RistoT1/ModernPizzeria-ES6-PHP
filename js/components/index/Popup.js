@@ -1,111 +1,139 @@
 import { AddToCartButton } from './AddToCartButton.js';
+import { validatePopupDom } from '../../helpers/domValid.js';
 
 export class Popup {
-    constructor({ popupElement, sizeMultipliers }) {
-        this.popup = popupElement;
+    constructor({ sizeMultipliers }) {
+        // Basic properties only
+        this.sizeMultipliers = sizeMultipliers || {};
         this.selectedPizzaID = null;
         this.selectedSizeID = "2";
         this.basePrice = 0;
-        this.quantityDisplay = this.popup.querySelector('#quantity');
         this.addToCartBtn = null;
-        this.sizeMultipliers = sizeMultipliers || {}; // Now this works
-        this.setupEventListeners();
+
+        // DOM references will be cached later
+        this.DOM = {};
     }
 
-    setupEventListeners() {
+    init() {
+        this.cacheDOM();
+        this.bindEvents();
+    }
+
+    /** ---------- DOM Caching ---------- */
+    cacheDOM() {
+        const DOM = validatePopupDom();
+        if (!DOM) throw new Error('Popup DOM not found');
+
+        this.DOM = DOM;
+
+        // Destructure for convenience
+        const {
+            popup, popupHeader, closeBtn, sizeContainer, qtyContainer,
+            quantityDisplay, popupTitle, popupInfo, popupIngredients,
+            popupPrice, popupInfoMain, popupBody
+        } = DOM;
+
+        Object.assign(this, {
+            popup, popupHeader, closeBtn, sizeContainer, qtyContainer,
+            quantityDisplay, popupTitle, popupInfo, popupIngredients,
+            popupPrice, popupInfoMain, popupBody
+        });
+    }
+
+    /** ---------- Event Binding ---------- */
+    bindEvents() {
         if (!this.popup) return;
 
         this.popup.addEventListener('click', e => {
             if (e.target === this.popup) this.close();
         });
 
-        const closeBtn = this.popup.querySelector('#closePopup');
-        if (closeBtn) closeBtn.addEventListener('click', () => this.close());
-
-        const sizeContainer = this.popup.querySelector('.size-options');
-        if (sizeContainer) sizeContainer.addEventListener('click', e => this.handleSizeChange(e));
-
-        const qtyContainer = this.popup.querySelector('.quantity-control');
-        if (qtyContainer) qtyContainer.addEventListener('click', e => this.handleQuantityChange(e));
+        this.closeBtn?.addEventListener('click', () => this.close());
+        this.sizeContainer?.addEventListener('click', e => this.handleSizeChange(e));
+        this.qtyContainer?.addEventListener('click', e => this.handleQuantityChange(e));
     }
 
+    /** ---------- Popup Controls ---------- */
     open(pizza) {
-        console.log(this.sizeMultipliers)
+        if (!pizza) return;
+
         this.selectedPizzaID = pizza.PizzaID;
         this.basePrice = parseFloat(pizza.Hinta) || 0;
         this.selectedSizeID = "2";
 
-        const title = this.popup.querySelector('.popup-title');
-        const info = this.popup.querySelector('.popup-info');
-        const ingredients = this.popup.querySelector('.popup-ingredients');
-        const header = this.popup.querySelector('.popup-header');
-
-        if (title) title.textContent = pizza.PizzaNimi || '';
-        if (info) info.textContent = pizza.Tiedot || '';
-        if (ingredients) {
-            ingredients.textContent = Array.isArray(pizza.Ainesosat)
-                ? pizza.Ainesosat.join(', ')
-                : (pizza.Ainesosat || '');
-        }
-        if (header) {
-            header.style.backgroundImage = `url(${pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg'})`;
-        }
-
-        if (this.quantityDisplay) this.quantityDisplay.textContent = '1';
-
-        const sizeBtns = this.popup.querySelectorAll('.size-btn');
-        sizeBtns.forEach(btn => btn.classList.remove('active'));
-        const defaultSizeBtn = this.popup.querySelector('.size-btn[data-size="2"]');
-        if (defaultSizeBtn) defaultSizeBtn.classList.add('active');
-
-        const existingBtn = this.popup.querySelector('.add-to-cart-btn');
-        if (existingBtn) existingBtn.remove();
-
-        const buttonContainer = this.popup.querySelector('.popup-info-main') || this.popup.querySelector('.popup-body');
-        if (buttonContainer) {
-            this.addToCartBtn = new AddToCartButton({
-                parentElement: buttonContainer,
-                pizzaID: this.selectedPizzaID,
-                getSizeID: () => this.selectedSizeID,
-                getQuantity: () => parseInt(this.quantityDisplay?.textContent) || 1,
-                onSuccess: () => this.close() // Pass close callback
-            });
-        }
-
+        this.resetQuantity();
+        this.populatePopup(pizza);
+        this.renderAddToCartButton();
         this.popup.classList.add('active');
         this.updatePrice();
     }
 
     close() {
-        console.log('Closing popup'); // Debug
         this.popup.classList.remove('active');
-        if (this.addToCartBtn) {
-            const btn = this.popup.querySelector('.add-to-cart-btn');
-            if (btn) btn.remove();
-            this.addToCartBtn = null;
-        }
+        this.addToCartBtn?.removeButton?.();
+        this.addToCartBtn = null;
     }
 
+    /** ---------- Helpers ---------- */
+    resetQuantity() {
+        if (this.quantityDisplay) this.quantityDisplay.textContent = '1';
+    }
+
+    populatePopup(pizza) {
+        if (this.popupTitle) this.popupTitle.textContent = pizza.PizzaNimi || '';
+        if (this.popupInfo) this.popupInfo.textContent = pizza.Tiedot || '';
+        if (this.popupIngredients) {
+            this.popupIngredients.textContent = Array.isArray(pizza.Ainesosat)
+                ? pizza.Ainesosat.join(', ')
+                : pizza.Ainesosat || '';
+        }
+        if (this.popupHeader) {
+            this.popupHeader.style.backgroundImage = `url(${pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg'})`;
+        }
+
+        this.setActiveSize('2');
+    }
+
+    setActiveSize(sizeID) {
+        const sizeBtns = this.sizeContainer?.querySelectorAll('.size-btn') || [];
+        sizeBtns.forEach(btn => btn.classList.remove('active'));
+
+        const defaultBtn = this.sizeContainer?.querySelector(`.size-btn[data-size="${sizeID}"]`);
+        if (defaultBtn) defaultBtn.classList.add('active');
+    }
+
+    renderAddToCartButton() {
+        this.addToCartBtn?.removeButton?.();
+
+        const container = this.popupInfoMain || this.popupBody;
+        if (!container) return;
+
+        this.addToCartBtn = new AddToCartButton({
+            parentElement: container,
+            pizzaID: this.selectedPizzaID,
+            getSizeID: () => this.selectedSizeID,
+            getQuantity: () => parseInt(this.quantityDisplay?.textContent) || 1,
+            onSuccess: () => this.close()
+        });
+        this.addToCartBtn.renderButton?.();
+    }
+
+    /** ---------- Price Calculation ---------- */
     updatePrice() {
         const multiplier = this.sizeMultipliers[this.selectedSizeID]?.multiplier || 1;
         const quantity = parseInt(this.quantityDisplay?.textContent) || 1;
         const totalPrice = this.basePrice * quantity * multiplier;
 
-        //:( this.popup.querySelector('.popup-price')?.textContent = `${totalPrice.toFixed(2)} €`; ei toiminu 
-        const price = this.popup.querySelector('.popup-price');
-        if (price) {
-            price.textContent = `${totalPrice.toFixed(2)} €`;
-        }
+        if (this.popupPrice) this.popupPrice.textContent = `${totalPrice.toFixed(2)} €`;
     }
 
+    /** ---------- Event Handlers ---------- */
     handleSizeChange(e) {
         const btn = e.target.closest('.size-btn');
         if (!btn) return;
 
-        const sizeBtns = this.popup.querySelectorAll('.size-btn');
-        sizeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
         this.selectedSizeID = btn.dataset.size;
+        this.setActiveSize(this.selectedSizeID);
         this.updatePrice();
     }
 
@@ -117,6 +145,7 @@ export class Popup {
         const change = parseInt(btn.dataset.change) || 0;
         current = Math.max(1, Math.min(99, current + change));
         this.quantityDisplay.textContent = current;
+
         this.updatePrice();
     }
 }

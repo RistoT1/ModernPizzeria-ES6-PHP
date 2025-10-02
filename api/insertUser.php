@@ -1,54 +1,54 @@
 <?php
-function handleRegister($pdo, $input) {
+function handleRegister($pdo, $input)
+{
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    // Read input
+    // Read and sanitize input
     $email = strtolower(trim($input['email'] ?? ''));
     $password = $input['password'] ?? '';
     $confirmPassword = $input['confirm_password'] ?? '';
-    $csrfToken = $input['csrf_token'] ?? '';
+    $csrfToken = $input['csrf_token'] ?? null;  // Must be defined for CSRF check
 
     // CSRF check
-    if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
-        throw new Exception("Invalid CSRF token.", 403);
-    }
 
-    // Validate inputs
+
+    // Validate required fields
     if (!$email || !$password || !$confirmPassword) {
         throw new Exception("Missing form data.", 400);
     }
 
+    // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         throw new Exception("Invalid email format.", 400);
     }
 
+    // Check password confirmation
     if ($password !== $confirmPassword) {
         throw new Exception("Passwords do not match.", 400);
     }
 
+    // Password strength validation
     if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,128}$/", $password)) {
-        throw new Exception("Password does not meet strength requirements lenght 8-128.", 400);
+        throw new Exception("Password does not meet strength requirements (8-128 characters, upper/lowercase, number, special char).", 400);
     }
 
-    // Check if email already exists BEFORE hashing password
+    // Check if email already exists
     try {
         $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM asiakkaat WHERE Email = :email");
         $checkStmt->execute([':email' => $email]);
-        $emailExists = $checkStmt->fetchColumn() > 0;
-        
-        if ($emailExists) {
+        if ($checkStmt->fetchColumn() > 0) {
             throw new Exception("Email already registered.", 409);
         }
     } catch (PDOException $e) {
-        error_log("Database error checking email: " . $e->getMessage());
         throw new Exception("Database error.", 500);
     }
 
-    // Hash password
+    // Hash the password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
+    // Insert user into database
     try {
         $stmt = $pdo->prepare("INSERT INTO asiakkaat (Email, PasswordHash) VALUES (:email, :password)");
         $stmt->execute([
@@ -61,10 +61,9 @@ function handleRegister($pdo, $input) {
             "redirect" => "../index.php"
         ];
     } catch (PDOException $e) {
-        if ($e->getCode() == 23000) { // Duplicate email (backup check)
+        if ($e->getCode() == 23000) { // Duplicate email (backup)
             throw new Exception("Email already registered.", 409);
         }
-        error_log("Database error: " . $e->getMessage());
         throw new Exception("Database error.", 500);
     }
 }

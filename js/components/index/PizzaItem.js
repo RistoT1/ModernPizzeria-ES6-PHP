@@ -5,6 +5,7 @@ export class PizzaItem {
         this.pizza = pizza;
         this.container = container;
         this.openPopupCallback = openPopupCallback;
+        this.element = null; // store the main element
         this.render();
     }
 
@@ -12,7 +13,19 @@ export class PizzaItem {
         const div = document.createElement('div');
         div.className = 'menuItemSmall';
         div.id = `pizza-${this.pizza.PizzaID}`;
+        this.element = div;
 
+        const imgContainer = this.createImageContainer();
+        const content = this.createContent();
+
+        div.appendChild(imgContainer);
+        div.appendChild(content);
+        div.addEventListener('click', () => this.openPopupCallback(this.pizza));
+
+        this.container.appendChild(div);
+    }
+
+    createImageContainer() {
         const imgContainer = document.createElement('div');
         imgContainer.className = 'itemImg';
 
@@ -28,9 +41,11 @@ export class PizzaItem {
             }
         };
 
-        // Append image to container
         imgContainer.appendChild(img);
+        return imgContainer;
+    }
 
+    createContent() {
         const content = document.createElement('div');
         content.className = 'itemContent';
         content.innerHTML = `
@@ -40,10 +55,6 @@ export class PizzaItem {
         </div>
         <p class="itemTiedot">${escapeHtml(this.pizza.Tiedot || '')}</p>
         `;
-
-        div.appendChild(imgContainer);
-        div.appendChild(content);
-        div.addEventListener('click', () => this.openPopupCallback(this.pizza));
-        this.container.appendChild(div);
+        return content;
     }
 }

@@ -74,8 +74,6 @@
                                     <button class="qty-btn" data-change="1">+</button>
                                 </div>
                             </div>
-
-                            <button class="add-to-cart-btn" id="addCart">Lisää koriin</button>
                         </div>
 
                     </div>

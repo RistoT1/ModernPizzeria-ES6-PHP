@@ -58,6 +58,7 @@ $routes = [
         "pizzat" => "fetchPizzat",
         "lisat" => "fetchLisat",
         "koko" => "fetchKoot",
+        "register" => "handleRegister",
         "kori" => "fetchCart",
         "asiakas" => "fetchUser"
     ],

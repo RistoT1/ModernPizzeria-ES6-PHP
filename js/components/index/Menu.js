@@ -11,7 +11,11 @@ export class Menu {
     render() {
         this.container.innerHTML = '';
         this.pizzas.forEach(pizza => {
-            new PizzaItem({ pizza, container: this.container, openPopupCallback: (p) => this.popup.open(p) });
+            new PizzaItem({
+                pizza,
+                container: this.container,
+                openPopupCallback: (p) => this.popup.open(p)
+            });
         });
     }
 }

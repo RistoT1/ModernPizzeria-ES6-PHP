@@ -68,15 +68,25 @@ export const checkQuantityLimit = async (getQuantity, fetchCartQuantity, showNot
   const MAX_QUANTITY = 99;
 
   const cartQty = await fetchCartQuantity();
-  console.log("lyuvut",cartQty, quantityToAdd)
   const newTotalQty = cartQty + quantityToAdd;
 
   if (newTotalQty > MAX_QUANTITY) {
-    showNotification(`Et voi lisätä yli ${MAX_QUANTITY} kappaletta koriin.`, 'error');
+    showNotification(`Tuotteiden kokonaismäärä ei voi ylittää: ${MAX_QUANTITY}. Soita Myymälään jos tilauksesi todella sisältää näin monta pizzaa <3`, 'error');
     setLoadingState(false);
     return true; // Indicate limit exceeded
   }
 
   return false; 
 };
+
+
+//signup and pass change
+export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+export const isEmailValid = (email) => 
+    email.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+export const isPasswordStrong = (password) => passwordRegex.test(password);
+
+export const doPasswordsMatch = (password, confirmPassword) => password === confirmPassword;
 

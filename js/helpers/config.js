@@ -1,4 +1,4 @@
-export const getApiPath = () => {
+export const getPath = (isApi = false) => {
     const path = window.location.pathname;
     const segments = path.split('/');
 
@@ -13,6 +13,9 @@ export const getApiPath = () => {
         segments.splice(pagesIndex, 1);
     }
 
+    // Construct base path
     const basePath = segments.join('/').replace(/\/+$/, '');
-    return `${basePath}/api/main.php`;
+
+    // Return base path, optionally with API
+    return isApi ? `${basePath}/api/main.php` : basePath;
 };

@@ -103,7 +103,7 @@ if (empty($_SESSION['csrf_token'])) {
         </div>
     </div>
 
-    <script type="module" src="../js/signup.js"></script>
+    <script type="module" src="../js/pages/signup.js"></script>
 </body>
 
 </html>

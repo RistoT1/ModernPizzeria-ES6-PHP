@@ -1,17 +1,18 @@
 <?php
 function addCartItem($pdo, $input)
 {
-    $pizzaID = intval($input['PizzaID'] ?? 0);
-    $quantity = intval($input['Quantity'] ?? 1);
-    $sizeID = intval($input['KokoID'] ?? 2);
+    $pizzaID = intval($input['pizzaID'] ?? 0);
+    $quantity = intval($input['quantity'] ?? 1);
+    $sizeID = intval($input['sizeID'] ?? 2);
 
     file_put_contents(__DIR__ . '/debug.log', "[" . date("Y-m-d H:i:s") . "] SESSION: " . json_encode($_SESSION) . json_encode($input) . "\n", FILE_APPEND);
+
     if (!$pizzaID || !$quantity || !$sizeID) {
-        throw new Exception("Missing required fields: pizzaid, quantity or sizeid", 400);
+        throw new Exception("Missing required fields: pizzaID, quantity or sizeID", 400);
     }
 
     if ($quantity < 1 || $quantity > 99) {
-        throw new Exception('Quantity must be between 1 and 99', 400);
+        throw new Exception('Quantity must be between 1 and 99', 450);
     }
 
     $user = getUser(); // registered or guest
@@ -22,7 +23,8 @@ function addCartItem($pdo, $input)
 
     $unitPrice = floatval($pizza['Hinta']) * floatval($size['HintaKerroin']);
 
-    $cartItemID = addOrUpdateCartItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitPrice);
+    // Insert new item
+    $cartItemID = insertItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitPrice);
 
     $totalQuantity = fetchCount($pdo, $cartID);
 
@@ -53,6 +55,7 @@ function getUser()
             $_SESSION['guestToken'] = $guestToken;
         }
     }
+
     return ['asiakasID' => $asiakasID, 'guestToken' => $guestToken];
 }
 
@@ -68,6 +71,7 @@ function getOrCreateCart($pdo, $user)
         $stmt = $pdo->prepare("SELECT OstoskoriID FROM ostoskori WHERE GuestToken=:token ORDER BY UpdatedAt DESC LIMIT 1");
         $stmt->execute(['token' => $guestToken]);
     }
+
     $cart = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($cart) {
@@ -94,8 +98,9 @@ function getPizza($pdo, $pizzaID)
     $stmt = $pdo->prepare("SELECT PizzaID,Nimi,Hinta FROM pizzat WHERE PizzaID=:id AND Aktiivinen=1");
     $stmt->execute(['id' => $pizzaID]);
     $pizza = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$pizza)
-        return apiError('Pizza not found');
+    if (!$pizza) {
+        throw new Exception('Pizza not found', 404);
+    }
     return $pizza;
 }
 
@@ -110,49 +115,29 @@ function getSize($pdo, $sizeID)
         $stmt = $pdo->prepare("SELECT KokoID,Koko,HintaKerroin FROM koot WHERE KokoID=2 AND Aktiivinen=1");
         $stmt->execute();
         $size = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$size)
+        if (!$size) {
             throw new Exception('No valid pizza sizes available');
+        }
     }
     return $size;
 }
 
-function addOrUpdateCartItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitPrice)
+// Only insert new item, function renamed to insertItem
+function insertItem($pdo, $cartID, $pizzaID, $sizeID, $quantity, $unitPrice)
 {
-    $pdo->beginTransaction();
+    $totalPrice = $unitPrice * $quantity;
 
     $stmt = $pdo->prepare("
-        SELECT OstoskoriRivitID, Maara 
-        FROM ostoskori_rivit 
-        WHERE OstoskoriID=:cartID AND PizzaID=:pizzaID AND KokoID=:sizeID
+        INSERT INTO ostoskori_rivit (OstoskoriID, PizzaID, KokoID, Maara, Hinta)
+        VALUES (:cartID, :pizzaID, :sizeID, :qty, :price)
     ");
     $stmt->execute([
         'cartID' => $cartID,
         'pizzaID' => $pizzaID,
-        'sizeID' => $sizeID
+        'sizeID' => $sizeID,
+        'qty' => $quantity,
+        'price' => $totalPrice
     ]);
-    $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($item) {
-        $newQty = $item['Maara'] + $quantity;
-        if ($newQty > 99) {
-            throw new Exception('Maximum quantity exceeded');
-        }
-
-        $stmt = $pdo->prepare("UPDATE ostoskori_rivit SET Maara=:q, Hinta=:price WHERE OstoskoriRivitID=:id");
-        $stmt->execute(['q' => $newQty, 'price' => $unitPrice * $newQty, 'id' => $item['OstoskoriRivitID']]);
-        $cartItemID = $item['OstoskoriRivitID'];
-    } else {
-        $totalPrice = $unitPrice * $quantity;
-        $stmt = $pdo->prepare("
-            INSERT INTO ostoskori_rivit (OstoskoriID,PizzaID,KokoID,Maara,Hinta)
-            VALUES (:cartID,:pizzaID,:sizeID,:qty,:price)
-        ");
-        $stmt->execute(['cartID' => $cartID, 'pizzaID' => $pizzaID, 'sizeID' => $sizeID, 'qty' => $quantity, 'price' => $totalPrice]);
-        $cartItemID = $pdo->lastInsertId();
-    }
-
-    $pdo->commit();
-    return $cartItemID;
+    return $pdo->lastInsertId();
 }
-
-

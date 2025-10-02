@@ -1,9 +1,9 @@
 import { CartBackup } from '../components/index/cartBackup.js';
-import { getApiPath } from './config.js';
+import { getPath } from './config.js';
 
 export const fetchSizes = async () => {
     try {
-        const res = await fetch(`${getApiPath()}?koko`);
+        const res = await fetch(`${getPath(true)}?koko`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const result = await res.json();
 
@@ -26,7 +26,7 @@ export const fetchSizes = async () => {
 
 export const fetchPizza = async () => {
     try {
-        const res = await fetch(`${getApiPath()}?pizzat`);
+        const res = await fetch(`${getPath(true)}?pizzat`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const result = await res.json();
         return result.success && Array.isArray(result.data) ? result.data : [];
@@ -41,7 +41,7 @@ export const fetchCartQuantity = async ({ includeItems = false } = {}) => {
         let guestToken = CartBackup.loadGuestToken();
         console.log(`local guestToken: ${guestToken || ''}`);
 
-        const res = await fetch(`${getApiPath()}?kori&includeItems=${includeItems}`, {
+        const res = await fetch(`${getPath(true)}?kori&includeItems=${includeItems}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -77,17 +77,17 @@ export const fetchCartQuantity = async ({ includeItems = false } = {}) => {
 export const deleteItemFromCart = async (item) => {
     try {
         const guestToken = CartBackup.loadGuestToken();
-        const res = await fetch(`${getApiPath()}`, {
+        const res = await fetch(`${getPath(true)}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Guest-Token': guestToken || ''
-            }, 
+            },
             body: JSON.stringify(
-            { 
-                deleteItem: true,
-                cartRowID: item.cartRowID 
-            })
+                {
+                    deleteItem: true,
+                    cartRowID: item.cartRowID
+                })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const result = await res.json();
@@ -99,20 +99,24 @@ export const deleteItemFromCart = async (item) => {
 };
 
 export const updateCartItemQuantity = async (cartRowID, newQuantity) => {
-    console.log('aaaa',cartRowID)
+    console.log('aaaa', cartRowID)
     try {
         const guestToken = CartBackup.loadGuestToken();
-        const res = await fetch(`${getApiPath()}?`, {
+        const payload = {
+            updateItemQuantity: true,
+            cartRowID: cartRowID,
+            quantity: newQuantity
+        };
+
+        console.log('Payload being sent to API:', payload);
+
+        const res = await fetch(`${getPath(true)}?`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Guest-Token': guestToken || ''
             },
-            body: JSON.stringify({
-                updateItemQuantity:  true,
-                cartRowID: cartRowID,
-                quantity: newQuantity
-            })
+            body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const result = await res.json();
@@ -126,20 +130,25 @@ export const addItemToCart = async (item) => {
     try {
         const guestToken = CartBackup.loadGuestToken();
 
-        const res = await fetch(`${getApiPath()}`, {
+        const payload = {
+            addItem: true,
+            pizzaID: item.pizzaID,
+            sizeID: item.sizeID,
+            quantity: item.quantity
+        };
+
+        // Debug: log payload
+        console.log('Sending payload to API:', payload);
+
+        const res = await fetch(getPath(true), {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
-                , 'X-Guest-Token': guestToken || ''
+                'Content-Type': 'application/json',
+                'X-Guest-Token': guestToken || ''
             },
-            body: JSON.stringify({
-                addItem: true,
-                PizzaID: item.PizzaID,
-                KokoID: item.KokoID,
-                Quantity: item.Quantity || 1
-            })
+            body: JSON.stringify(payload)
         });
-        console.log('adding product in api', item); // Debug
+
         const result = await res.json();
         console.log('add to cart response', result); // Debug
         if (result.data?.guestToken) {
@@ -156,9 +165,33 @@ export const addItemToCart = async (item) => {
         return false;
     }
 };
+// Function to signup user via API
+export const signupUser = async (requestData) => {
+    try {
+        const res = await fetch(getPath(true), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        const result = await res.json();
+        if (result.success) {
+            return result;
+        } else {
+            console.warn('API error:', result.error || 'Unknown error');
+            return result;
+        }
+    } catch (err) {
+        console.error('Error adding user:', err);
+        return false;
+    }
+};
+
 export const logoutUser = async () => {
     try {
-        const res = await fetch(`${getApiPath()}`, {
+        const res = await fetch(`${getPath(true)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ logout: true })

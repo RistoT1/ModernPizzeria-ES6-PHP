@@ -17,6 +17,50 @@ export const validateIndexDom = () => {
     return elements;
 };
 
+export const validatePopupDom = () => {
+    const popup = document.getElementById('pizzaPopup');
+    if (!popup) return null;
+
+    const elements = {
+        popup,
+        popupHeader: popup.querySelector('.popup-header'),
+        closeBtn: popup.querySelector('#closePopup'),
+        sizeContainer: popup.querySelector('.size-options'),
+        quantityDisplay: popup.querySelector('#quantity'),
+        qtyContainer: popup.querySelector('.quantity-control'),
+        popupTitle: popup.querySelector('.popup-title'),
+        popupInfo: popup.querySelector('.popup-info'),
+        popupIngredients: popup.querySelector('.popup-ingredients'),
+        popupPrice: popup.querySelector('.popup-price'),
+        popupInfoMain: popup.querySelector('.popup-info-main'),
+        popupBody: popup.querySelector('.popup-body')
+    };
+
+    if (!checkMissingElements(elements)) {
+        return null;
+    }
+
+    return elements;
+};
+
+export const validateSignUpDom = () => {
+    const elements = {
+        form: document.getElementById('signupForm'),
+        email: document.getElementById('email'),
+        password: document.getElementById('password'),
+        confirmPassword: document.getElementById('confirm-password'),
+        errorMessage: document.getElementById('error'),
+        submitBtn: document.getElementById('submitBtn'),
+        passwordToggle: document.getElementById('passwordToggle'),
+        csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+    };
+    if (!checkMissingElements(elements)) {
+        return null;
+    }
+
+    return elements;
+}
+
 export const validateCartDom = () => {
     const elements = {
         cartItemContainer: document.getElementById("cartItems"),
