@@ -76,15 +76,25 @@ export const checkQuantityLimit = async (getQuantity, fetchCartQuantity, showNot
     return true; // Indicate limit exceeded
   }
 
-  return false; 
+  return false;
 };
 
+export const passwordToggle = (passwordInput, toggleIcon) => {
+  if (!passwordInput) return;
+
+  passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+
+  if (toggleIcon) {
+    toggleIcon.classList.toggle("fa-eye");
+    toggleIcon.classList.toggle("fa-eye-slash");
+  }
+};
 
 //signup and pass change
 export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
-export const isEmailValid = (email) => 
-    email.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+export const isEmailValid = (email) =>
+  email.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export const isPasswordStrong = (password) => passwordRegex.test(password);
 

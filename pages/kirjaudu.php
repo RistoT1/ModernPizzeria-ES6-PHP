@@ -7,6 +7,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>" />
     <title>Kirjaudu -Sakky Pizzeria</title>
     <link rel="stylesheet" href="../css/reset.css" />
     <link rel="stylesheet" href="../css/main.css" />
@@ -22,7 +23,7 @@
             <a href="../index.php" class="login-link">Takaisin menuun!</a>
         </div>
         <div class="login-form">
-            <div id="errorMsg" class="login-message error" style="display:none;"></div>
+            <div id="error" class="login-message error" style="display:none;"></div>
 
             <form id="loginForm" class="login-form" action="../api/loginCheck.php" method="post" autocomplete="off">
                 <input type="hidden" name="csrf_token"
@@ -46,7 +47,7 @@
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="login-btn" id="loginBtn">
+                <button type="submit" class="login-btn" id="submitBtn">
                     Sign In
                 </button>
             </form>
@@ -58,7 +59,7 @@
         </div>
     </div>
 
-    <script type="module" src="../js/login.js"></script>
+    <script type="module" src="../js/pages/login.js"></script>
 </body>
 
 </html>

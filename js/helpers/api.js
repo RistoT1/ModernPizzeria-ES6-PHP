@@ -189,6 +189,29 @@ export const signupUser = async (requestData) => {
     }
 };
 
+export const loginUser = async (requestData) => {
+    try {
+        const res = await fetch(getPath(true), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        const result = await res.json();
+        if (result.success) {
+            return result;
+        } else {
+            console.warn('API error:', result.error || 'Unknown error');
+            return result;
+        }
+    } catch (err) {
+        console.error('Error adding user:', err);
+        return false;
+    }
+};
+
 export const logoutUser = async () => {
     try {
         const res = await fetch(`${getPath(true)}`, {

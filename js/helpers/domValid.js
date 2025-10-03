@@ -44,6 +44,8 @@ export const validatePopupDom = () => {
 };
 
 export const validateSignUpDom = () => {
+    const passwordToggleBtn = document.getElementById('passwordToggle');
+
     const elements = {
         form: document.getElementById('signupForm'),
         email: document.getElementById('email'),
@@ -51,15 +53,45 @@ export const validateSignUpDom = () => {
         confirmPassword: document.getElementById('confirm-password'),
         errorMessage: document.getElementById('error'),
         submitBtn: document.getElementById('submitBtn'),
-        passwordToggle: document.getElementById('passwordToggle'),
+        passwordToggleBtn: passwordToggleBtn,
+        toggleIcon: passwordToggleBtn?.querySelector('i') || null, // fallback
         csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            || document.querySelector('input[name="csrf_token"]')?.value
     };
+
+    if (!checkMissingElements(elements)) {
+        return null;
+    }
+
+    return elements;
+};
+
+
+export const validateLoginDom = () => {
+    const passwordToggleBtn = document.getElementById('passwordToggle');
+    const elements = {
+        form: document.getElementById('loginForm'),
+        email: document.getElementById('email'),
+        password: document.getElementById('password'),
+        passwordToggleBtn: passwordToggleBtn,
+        toggleIcon: passwordToggleBtn?.querySelector('i') || null,
+        errorMessage: document.getElementById('error'),
+        submitBtn: document.getElementById('submitBtn'),
+        csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            || document.querySelector('input[name="csrf_token"]')?.value
+    }
+
     if (!checkMissingElements(elements)) {
         return null;
     }
 
     return elements;
 }
+
+
+
+
+
 
 export const validateCartDom = () => {
     const elements = {

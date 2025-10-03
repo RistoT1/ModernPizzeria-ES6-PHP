@@ -1,4 +1,5 @@
 import { logoutUser, fetchCartQuantity } from '../helpers/api.js';
+import { getPath } from '../helpers/config.js';
 import { validateNavDom } from '../helpers/domValid.js';
 import { updateCartCounter } from '../helpers/utils.js';
 
@@ -31,7 +32,7 @@ const setupEventListeners = (DOM) => {
 
         const success = await logoutUser();
         if (success) {
-            window.location.href = './index.php';
+            window.location.href = `${getPath(false)}/index.php`;
         } else {
             alert('Logout failed. Please try again.');
         }

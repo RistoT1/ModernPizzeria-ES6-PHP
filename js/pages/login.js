@@ -1,45 +1,73 @@
-const form = document.getElementById('loginForm');
-const errorMsg = document.getElementById('errorMsg');
-const password = document.getElementById('password');
-const passwordToggle = document.getElementById('passwordToggle');
-const toggleIcon = passwordToggle.querySelector('i');
+import { ErrorMessage } from "../helpers/ErrorMessage.js";
+import { validateLoginDom } from "../helpers/domValid.js";
+import { passwordToggle } from "../helpers/utils.js";
+import { getPath } from "../helpers/config.js";
+import { loginUser } from "../helpers/api.js";
 
-passwordToggle.addEventListener('click', () => {
-    password.type = password.type === 'password' ? 'text' : 'password';
+class LoginPage {
+    #DOM;
+    #error;
 
-    toggleIcon.classList.toggle('fa-eye');
-    toggleIcon.classList.toggle('fa-eye-slash');
-});
+    constructor() {
+        this.#DOM = validateLoginDom();
+        if (!this.#DOM) throw new Error('Required DOM elements not found');
 
-form.addEventListener('submit', async e => {
-    e.preventDefault();
-    errorMsg.style.display = 'none';
+        this.#error = new ErrorMessage(this.#DOM.errorMessage);
 
-    const payload = {
-        login: true,
-        email: form.email.value,
-        password: form.password.value
-    };
+        this.#initializeFormSubmit();
+        console.log('loaded');
+    }
 
-    try {
-        const res = await fetch('../api/main.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(payload)
+    #initializeFormSubmit() {
+        const { form, password, passwordToggleBtn, toggleIcon } = this.#DOM;
+
+        form?.addEventListener("submit", async (e) => {
+            await this.#submitForm(e);
         });
 
-        const data = await res.json();
+        passwordToggleBtn?.addEventListener("click", () => {
+            passwordToggle(password, toggleIcon);
+        });
+    };
 
-        if (data.success) {
-            window.location.href = data.data.redirect || '../index.php';
-        } else {
-            errorMsg.textContent = data.error || 'Login failed';
-            errorMsg.style.display = 'block';
+    async #submitForm(e) {
+        e.preventDefault();
+        const { email, password, submitBtn, csrfToken } = this.#DOM;
+
+        submitBtn.disabled = true;
+
+        const requestData = {
+            login: true,
+            email: email.value.trim(),
+            password: password.value,
+            csrf_token: csrfToken
+        };
+
+        try {
+            const result = await loginUser(requestData);
+
+            if (result.success) {
+                console.log("Login success!");
+                window.location.href = `${getPath(false)}/index.php`;
+            } else {
+                console.log("Login failed!");
+                this.#error.show(result.error || 'Signup failed');
+                submitBtn.disabled = false;
+            }
+        } catch (err) {
+            this.#error.show('Login failed. Please try again.');
+            submitBtn.disabled = false;
+            console.error(err);
         }
-    } catch (err) {
-        errorMsg.textContent = 'Network error: ' + err.message;
-        errorMsg.style.display = 'block';
-    }
-});
 
+    };
+}
+
+const waitForDOM = () =>
+    document.readyState === 'loading'
+        ? new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve))
+        : Promise.resolve();
+
+await waitForDOM();
+
+const loginPage = new LoginPage();
