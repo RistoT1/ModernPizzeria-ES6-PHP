@@ -133,7 +133,9 @@ export const validateCartDom = () => {
 export const validateNavDom = () => {
     const elements = {
         nav: document.getElementById('navbar'),
-        logoutBtn: document.getElementById('logoutBtn')
+        logoutBtn: document.getElementById('logoutBtn'),
+        mobileToggle: document.querySelector('.mobile-menu-toggle'),
+        navLinks: document.querySelector('.nav-links')
     };
 
     return elements;

@@ -37,7 +37,7 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
                     <i class="fa-solid fa-basket-shopping"></i>
                     <h3>Ostoskorisi on tyhjä</h3>
                     <p>Lisää pizzoja koriin aloittaaksesi tilauksen</p>
-                    <a href="../index.php" class="btn-primary">Takaisin menuun</a>
+                    <a href="./menu.php" class="btn-primary">Takaisin menuun</a>
                 </div>
 
                 <!-- Customer Info Form -->

@@ -32,7 +32,7 @@ nav {
     z-index: 1000;
     background: rgba(0, 0, 0, 0.98);
     animation: navFadeIn 1s ease forwards;
-    gap: 1rem;
+    gap: 0.1rem;
     box-sizing: border-box;
 }
 
@@ -107,8 +107,12 @@ nav {
     transition: width 0.3s ease;
 }
 
-.nav-links a:hover::after,
-.nav-links a:focus::after {
+.nav-links a::after {
+    transition: width 0.3s ease;
+}
+
+/* underline only for active link */
+.nav-links a.active::after {
     width: 100%;
 }
 
@@ -142,10 +146,14 @@ nav {
     min-width: 0;
     text-decoration: none;
 
-    display: inline-flex;       /* Ensures proper vertical alignment */
-    align-items: center;        /* Vertically centers text */
-    justify-content: center;    /* Horizontally centers text */
-    line-height: 1;             /* Prevents extra height from font */
+    display: inline-flex;
+    /* Ensures proper vertical alignment */
+    align-items: center;
+    /* Vertically centers text */
+    justify-content: center;
+    /* Horizontally centers text */
+    line-height: 1;
+    /* Prevents extra height from font */
 }
 
 
@@ -163,13 +171,15 @@ nav {
 /* Shopping Cart Icon */
 .shopping-ostoskori {
     position: relative;
-    font-size: 1.2rem;
     color: rgba(255, 255, 255, 0);
     transition: transform 0.3s ease;
     animation: fadeInText 1s ease forwards;
     animation-delay: 0.9s;
     text-decoration: none;
     flex-shrink: 0;
+}
+.shopping-ostoskori i{
+    font-size: 1.3rem;
 }
 
 .shopping-ostoskori:hover {
@@ -180,16 +190,18 @@ nav {
     position: absolute;
     top: -8px;
     right: -8px;
-    text-align: center;
     background: var(--primary-white, white);
     color: var(--primary-black, black);
     font-size: 0.7rem;
     font-weight: 600;
     padding: 1px 1px;
     border-radius: 50%;
-    min-width: 9px;
-    min-height: 9px;
+    width: 15px;
+    height: 15px;
     text-align: center;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Mobile Menu Toggle */
@@ -221,13 +233,19 @@ nav {
 .mobile-menu-toggle.active span:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -7px);
 }
-
+@media (max-width: 925px) {
+    .order-btn {
+        display: none;
+    }
+}
 /* ===================== Responsive ===================== */
 @media (max-width: 768px) {
     nav {
         padding: 1rem 3%;
         flex-wrap: wrap;
         gap: 0.5rem;
+        /* disable entrance animation on mobile for snappier UX */
+        animation: none;
     }
 
     .nav-links {
@@ -241,6 +259,12 @@ nav {
 
     .nav-links.active {
         display: flex;
+        position: absolute;
+        left: 0;
+        top: 100%;
+        width: 100%;
+        box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+        padding-bottom: 1.5rem;
     }
 
     .nav-actions {
@@ -260,6 +284,22 @@ nav {
         display: flex;
         order: -1;
     }
+
+    /* disable logo and text fade animations on mobile */
+    .logo, .nav-links a, .shopping-ostoskori, .nav-actions .order-btn, .nav-actions .login-link, .nav-actions .logout-btn {
+        animation: none !important;
+        /* animation previously changed color from transparent to visible; set explicit color for mobile */
+        color: #ffffff !important;
+    }
+
+    /* ensure nav link underlines are visible when color is set */
+    .nav-links a::after { background: var(--primary-white, white); }
+}
+
+/* When nav is open lock body scroll */
+.nav-open {
+    height: 100vh;
+    overflow: hidden;
 }
 
 @media (max-width: 480px) {

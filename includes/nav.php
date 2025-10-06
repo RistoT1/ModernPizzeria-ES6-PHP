@@ -12,15 +12,40 @@ $isIndexPage = ($current_page === 'index.php');
     </div>
     <div class="nav-center">
         <ul class="nav-links">
-            <li><a href="<?php echo $in_pages_folder ? '../index.php#home' : '#home'; ?>">Etusivu</a></li>
-            <li><a href="<?php echo $in_pages_folder ? '../index.php#about' : '#about'; ?>">Meistä</a></li>
-            <li><a href="<?php echo $in_pages_folder ? 'menu.php#menu' : './pages/menu.php#menu'; ?>">Menu</a></li>
-            <li><a href="<?php echo $in_pages_folder ? '../contact.php' : './contact.php'; ?>">Yhteystiedot</a></li>
-            <li><a href="<?php echo $in_pages_folder ? '../pages/ostoskori.php' : './pages/ostoskori.php'; ?>"
-                    class="shopping-ostoskori" aria-label="Ostoskori">
-                    <i class="fa-solid fa-basket-shopping"></i>
-                    <span class="cart-counter">0</span>
-                </a></li>
+            <?php
+                // Data-driven nav items to avoid hardcoding in multiple places
+                $navItems = [
+                    [
+                        'href' => $in_pages_folder ? '../index.php#home' : '#home',
+                        'label' => 'Etusivu'
+                    ],
+                    [
+                        'href' => $in_pages_folder ? '../index.php#about' : '#about',
+                        'label' => 'Meistä'
+                    ],
+                    [
+                        'href' => $in_pages_folder ? 'menu.php#menu' : './pages/menu.php#menu',
+                        'label' => 'Menu'
+                    ],
+                    [
+                        'href' => $in_pages_folder ? '../index.php#location' : './index.php#location',
+                        'label' => 'Yhteystiedot'
+                    ],
+                    [
+                        'href' => $in_pages_folder ? '../pages/ostoskori.php' : './pages/ostoskori.php',
+                        'label' => '<i class="fa-solid fa-basket-shopping"></i><span class="cart-counter">0</span>',
+                        'extra' => 'class="shopping-ostoskori" aria-label="Ostoskori"'
+                    ]
+                ];
+
+                foreach ($navItems as $item) {
+                    $href = $item['href'];
+                    $label = $item['label'];
+                    $extra = isset($item['extra']) ? $item['extra'] : '';
+                    // Output anchor; active class will be set client-side for hashes and by pathname matching
+                    echo "<li><a href=\"$href\" $extra>$label</a></li>";
+                }
+            ?>
         </ul>
     </div>
     <div class="nav-right">

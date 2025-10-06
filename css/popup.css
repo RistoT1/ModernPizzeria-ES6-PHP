@@ -25,6 +25,9 @@
     width: 100%;
     max-width: 500px;
     height: 80vh;
+    border-style: solid;
+    border-color: #ffffff;
+    border-width: 3px 4px 0px 4px;
     border-radius: 20px 20px 0 0;
     padding: 0;
     transform: translateY(100%);
@@ -133,13 +136,12 @@
 }
 
 .size-btn.active {
-    border-color: #2e7d32;
-    background: #2e7d32;
-    color: #fff;
+    background-color: #e3b82c;
+    color: #000;
 }
 
 .size-btn:hover:not(.active) {
-    border-color: #2e7d32;
+      background: var(--color-gray-900);
 }
 
 /* === Toppings === */
