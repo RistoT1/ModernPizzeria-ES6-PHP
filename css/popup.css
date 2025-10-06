@@ -21,7 +21,7 @@
 
 /* === Popup Content (slides from bottom) === */
 .popup-content {
-    background: #fff;
+    background: #000000;
     width: 100%;
     max-width: 500px;
     height: 80vh;
@@ -85,13 +85,13 @@
 
 .popup-title {
     font-size: 2rem;
-    color: hsl(44, 100%, 50%);
+    color: var(--color-accent);
 }
 
 .popup-price {
     font-size: 1.8rem;
     font-weight: bold;
-    color: #333;
+    color: var(--color-white);
 }
 
 .popup-info {
@@ -123,10 +123,10 @@
 
 .size-btn {
     flex: 1;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    background: #fff;
-    border-radius: 8px;
+    padding: 14px;
+    border: none;
+    background: var(--color-gray-700);
+    border-radius: 2px;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.3s;
@@ -250,35 +250,29 @@
     transition: all 0.3s;
 }
 
-.qty-btn:hover:not(:disabled) {
-    background: #2e7d32;
-    color: #fff;
-    border-color: #2e7d32;
-}
-
-.qty-btn:disabled {
+/* .qty-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     background: #fff;
     color: #333;
     border-color: #ddd;
-}
+} */
 
 .quantity-display {
     font-size: 1.2rem;
     font-weight: bold;
     min-width: 30px;
     text-align: center;
+    color: var(--color-accent);
 }
 
 /* === Add to Cart Button === */
 .add-to-cart-btn {
     width: 100%;
-    background: var(--color-primary);
+    background: #ce9731;
     color: #fff;
     border: none;
     padding: 15px;
-    border-radius: 12px;
     font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;

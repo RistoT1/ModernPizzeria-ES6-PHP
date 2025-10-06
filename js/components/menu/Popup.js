@@ -3,14 +3,12 @@ import { validatePopupDom } from '../../helpers/domValid.js';
 
 export class Popup {
     constructor({ sizeMultipliers }) {
-        // Basic properties only
         this.sizeMultipliers = sizeMultipliers || {};
         this.selectedPizzaID = null;
         this.selectedSizeID = "2";
         this.basePrice = 0;
-        this.addToCartBtn = null;
 
-        // DOM references will be cached later
+        this.addToCartBtn = null;
         this.DOM = {};
     }
 
@@ -26,7 +24,6 @@ export class Popup {
 
         this.DOM = DOM;
 
-        // Destructure for convenience
         const {
             popup, popupHeader, closeBtn, sizeContainer, qtyContainer,
             quantityDisplay, popupTitle, popupInfo, popupIngredients,
@@ -57,21 +54,21 @@ export class Popup {
     open(pizza) {
         if (!pizza) return;
 
-        this.selectedPizzaID = pizza.PizzaID;
+        // Set the popup state first
+        this.selectedPizzaID = pizza.PizzaID || pizza.id; // fallback in case of different key
         this.basePrice = parseFloat(pizza.Hinta) || 0;
         this.selectedSizeID = "2";
 
         this.resetQuantity();
         this.populatePopup(pizza);
-        this.renderAddToCartButton();
+        this.renderAddToCartButton(); // create button once
         this.popup.classList.add('active');
         this.updatePrice();
     }
 
     close() {
         this.popup.classList.remove('active');
-        this.addToCartBtn?.removeButton?.();
-        this.addToCartBtn = null;
+        // keep the button, no need to recreate
     }
 
     /** ---------- Helpers ---------- */
@@ -88,7 +85,7 @@ export class Popup {
                 : pizza.Ainesosat || '';
         }
         if (this.popupHeader) {
-            this.popupHeader.style.backgroundImage = `url(${pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg'})`;
+            this.popupHeader.style.backgroundImage = `url(${pizza.Kuva ? `../src/img/${pizza.Kuva}` : '../src/img/default-pizza.jpg'})`;
         }
 
         this.setActiveSize('2');
@@ -103,19 +100,22 @@ export class Popup {
     }
 
     renderAddToCartButton() {
-        this.addToCartBtn?.removeButton?.();
-
         const container = this.popupInfoMain || this.popupBody;
         if (!container) return;
 
-        this.addToCartBtn = new AddToCartButton({
-            parentElement: container,
-            pizzaID: this.selectedPizzaID,
-            getSizeID: () => this.selectedSizeID,
-            getQuantity: () => parseInt(this.quantityDisplay?.textContent) || 1,
-            onSuccess: () => this.close()
-        });
-        this.addToCartBtn.renderButton?.();
+        if (!this.addToCartBtn) {
+            // Create button once
+            console.log(this.selectedPizzaID);
+            this.addToCartBtn = new AddToCartButton({
+                parentElement: container,
+                getPizzaID: () => this.selectedPizzaID,
+                getSizeID: () => this.selectedSizeID,
+                getQuantity: () => parseInt(this.quantityDisplay?.textContent) || 1,
+                onSuccess: () => this.close()
+            });
+            this.addToCartBtn.renderButton();
+        }
+        // No need to recreate on subsequent opens
     }
 
     /** ---------- Price Calculation ---------- */

@@ -1,7 +1,7 @@
 /* Basic Cart Styling */
 .container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 30px auto;
     padding: 20px;
 }
 
@@ -16,7 +16,7 @@
 
 .cart-header p {
     margin: 0;
-    color: #666;
+    color: var(--color-gray-600);
 }
 
 .cart-container {
@@ -38,8 +38,13 @@
     gap: 15px;
     flex-direction: row;
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
+    transition: border-color 0.2s ease;
+}
+
+.cart-item:hover {
+    border-color: #9b9999;
 }
 
 .cart-item img {
@@ -50,11 +55,11 @@
 }
 
 .cart-item-content {
-    flex: 1;
     display: flex;
-    gap: 10px;
-    flex-direction: row;
+    justify-content: space-between; 
     align-items: center;
+    gap: 15px;
+    width: 100%;
 }
 
 .cart-item-title {
@@ -64,11 +69,20 @@
 .cart-item-quantity,
 .cart-item-size,
 .cart-item-price {
-    font-size: 14px;
+    font-size: 16px;
 }
 
+
+.cart-item-price {
+    width: 80px; 
+    text-align: center; 
+    flex-shrink: 0;
+}
+
+
+
 .cart-item-remove {
-    background: #dc3545;
+    background: #000;
     color: white;
     border: none;
     width: 30px;
@@ -76,6 +90,11 @@
     border-radius: 50%;
     cursor: pointer;
     font-size: 16px;
+    transition: background 0.2s ease;
+}
+
+.cart-item-remove:hover {
+    background: #333;
 }
 
 /* Empty Cart */
@@ -93,27 +112,32 @@
 
 .cart-empty h3 {
     margin: 15px 0 10px 0;
-    color: #666;
+    color: #333;
 }
 
 .cart-empty p {
     margin: 10px 0 20px 0;
-    color: #999;
+    color: #666;
 }
 
 .btn-primary {
-    background: #007bff;
+    background: #000;
     color: white;
     padding: 10px 20px;
     text-decoration: none;
     border-radius: 4px;
     display: inline-block;
+    transition: background 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #333;
 }
 
 /* Customer Info Form */
 .customer-info {
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
 }
 
@@ -130,45 +154,57 @@
 
 .info-form input {
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
     font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.info-form input:focus {
+    outline: none;
+    border-color: #000;
 }
 
 .address-btn,
 .maksa {
-    background: #28a745;
+    background: #000;
     color: white;
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    transition: background 0.2s ease;
 }
 
 .address-btn:hover,
 .maksa:hover {
-    background: #218838;
+    background: #333;
 }
 
 /* Error Message */
 .error-message {
     text-align: center;
     padding: 20px;
-    background: #f8d7da;
-    border: 1px solid #f5c6cb;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
-    color: #721c24;
+    color: #000;
 }
 
 .error-message button {
-    background: #dc3545;
+    background: #000;
     color: white;
     padding: 8px 15px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     margin-top: 10px;
+    transition: background 0.2s ease;
+}
+
+.error-message button:hover {
+    background: #333;
 }
 
 /* Modal Styles */
@@ -185,8 +221,9 @@
 
 .modal-content {
     background: white;
+    border: 1px solid #000000;
     margin: 15% auto;
-    padding: 20px;
+    padding: 20px 60px 20px 60px;
     border-radius: 4px;
     width: 90%;
     max-width: 400px;
@@ -199,6 +236,11 @@
     right: 15px;
     font-size: 20px;
     cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-content span:hover {
+    color: #666;
 }
 
 .modal-content h3 {
@@ -217,13 +259,20 @@
     width: 100%;
     padding: 8px;
     margin-bottom: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
     box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.modal-content input[type="text"]:focus,
+.modal-content input[type="email"]:focus {
+    outline: none;
+    border-color: #000;
 }
 
 .modal-content button {
-    background: #28a745;
+    background: #000;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -231,15 +280,20 @@
     cursor: pointer;
     width: 100%;
     margin-top: 10px;
+    transition: background 0.2s ease;
+}
+
+.modal-content button:hover {
+    background: #333;
 }
 
 /* Address Section */
 .address-section {
     margin-top: 15px;
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
-    background: #f8f9fa;
+    background: #f8f8f8;
     display: none;
 }
 
@@ -268,25 +322,72 @@
 
 /* Submit Button */
 .submit {
-    background: #28a745;
+    background: #000;
     color: white;
+    border: 1px solid var(--color-white);
     padding: 12px 20px;
-    border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
     width: 100%;
-    margin-top: 15px;
+    margin: 15px 0;
+    transition: background 0.2s ease;
 }
 
 .submit:hover {
-    background: #218838;
+    background: #333;
 }
 
 .submit:disabled {
-    background: #6c757d;
+    background: #999;
     cursor: not-allowed;
+}
+
+/* Cart Item Actions */
+.cartItemActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; 
+}
+
+.cartItemActions button {
+    background: #000;
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.cartItemActions button:hover {
+    background: #333;
+}
+
+.cartItemActions .decrease,
+.cartItemActions .increase {
+    font-weight: bold;
+}
+
+.cartItemActions .delete {
+    margin-left: 4px;
+}
+
+.cartItemQuantity {
+    width: 32px;
+    min-width: 32px; 
+    text-align: center;
+    color: var(--color-white);
+    font-weight: bold;
+    font-size: 16px;
 }
 
 /* Responsive */

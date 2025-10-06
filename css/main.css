@@ -1,5 +1,5 @@
 :root {
-  --color-primary: hsl(46, 94%, 51%); 
+  --color-primary: hsl(46, 94%, 51%);
   --color-primary-light: #483c2d;
   --color-secondary: #685b4a;
   --color-accent: #ce9731;
@@ -8,20 +8,19 @@
   --color-warning: #d69e2e;
   --color-error: #e53e3e;
   --color-white: #ffffff;
-  --color-gray-50: #f7fafc;
-  --color-gray-100: #edf2f7;
-  --color-gray-200: #e2e8f0;
-  --color-gray-300: #cbd5e0;
-  --color-gray-400: #a0aec0;
-  --color-gray-500: #718096;
-  --color-gray-600: #4a5568;
-  --color-gray-700: #2d3748;
-  --color-gray-800: #1a202c;
-  --color-gray-900: #171923;
-  
+  --color-gray-50: #fff8ed;
+  --color-gray-100: #f9eed6;
+  --color-gray-200: #f2ddb0;
+  --color-gray-300: #e9c788;
+  --color-gray-400: #dfb260;
+  --color-gray-500: #d6a13b;
+  --color-gray-600: #ce9731;
+  --color-gray-700: #b87b27;
+  --color-gray-800: #8f5c1d;
+  --color-gray-900: #5f3a12;
   --font-family-primary: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-family-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
-  
+
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -30,12 +29,12 @@
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 1.875rem;
   --font-size-4xl: 2.25rem;
-  
+
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-  
+
   --spacing-1: 0.25rem;
   --spacing-2: 0.5rem;
   --spacing-3: 0.75rem;
@@ -48,16 +47,16 @@
   --spacing-16: 4rem;
   --spacing-20: 5rem;
   --spacing-24: 6rem;
-  
+
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  
+
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-slow: 350ms ease;
-  
+
   --max-width-container: 1200px;
   --header-height: 4rem;
 }
@@ -72,17 +71,22 @@ body {
   font-weight: var(--font-weight-normal);
   line-height: 1.6;
   color: var(--color-gray-800);
-  background-color: var(--color-gray-50);
+  background-color: black;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  margin: 0;
+  margin: 60px 0 0 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: var(--font-weight-bold);
   line-height: 1;
-  color: var(--color-gray-900);
+  color: var(--color-white);
 }
 
 h1 {
@@ -111,7 +115,7 @@ h6 {
 
 p {
   margin-bottom: var(--spacing-4);
-  color: var(--color-gray-700);
+  color: var(--color-white);
 }
 
 a {
@@ -129,6 +133,10 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+label {
+  color: var(--color-accent);
+  text-decoration: none;
+}
 
 .btn {
   display: inline-flex;
@@ -217,7 +225,7 @@ a:focus-visible {
   margin-bottom: var(--spacing-2);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-700);
+  color: var(--color-white);
 }
 
 .form-input,
@@ -259,13 +267,23 @@ a:focus-visible {
 .container {
   width: 100%;
   margin: 0 auto;
-  padding: 0 var(--spacing-4);
 }
 
-.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-cols-1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
 
 .flex {
   display: flex;
@@ -291,42 +309,121 @@ a:focus-visible {
   flex: 1;
 }
 
-.mt-auto { margin-top: auto; }
-.mb-auto { margin-bottom: auto; }
-.m-0 { margin: 0; }
-.p-0 { padding: 0; }
+.mt-auto {
+  margin-top: auto;
+}
 
-.mt-4 { margin-top: var(--spacing-4); }
-.mb-4 { margin-bottom: var(--spacing-4); }
-.pt-4 { padding-top: var(--spacing-4); }
-.pb-4 { padding-bottom: var(--spacing-4); }
+.mb-auto {
+  margin-bottom: auto;
+}
 
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
+.m-0 {
+  margin: 0;
+}
 
-.text-xs { font-size: var(--font-size-xs); }
-.text-sm { font-size: var(--font-size-sm); }
-.text-lg { font-size: var(--font-size-lg); }
+.p-0 {
+  padding: 0;
+}
 
-.font-medium { font-weight: var(--font-weight-medium); }
-.font-semibold { font-weight: var(--font-weight-semibold); }
-.font-bold { font-weight: var(--font-weight-bold); }
+.mt-4 {
+  margin-top: var(--spacing-4);
+}
 
-.text-primary { color: var(--color-primary); }
-.text-secondary { color: var(--color-secondary); }
-.text-success { color: var(--color-success); }
-.text-error { color: var(--color-error); }
-.text-warning { color: var(--color-warning); }
+.mb-4 {
+  margin-bottom: var(--spacing-4);
+}
 
-.bg-white { background-color: var(--color-white); }
-.bg-gray-50 { background-color: var(--color-gray-50); }
-.bg-gray-100 { background-color: var(--color-gray-100); }
+.pt-4 {
+  padding-top: var(--spacing-4);
+}
 
-.shadow-sm { box-shadow: var(--shadow-sm); }
-.shadow { box-shadow: var(--shadow-base); }
-.shadow-md { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); }
+.pb-4 {
+  padding-bottom: var(--spacing-4);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-xs {
+  font-size: var(--font-size-xs);
+}
+
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.bg-white {
+  background-color: var(--color-white);
+}
+
+.bg-gray-50 {
+  background-color: var(--color-gray-50);
+}
+
+.bg-gray-100 {
+  background-color: var(--color-gray-100);
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow {
+  box-shadow: var(--shadow-base);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
 
 @media (max-width: 768px) {
   :root {
@@ -334,17 +431,17 @@ a:focus-visible {
     --font-size-3xl: 1.75rem;
     --font-size-2xl: 1.375rem;
   }
-  
+
   .container {
     padding: 0 var(--spacing-3);
   }
-  
+
   .grid-cols-2,
   .grid-cols-3,
   .grid-cols-4 {
     grid-template-columns: 1fr;
   }
-  
+
   .btn {
     padding: var(--spacing-3) var(--spacing-5);
   }

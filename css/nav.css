@@ -1,11 +1,23 @@
 @keyframes navFadeIn {
-    0% { background: rgba(0,0,0,0); transform: translateY(-10px); }
-    100% { background: rgba(0,0,0,0.98); transform: translateY(0); }
+    0% {
+        background: rgba(0, 0, 0, 0);
+        transform: translateY(-10px);
+    }
+
+    100% {
+        background: rgba(0, 0, 0, 0.98);
+        transform: translateY(0);
+    }
 }
 
 @keyframes fadeInText {
-    0% { color: rgba(255,255,255,0); }
-    100% { color: var(--primary-white, white); }
+    0% {
+        color: rgba(255, 255, 255, 0);
+    }
+
+    100% {
+        color: var(--primary-white, white);
+    }
 }
 
 /* ===================== Navigation ===================== */
@@ -18,10 +30,32 @@ nav {
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
-    background: rgba(0,0,0,0.98);
+    background: rgba(0, 0, 0, 0.98);
     animation: navFadeIn 1s ease forwards;
     gap: 1rem;
     box-sizing: border-box;
+}
+
+.nav-left,
+.nav-center,
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.nav-left {
+    flex: 1;
+    justify-content: flex-start;
+}
+
+.nav-center {
+    flex: 2;
+    justify-content: center;
+}
+
+.nav-right {
+    flex: 1;
+    justify-content: flex-end;
 }
 
 /* Logo */
@@ -30,7 +64,7 @@ nav {
     font-weight: 600;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0);
+    color: rgba(255, 255, 255, 0);
     animation: fadeInText 1s ease forwards;
     animation-delay: 0.5s;
     flex-shrink: 0;
@@ -49,7 +83,7 @@ nav {
 }
 
 .nav-links a {
-    color: rgba(255,255,255,0);
+    color: rgba(255, 255, 255, 0);
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 500;
@@ -100,13 +134,20 @@ nav {
     font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: 1px;
+    box-sizing: border-box;
     text-transform: uppercase;
     transition: all 0.3s ease;
     white-space: nowrap;
     flex-shrink: 1;
     min-width: 0;
     text-decoration: none;
+
+    display: inline-flex;       /* Ensures proper vertical alignment */
+    align-items: center;        /* Vertically centers text */
+    justify-content: center;    /* Horizontally centers text */
+    line-height: 1;             /* Prevents extra height from font */
 }
+
 
 .order-btn:hover,
 .login-link:hover,
@@ -123,7 +164,7 @@ nav {
 .shopping-ostoskori {
     position: relative;
     font-size: 1.2rem;
-    color: rgba(255,255,255,0);
+    color: rgba(255, 255, 255, 0);
     transition: transform 0.3s ease;
     animation: fadeInText 1s ease forwards;
     animation-delay: 0.9s;
@@ -172,7 +213,11 @@ nav {
 .mobile-menu-toggle.active span:nth-child(1) {
     transform: rotate(45deg) translate(7px, 7px);
 }
-.mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+
+.mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
 .mobile-menu-toggle.active span:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -7px);
 }
@@ -189,7 +234,7 @@ nav {
         flex-direction: column;
         width: 100%;
         display: none;
-        background: rgba(0,0,0,0.95);
+        background: rgba(0, 0, 0, 0.95);
         padding: 1rem 5%;
         gap: 0.75rem;
     }
@@ -211,10 +256,14 @@ nav {
         padding: 0.5rem 1rem;
     }
 
-    .mobile-menu-toggle { display: flex; order: -1; }
+    .mobile-menu-toggle {
+        display: flex;
+        order: -1;
+    }
 }
 
 @media (max-width: 480px) {
+
     .order-btn,
     .login-link,
     .logout-btn {
@@ -223,6 +272,11 @@ nav {
         letter-spacing: 0.5px;
     }
 
-    .nav-actions { gap: 0.4rem; }
-    .shopping-ostoskori { font-size: 1.1rem; }
+    .nav-actions {
+        gap: 0.4rem;
+    }
+
+    .shopping-ostoskori {
+        font-size: 1.1rem;
+    }
 }

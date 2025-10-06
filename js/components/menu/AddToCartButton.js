@@ -3,9 +3,9 @@ import { fetchCartQuantity, addItemToCart, apiRequest } from '../../helpers/api.
 import { CartBackup } from './cartBackup.js';
 
 export class AddToCartButton {
-    constructor({ parentElement, pizzaID, getSizeID = () => "2", getQuantity = () => 1, onSuccess = null }) {
+    constructor({ parentElement, getPizzaID = () => null, getSizeID = () => "2", getQuantity = () => 1, onSuccess = null }) {
         this.parentElement = parentElement;
-        this.pizzaID = pizzaID;
+        this.getPizzaID = getPizzaID;
         this.getSizeID = getSizeID;
         this.getQuantity = getQuantity;
         this.onSuccess = onSuccess;
@@ -14,11 +14,9 @@ export class AddToCartButton {
     }
 
     renderButton() {
-        if (!this.parentElement) {
-            console.warn('AddToCartButton parentElement is missing');
-            return;
-        }
+        if (!this.parentElement) return;
         if (this.parentElement.querySelector('.add-to-cart-btn')) return;
+
         this.button = document.createElement('button');
         this.button.className = 'add-to-cart-btn';
         this.button.textContent = 'Lisää koriin';
@@ -38,19 +36,21 @@ export class AddToCartButton {
         this.setLoadingState(true);
 
         try {
+            const pizzaID = this.getPizzaID();
+            if (!pizzaID) throw new Error("PizzaID missing");
+
             if (await checkQuantityLimit(this.getQuantity, fetchCartQuantity, showNotification, this.setLoadingState.bind(this))) {
                 return;
             }
 
             const itemPayload = {
                 addItem: true,
-                pizzaID: this.pizzaID,
+                pizzaID,
                 sizeID: this.getSizeID(),
                 quantity: this.getQuantity()
             };
-
+            console.log("sending to api", itemPayload);
             const success = await addItemToCart(itemPayload);
-            
 
             if (success) {
                 showNotification('Lisätty koriin!', 'success');
@@ -59,7 +59,6 @@ export class AddToCartButton {
             } else {
                 showNotification('Virhe lisättäessä koriin', 'error');
             }
-
         } catch (error) {
             console.error('Add to cart error:', error);
             showNotification('Istunto menetetty. Uusi vieraskortti luotu.', 'error');
@@ -68,7 +67,6 @@ export class AddToCartButton {
             CartBackup.saveGuestToken(token);
 
             updateCartCounter(await fetchCartQuantity());
-
         } finally {
             this.setLoadingState(false);
         }

@@ -1,5 +1,6 @@
 import { AddToCartButton } from './AddToCartButton.js';
 import { escapeHtml } from '../../helpers/utils.js';
+import { getPath } from '../../helpers/config.js';
 
 export class Recommended {
     constructor({ container, pizzas }) {
@@ -15,7 +16,9 @@ export class Recommended {
         this.pizzas.slice(0, 2).forEach(pizza => {
             const pizzaElement = this.createPizzaElement(pizza);
             this.container.appendChild(pizzaElement);
-            this.addCartButton(pizza, pizzaElement.querySelector('.itemContent'));
+
+            const parent = pizzaElement.querySelector('.itemContent');
+            this.addCartButton(pizza, parent);
         });
     }
 
@@ -39,8 +42,8 @@ export class Recommended {
 
         const img = document.createElement('img');
         img.alt = pizza.PizzaNimi || 'Pizza';
-        img.src = pizza.Kuva ? `src/img/${pizza.Kuva}` : 'src/img/default-pizza.jpg';
-        img.onerror = () => { img.src = 'src/img/default-pizza.jpg'; };
+        img.src = pizza.Kuva ? `${getPath(false)}/src/img/${pizza.Kuva}` : `${getPath(false)}/src/img/default-pizza.jpg`;
+        img.onerror = () => { img.src = `${getPath(false)}/src/img/default-pizza.jpg` };
 
         imgContainer.appendChild(img);
         return imgContainer;
@@ -62,10 +65,11 @@ export class Recommended {
     addCartButton(pizza, parentElement) {
         const btn = new AddToCartButton({
             parentElement,
-            pizzaID: pizza.PizzaID,
+            getPizzaID: () => pizza.PizzaID || pizza.id,
             getSizeID: () => "2",
             getQuantity: () => 1
         });
+
         btn.renderButton();
     }
 }

@@ -1,11 +1,11 @@
 import { validateIndexDom } from '../helpers/domValid.js';
 import { fetchSizes, fetchPizza } from '../helpers/api.js';
-import { Popup } from '../components/index/Popup.js';
-import { Menu } from '../components/index/Menu.js';
-import { Recommended } from '../components/index/Recommended.js';
+import { Popup } from '../components/menu/Popup.js';
+import { Menu } from '../components/menu/Menu.js';
+import { Recommended } from '../components/menu/Recommended.js';
 import { showNotification } from '../helpers/utils.js';
 
-class IndexPage {
+class MenuPage {
     constructor() {
         this.DOM = null;
         this.popup = null;
@@ -102,6 +102,6 @@ const waitForDOM = () => {
 };
 
 waitForDOM().then(() => {
-    const indexPage = new IndexPage();
+    const indexPage = new MenuPage();
     indexPage.init();
 });

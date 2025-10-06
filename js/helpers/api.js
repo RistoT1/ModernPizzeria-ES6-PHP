@@ -1,4 +1,4 @@
-import { CartBackup } from '../components/index/cartBackup.js';
+import { CartBackup } from '../components/menu/cartBackup.js';
 import { getPath } from './config.js';
 
 export const apiRequest = async ({
