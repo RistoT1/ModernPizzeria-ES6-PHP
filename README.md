@@ -59,16 +59,22 @@ git clone https://github.com/yourusername/ModernPizzeria-ES6.git
 ## 📸 Screenshots / Demo
 
 
-### Menu Page  
-![Menu Screenshot](src/ReadMeImgs/Image1.png)
+### Index Page  
+![Index Screenshot](src/ReadMeImgs/index.png)
+## Index Menu 
+![Menu Screenshot](src/ReadMeImgs/indexMenu.png)
 
-### Menu PopUp
-![Popup Screenshot](src/ReadMeImgs/Image2.png)
+### Menu
+![Menu Screenshot](src/ReadMeImgs/menu.png)
+
+## Menu PopUp
+![Popup Screenshot](src/ReadMeImgs/popup.png)
 
 ### Cart Page  
-![Cart Screenshot](src/ReadMeImgs/Image3.png)
+![Cart Screenshot](src/ReadMeImgs/ostoskori.png)
 
-
+### Contacts
+![Contacts Screenshot](src/ReadMeImgs/yhteystiedot.png)  
 ---
 
 ## 🔮 Future Improvements
