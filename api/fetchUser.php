@@ -1,7 +1,7 @@
 <?php
 function fetchUser($pdo)
 {
-    $asiakasID = $_SESSION['AsiakasID'];
+    $asiakasID = $_SESSION['AsiakasID'] ?? null;
     if (!$asiakasID) {
         if (!isset($_SESSION['guestToken'])) {
             $_SESSION['guestToken'] = bin2hex(random_bytes(16));

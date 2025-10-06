@@ -45,7 +45,7 @@ class LoginPage {
 
         try {
             const result = await loginUser(requestData);
-
+            console.log('Login result:', result);
             if (result.success) {
                 console.log("Login success!");
                 window.location.href = `${getPath(false)}/index.php`;

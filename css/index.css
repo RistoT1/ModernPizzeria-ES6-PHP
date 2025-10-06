@@ -1,8 +1,4 @@
-:root {
-    --color-white: #fff;
-    --spacing-4: 1rem;
-    --spacing-16: 4rem;
-}
+
 
 /* ===== Container & Header ===== */
 .container {
@@ -44,7 +40,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #F7D94C;
+    background-color: #000000;
     clip-path: polygon(0 0, 50% 0, 20% 100%, 0 100%);
     z-index: 1;
 }

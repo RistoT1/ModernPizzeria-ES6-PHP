@@ -1,8 +1,7 @@
-
 .notification-container {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 70px; /* Offset below navbar */
+    right: 0px;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
@@ -12,35 +11,40 @@
 
 /* === Notification Box === */
 .notification {
-    padding: 15px 20px;
-    border-radius: 8px;
-    color: white;
+    padding: 8px 10px;
+    color: rgb(0, 0, 0);
+    border: rgb(0, 0, 0) 3px solid;
     font-weight: 500;
     max-width: 300px;
-    opacity: 1;
-    transform: translateX(0);
-    transition: transform 0.4s ease, opacity 0.4s ease;
+    cursor: pointer;
+
+    opacity: 0; /* Start hidden */
+    transform: translateY(-50px); /* Start above view */
+    transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 /* Show / Hide Animations */
 .notification.show {
-    transform: translateX(0);
+    opacity: 1;              /* Fade in */
+    transform: translateY(0); /* Slide down into view */
 }
 
 .notification.hide {
     opacity: 0;
-    transform: translateX(400px);
+    transform: translateX(400px); /* Slide right when hiding */
 }
 
 /* Notification Types */
 .notification-success {
-    background: #4CAF50;
+    background: #ffffff;
 }
 
 .notification-error {
     background: #f44336;
+    color: #fff;
 }
 
 .notification-info {
     background: #2196F3;
+    color: #fff;
 }

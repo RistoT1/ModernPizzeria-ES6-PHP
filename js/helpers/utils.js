@@ -35,16 +35,34 @@ function processQueue() {
   container.appendChild(el);
   activeCount++;
 
-  // Show notification for 3s, then hide + remove
+  // Trigger slide down + fade in
   setTimeout(() => {
-    el.classList.add('hide');
-    setTimeout(() => {
-      el.remove();
-      activeCount--;
-      processQueue(); // Show next in queue
-    }, 400);
+    el.classList.add('show');
+  }, 50);
+
+  // Click to hide immediately
+  el.addEventListener('click', () => {
+    hideNotification(el);
+  });
+
+  // Show notification for 3s, then hide automatically
+  setTimeout(() => {
+    hideNotification(el);
   }, 3000);
 }
+
+function hideNotification(el) {
+  // Avoid hiding twice
+  if (el.classList.contains('hide')) return;
+
+  el.classList.add('hide');
+  setTimeout(() => {
+    el.remove();
+    activeCount--;
+    processQueue(); // Show next in queue
+  }, 500); // Match the CSS transition duration
+}
+
 
 export const updateCartCounter = qty => {
   const counter = document.querySelector('.cart-counter');

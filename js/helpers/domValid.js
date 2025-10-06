@@ -17,6 +17,18 @@ export const validateIndexDom = () => {
     return elements;
 };
 
+export const validateKassaDom = () => {
+    const elements = {
+        orderSummary: document.getElementById("orderSummary"),
+        payButton: document.getElementById("payBtn"),
+        csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+    };
+    if (!checkMissingElements(elements)) {
+        return null;
+    }
+    return elements;
+};
+
 export const validatePopupDom = () => {
     const popup = document.getElementById('pizzaPopup');
     if (!popup) return null;
@@ -120,6 +132,7 @@ export const validateCartDom = () => {
 
 export const validateNavDom = () => {
     const elements = {
+        nav: document.getElementById('navbar'),
         logoutBtn: document.getElementById('logoutBtn')
     };
 

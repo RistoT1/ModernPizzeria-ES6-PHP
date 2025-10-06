@@ -113,5 +113,10 @@ try {
 } catch (Exception $e) {
     http_response_code($e->getCode() ?: 500);
     echo json_encode(apiError($e->getMessage()));
+
+    //$errorMessage = json_encode(apiError($e->getMessage()));
+    //$debugFile = __DIR__ . '/debug.log';
+    //file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] ERRORS: " . json_encode($errorMessage) . "\n", FILE_APPEND);
+
 }
 ?>

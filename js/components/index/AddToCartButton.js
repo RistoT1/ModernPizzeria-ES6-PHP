@@ -1,5 +1,5 @@
 import { checkQuantityLimit, showNotification, updateCartCounter } from '../../helpers/utils.js';
-import { fetchCartQuantity, addItemToCart } from '../../helpers/api.js';
+import { fetchCartQuantity, addItemToCart, apiRequest } from '../../helpers/api.js';
 import { CartBackup } from './cartBackup.js';
 
 export class AddToCartButton {
@@ -43,12 +43,14 @@ export class AddToCartButton {
             }
 
             const itemPayload = {
+                addItem: true,
                 pizzaID: this.pizzaID,
                 sizeID: this.getSizeID(),
                 quantity: this.getQuantity()
             };
-            
+
             const success = await addItemToCart(itemPayload);
+            
 
             if (success) {
                 showNotification('Lisätty koriin!', 'success');

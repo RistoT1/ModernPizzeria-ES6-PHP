@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once 'session.php';
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -6,32 +6,46 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
 $in_pages_folder = strpos($_SERVER['PHP_SELF'], '/pages/') !== false;
 $apiPath = $in_pages_folder ? '../api/main.php' : './api/main.php';
 $jsPath = $in_pages_folder ? '../js/includes/nav.js' : './js/includes/nav.js';
+$isIndexPage = ($current_page === 'index.php');
 ?>
-<nav class="navbar">
-    <div class="navbar-container">
-        <div class="navbar-header">
-            <div class="navbar-title">
-                <h1>Sakky Pizzeria</h1>
-            </div>
-            <div class="navbar-links">
-                <a href="<?php echo $in_pages_folder ? '../index.php' : './index.php'; ?>">Home</a>
-                <a href="<?php echo $in_pages_folder ? '../index.php' : './index.php'; ?>">Menu</a>
-                <a href="<?php echo $in_pages_folder ? '../contact.php' : './contact.php'; ?>">Contact</a>
+<nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="logo">SAKKY</div>
 
-                <?php if ($isLoggedIn): ?>
-                    <button id="logoutBtn" class="logout-btn" style="background:none;border:none;color:inherit;cursor:pointer;">Logout</button>
-                <?php else: ?>
-                    <a href="<?php echo $in_pages_folder ? '../pages/kirjaudu.php' : './pages/kirjaudu.php'; ?>">Kirjaudu</a>
-                <?php endif; ?>
+    <ul class="nav-links">
+        <li><a href="<?php echo $in_pages_folder ? '../index.php#home' : '#home'; ?>">Etusivu</a></li>
+        <li><a href="<?php echo $in_pages_folder ? '../index.php#about' : '#about'; ?>">Meistä</a></li>
+        <li><a href="<?php echo $in_pages_folder ? '../index.php#menu' : '#menu'; ?>">Menu</a></li>
+        <li><a href="<?php echo $in_pages_folder ? '../contact.php' : './contact.php'; ?>">Yhteystiedot</a></li>
+        <li><a href="<?php echo $in_pages_folder ? '../pages/ostoskori.php' : './pages/ostoskori.php'; ?>"
+                class="shopping-ostoskori" aria-label="Ostoskori">
+                <i class="fa-solid fa-basket-shopping"></i>
+                <span class="cart-counter">0</span>
+            </a></li>
+    </ul>
 
-                <a href="<?php echo $in_pages_folder ? '../pages/ostoskori.php' : './pages/ostoskori.php'; ?>" class="shopping-ostoskori">
-                    <i class="fa-solid fa-basket-shopping"></i>
-                    <span class="cart-counter">0</span>
-                </a>
-            </div>
-        </div>
+    <div class="nav-actions">
+        <?php if ($isIndexPage): ?>
+            <button class="order-btn" aria-label="Siirry menuun">Tilaa</button>
+        <?php endif; ?>
+
+        <?php if ($isLoggedIn): ?>
+            <button id="logoutBtn" class="logout-btn">Kirjaudu ulos</button>
+        <?php else: ?>
+            <a href="<?php echo $in_pages_folder ? '../pages/kirjaudu.php' : './pages/kirjaudu.php'; ?>"
+                class="login-link">Kirjaudu</a>
+        <?php endif; ?>
+
+
     </div>
+
+    <!-- Mobile toggle button placeholder -->
+    <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
 </nav>
+<div style="height: 60px;"></div>
 <div class="notification-container"></div>
 
 <script type="module" src="<?php echo $jsPath; ?>"></script>

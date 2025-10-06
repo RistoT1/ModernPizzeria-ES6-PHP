@@ -1,106 +1,111 @@
-// kassa.js
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // Get customer data from sessionStorage
-        let customerData = JSON.parse(sessionStorage.getItem("customerData"));
-        const orderSummary = document.getElementById("orderSummary");
-        
-        if (!orderSummary) {
-            console.error("Order summary container not found");
-            return;
-        }
+import { validateKassaDom } from "../helpers/domValid.js";
+import { fetchUser, insertTilaus } from "../helpers/api.js";
+import { getPath } from "../helpers/config.js";
 
-        if (!customerData) {
-            orderSummary.innerHTML = "<p>Ei asiakastietoja.</p>";
-            return;
-        }
+class KassaPage {
+    #DOM;
+    #customerData;
+    #cartItems;
 
-        console.log('Retrieved customerData:', customerData);
+    constructor() {
+        this.#DOM = validateKassaDom();
+        if (!this.#DOM) throw new Error("Required DOM elements not found");
 
-        // If logged in, fetch full customer info from server
-        if (customerData.loggedIn) {
-            try {
-                const res = await fetch("../../api/main.php?asiakas", {
-                    method: "GET",
-                    credentials: "same-origin"
-                });
-                const result = await res.json();
-                if (result.success && result.data) {
-                    customerData = { ...customerData, ...result.data };
-                } else {
-                    console.warn("Failed to fetch customer info from server, using sessionData");
-                }
-            } catch (err) {
-                console.warn("Error fetching customer info:", err);
-            }
-        }
+        const rawCustomerData = sessionStorage.getItem("customerData");
+        if (!rawCustomerData) throw new Error("Customer data not found in session");
 
-        // Get cart items
-        const cartItems = JSON.parse(sessionStorage.getItem('cartItems')) || [];
-        console.log('Retrieved cartItems:', cartItems);
+        this.#customerData = JSON.parse(rawCustomerData);
+        this.#cartItems = JSON.parse(sessionStorage.getItem("cartItems")) || [];
 
-        // Build order summary HTML
-        let html = `
-            <h2>Asiakas</h2>
-            <p>${customerData.Enimi || ''} ${customerData.Snimi || ''}</p>
-            <p>${customerData.Email || ''}, ${customerData.Puh || ''}</p>
-            <p>${customerData.Osoite || ''}, ${customerData.PostiNum || ''} ${customerData.PostiTp || ''}</p>
-            <h2>Tuotteet</h2>
-            <ul>
-        `;
-
-        cartItems.forEach(item => {
-            html += `<li>${item.Nimi || 'Tuote'} (${item.sizeName || ''}) × ${item.quantity || 1} - ${
-                item.quantity === 1 ? `Yksilöhinta ${item.unitPrice?.toFixed(2) || '0.00'}€` :
-                `Kokonaishinta ${item.totalPrice?.toFixed(2) || '0.00'}€`
-            }</li>`;
-        });
-
-        html += "</ul>";
-        orderSummary.innerHTML = html;
-
-        // Handle payment button
-        const payBtn = document.getElementById("payBtn");
-        if (payBtn) {
-            payBtn.addEventListener("click", async () => {
-                try {
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
-                    const payload = {
-                        addTilaus: true,
-                        ...customerData,
-                        csrf_token: csrfToken
-                    };
-
-                    const response = await fetch("../api/main.php?addTilaus", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "same-origin",
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
-                    if (result.success === true) {
-                        alert("Tilaus vastaanotettu! Kiitos.");
-                        // Clear sessionStorage
-                        sessionStorage.removeItem("customerData");
-                        sessionStorage.removeItem("cartItems");
-                        window.location.href = "../index.php";
-                    } else {
-                        alert("Virhe: " + result.error);
-                    }
-                } catch (err) {
-                    console.error("Payment error:", err);
-                    alert("Virhe maksuprosessissa");
-                }
-            });
-        } else {
-            console.warn("Pay button not found");
-        }
-
-    } catch (err) {
-        console.error("Error loading order data:", err);
-        const orderSummary = document.getElementById("orderSummary");
-        if (orderSummary) orderSummary.innerHTML = "<p>Virhe ladattaessa tilausdataa.</p>";
+        this.#initialize();
     }
-});
+
+    async #initialize() {
+        try {
+            console.log("Customer data:", this.#customerData);
+
+            if (this.#customerData.loggedIn) {
+                await this.#fetchCustomerDetails();
+            }
+
+            console.log("Cart items:", this.#cartItems);
+
+            this.#renderOrderSummary();
+            this.#setupPaymentHandler();
+        } catch (error) {
+            console.error("Initialization error:", error);
+            this.#DOM.orderSummary.innerHTML = "<p>Virhe ladattaessa tilausdataa.</p>";
+        }
+    }
+
+    async #fetchCustomerDetails() {
+         try {
+            const userDetails = await fetchUser();
+            if (userDetails.success) {
+                this.#customerData = { ...this.#customerData, ...userDetails.data };
+                console.log("Fetched user details:", userDetails.data);
+            } else {
+                console.warn("Failed to fetch user details:", userDetails.error);
+            }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
+    };
+
+    #renderOrderSummary() {
+        const c = this.#customerData;
+        const itemsHtml = this.#cartItems.map(item => {
+            const name = item.Nimi || "Tuote";
+            const size = item.sizeName || "";
+            const qty = item.quantity || 1;
+            const priceText = qty === 1
+                ? `Yksilöhinta ${item.unitPrice?.toFixed(2) || "0.00"}€`
+                : `Kokonaishinta ${item.totalPrice?.toFixed(2) || "0.00"}€`;
+
+            return `<li>${name} (${size}) × ${qty} - ${priceText}</li>`;
+        }).join("");
+
+        this.#DOM.orderSummary.innerHTML = `
+            <h2>Asiakas</h2>
+            <p>${c.Enimi || ""} ${c.Snimi || ""}</p>
+            <p>${c.Email || ""}, ${c.Puh || ""}</p>
+            <p>${c.Osoite || ""}, ${c.PostiNum || ""} ${c.PostiTp || ""}</p>
+            <h2>Tuotteet</h2>
+            <ul>${itemsHtml}</ul>
+        `;
+    }
+
+    #setupPaymentHandler() {
+        this.#DOM.payButton?.addEventListener("click", async () => {
+            try {
+                const requestData = {
+                    addTilaus: true,
+                    ...this.#customerData,
+                    csrf_token: this.#DOM.csrfToken
+                };
+
+                const response = await insertTilaus(requestData);
+                if (response.success) {
+                    console.log("Payment successful, order ID:", response.data.orderId);
+                    alert("Maksu onnistui! Tilausvahvistus lähetetty sähköpostiin.");
+                    window.location.href = `${getPath(false)}/index.php`;
+                } else {
+                    console.error("Payment failed:", response.error);
+                    alert("Maksu epäonnistui: " + (response.error || "Tuntematon virhe"));
+                }
+            } catch (error) {
+                console.error("Payment error:", error);
+                alert("Virhe maksuprosessissa");
+            }
+        });
+    }
+}
+
+// Wait for DOM readiness before initializing
+const waitForDOM = () =>
+    document.readyState === "loading"
+        ? new Promise(resolve => document.addEventListener("DOMContentLoaded", resolve))
+        : Promise.resolve();
+
+await waitForDOM();
+new KassaPage();

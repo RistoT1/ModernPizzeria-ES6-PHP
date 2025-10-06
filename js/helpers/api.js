@@ -1,231 +1,179 @@
 import { CartBackup } from '../components/index/cartBackup.js';
 import { getPath } from './config.js';
 
-export const fetchSizes = async () => {
-    try {
-        const res = await fetch(`${getPath(true)}?koko`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const result = await res.json();
+export const apiRequest = async ({
+    endpoint = '',
+    method = 'GET',
+    payload = null,
+    includeItems = false,
+    useGuestToken = false,
+    credentials = null
+} = {}) => {
+    const url = `${getPath(true)}${endpoint}${includeItems ? `&includeItems=${includeItems}` : ''}`;
+    const headers = { 'Content-Type': 'application/json' };
 
-        const sizeMultipliers = {};
-        if (result.success && Array.isArray(result.data)) {
-            result.data.forEach(size => {
-                sizeMultipliers[size.KokoID] = {
-                    multiplier: parseFloat(size.HintaKerroin),
-                    name: size.Nimi,
-                    description: size.Kuvaus || ''
-                };
-            });
-        }
-        return sizeMultipliers;
-    } catch (error) {
-        console.error('Error fetching sizes:', error);
-        return {};
+    if (useGuestToken) {
+        const guestToken = CartBackup.loadGuestToken();
+        headers['X-Guest-Token'] = guestToken || '';
     }
+
+    const options = {
+        method,
+        headers,
+        ...(payload && { body: JSON.stringify(payload) }),
+        ...(credentials && { credentials })
+    };
+
+    try {
+        const res = await fetch(url, options);
+        let result;
+
+        try {
+            result = await res.json();
+        } catch (jsonError) {
+            console.error(`Failed to parse JSON response from ${url}:`, jsonError);
+            throw new Error(`Invalid JSON raaaaaaaaaaaaaaaaaesponse. HTTP ${res.status}`);
+        }
+        console.log(`API response from ${method} ${endpoint}:`, result);
+        if (!res.ok) {
+            const errorMsg = result?.error || `HTTP ${res.status}`;
+        }
+
+        // Handle guest token updates
+        if (result.data?.guestToken && useGuestToken) {
+            CartBackup.saveGuestToken(result.data.guestToken);
+        }
+
+        return result;
+    } catch (error) {
+        console.error(`API error on ${method} ${endpoint}:`, error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const fetchSizes = async () => {
+    const response = await apiRequest({
+        endpoint: '?koko',
+        method: 'GET'
+    });
+
+    const sizeMultipliers = {};
+    if (response.success && Array.isArray(response.data)) {
+        response.data.forEach(size => {
+            sizeMultipliers[size.KokoID] = {
+                multiplier: parseFloat(size.HintaKerroin),
+                name: size.Nimi,
+                description: size.Kuvaus || ''
+            };
+        });
+    }
+    return sizeMultipliers;
 };
 
 export const fetchPizza = async () => {
-    try {
-        const res = await fetch(`${getPath(true)}?pizzat`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const result = await res.json();
-        return result.success && Array.isArray(result.data) ? result.data : [];
-    } catch (error) {
-        console.error('Error fetching pizzas:', error);
-        return [];
-    }
+    const response = await apiRequest({
+        endpoint: '?pizzat',
+        method: 'GET'
+    });
+    return response.success && Array.isArray(response.data) ? response.data : [];
 };
 
 export const fetchCartQuantity = async ({ includeItems = false } = {}) => {
-    try {
-        let guestToken = CartBackup.loadGuestToken();
-        console.log(`local guestToken: ${guestToken || ''}`);
+    const response = await apiRequest({
+        endpoint: `?kori`,
+        method: 'GET',
+        includeItems,
+        useGuestToken: true
+    });
 
-        const res = await fetch(`${getPath(true)}?kori&includeItems=${includeItems}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Guest-Token': guestToken || ''
-            }
-        });
+    if (response.data?.guestToken) {
+        CartBackup.saveGuestToken(response.data.guestToken);
+    }
 
-        const result = await res.json();
-        console.log('cart fetch', result);
-
-        if (result.data && result.data.guestToken) {
-            CartBackup.saveGuestToken(result.data.guestToken);
-            guestToken = result.data.guestToken;
-        }
-
-        if (result.success && result.data) {
-            const quantity = typeof result.data.totalQuantity === 'number' ? result.data.totalQuantity : 0;
-            if (includeItems && Array.isArray(result.data.items)) {
-                return { quantity, items: result.data.items };
-            } else {
-                return quantity;
-            }
+    if (response.success && response.data) {
+        const quantity = typeof response.data.totalQuantity === 'number' ? response.data.totalQuantity : 0;
+        if (includeItems && Array.isArray(response.data.items)) {
+            return { quantity, items: response.data.items };
         } else {
-            console.warn('Cart empty or not found from API.');
-            return includeItems ? { quantity: 0, items: [] } : 0;
+            return quantity;
         }
-    } catch (error) {
-        console.error('Error fetching cart quantity:', error);
+    } else {
         return includeItems ? { quantity: 0, items: [] } : 0;
     }
 };
 
 export const deleteItemFromCart = async (item) => {
-    try {
-        const guestToken = CartBackup.loadGuestToken();
-        const res = await fetch(`${getPath(true)}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Guest-Token': guestToken || ''
-            },
-            body: JSON.stringify(
-                {
-                    deleteItem: true,
-                    cartRowID: item.cartRowID
-                })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const result = await res.json();
-        return result.success;
-    } catch (error) {
-        console.error('Error deleting cart item:', error);
-        return false;
-    }
+    const response = await apiRequest({
+        method: 'DELETE',
+        payload: {
+            deleteItem: true,
+            cartRowID: item.cartRowID
+        },
+        useGuestToken: true
+    });
+    return response.success;
 };
 
 export const updateCartItemQuantity = async (cartRowID, newQuantity) => {
-    console.log('aaaa', cartRowID)
-    try {
-        const guestToken = CartBackup.loadGuestToken();
-        const payload = {
+    const response = await apiRequest({
+        method: 'PUT',
+        payload: {
             updateItemQuantity: true,
-            cartRowID: cartRowID,
+            cartRowID,
             quantity: newQuantity
-        };
-
-        console.log('Payload being sent to API:', payload);
-
-        const res = await fetch(`${getPath(true)}?`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Guest-Token': guestToken || ''
-            },
-            body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const result = await res.json();
-        return result.success;
-    } catch (error) {
-        console.error('Error updating cart quantity:', error);
-        return false;
-    }
+        },
+        useGuestToken: true
+    });
+    return response.success;
 };
-export const addItemToCart = async (item) => {
-    try {
-        const guestToken = CartBackup.loadGuestToken();
 
-        const payload = {
-            addItem: true,
-            pizzaID: item.pizzaID,
-            sizeID: item.sizeID,
-            quantity: item.quantity
-        };
-
-        // Debug: log payload
-        console.log('Sending payload to API:', payload);
-
-        const res = await fetch(getPath(true), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Guest-Token': guestToken || ''
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-        console.log('add to cart response', result); // Debug
-        if (result.data?.guestToken) {
-            CartBackup.saveGuestToken(result.data.guestToken);
-        }
-        if (result.success) {
-            return true;
-        } else {
-            console.warn('API error:', result.error || 'Unknown error');
-            return false;
-        }
-    } catch (error) {
-        console.error('Error adding item to cart:', error);
-        return false;
-    }
+export const addItemToCart = async (requestData) => {
+    const response = await apiRequest({
+        method: 'POST',
+        payload: requestData,
+        useGuestToken: true
+    });
+    return response.success;
 };
-// Function to signup user via API
+
+export const insertTilaus = async (requestData) => {
+    const response = await apiRequest({
+        method: 'POST',
+        payload: requestData
+    });
+    return response;
+};
+
+export const fetchUser = async () => {
+    const response = await apiRequest({
+        endpoint: '?asiakas',
+        method: 'GET',
+        credentials: 'same-origin'
+    });
+    return response.success ? response : null;
+};
+
 export const signupUser = async (requestData) => {
-    try {
-        const res = await fetch(getPath(true), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        const result = await res.json();
-        if (result.success) {
-            return result;
-        } else {
-            console.warn('API error:', result.error || 'Unknown error');
-            return result;
-        }
-    } catch (err) {
-        console.error('Error adding user:', err);
-        return false;
-    }
+    const response = await apiRequest({
+        method: 'POST',
+        payload: requestData
+    });
+    return response.success ? response : false;
 };
 
 export const loginUser = async (requestData) => {
-    try {
-        const res = await fetch(getPath(true), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        const result = await res.json();
-        if (result.success) {
-            return result;
-        } else {
-            console.warn('API error:', result.error || 'Unknown error');
-            return result;
-        }
-    } catch (err) {
-        console.error('Error adding user:', err);
-        return false;
-    }
+    console.log('logiiiin' ,requestData);
+    const response = await apiRequest({
+        method: 'POST',
+        payload: requestData
+    });
+    return response;
 };
 
 export const logoutUser = async () => {
-    try {
-        const res = await fetch(`${getPath(true)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ logout: true })
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const result = await res.json();
-        return result.success;
-    } catch (err) {
-        console.error('Logout API error:', err);
-        return false;
-    }
+    const response = await apiRequest({
+        method: 'POST',
+        payload: { logout: true }
+    });
+    return response.success;
 };
