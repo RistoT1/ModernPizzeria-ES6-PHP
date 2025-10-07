@@ -65,7 +65,6 @@ class NavInclude {
         }
     }
     setupEventListeners() {
-        console.log("yoo")
         const logoutBtn = this.DOM.logoutBtn;
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
@@ -84,7 +83,6 @@ class NavInclude {
         if (!Navbar) { return; }
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
-                console.log('scrolled');
                 Navbar.classList.add('scrolled');
             } else {
                 Navbar.classList.remove('scrolled');

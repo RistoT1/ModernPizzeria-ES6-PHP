@@ -1,4 +1,4 @@
-export const validateIndexDom = () => {
+export const validateMenuDom = () => {
     const elements = {
         mainContainer: document.getElementById("mainContainer"),
         menu: document.getElementById("menu"),
@@ -8,6 +8,22 @@ export const validateIndexDom = () => {
         sizeContainer: document.querySelector('.size-options'),
         quantityDisplay: document.getElementById("quantity"),
         qtyContainer: document.querySelector('.quantity-control'),
+    };
+
+    if (!checkMissingElements(elements)) {
+        return null;
+    }
+
+    return elements;
+};
+export const validateIndexDom = () => {
+    const elements = {
+        heroSection: document.querySelector('.hero'),
+        aboutSection: document.querySelector('.about'),
+        menuSection: document.querySelector('.menu'),
+        statsSection: document.querySelector('.stats'),
+        menuButton: document.getElementById('menu_button'),
+        locationSection: document.querySelector('.location')
     };
 
     if (!checkMissingElements(elements)) {

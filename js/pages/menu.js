@@ -1,4 +1,4 @@
-import { validateIndexDom } from '../helpers/domValid.js';
+import { validateMenuDom } from '../helpers/domValid.js';
 import { fetchSizes, fetchPizza } from '../helpers/api.js';
 import { Popup } from '../components/menu/Popup.js';
 import { Menu } from '../components/menu/Menu.js';
@@ -19,7 +19,7 @@ class MenuPage {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            this.DOM = validateIndexDom();
+            this.DOM = validateMenuDom();
             if (!this.DOM) {
                 throw new Error('Required DOM elements not found');
             }

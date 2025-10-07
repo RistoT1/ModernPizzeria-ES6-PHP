@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <meta name="description"
         content="Sakky Pizzeria - Savon Ammatti- ja Aikuisopiston opiskelijoiden ylläpitämä pizzeria Kuopiossa">
     <title>Sakky Pizzeria - Savon Ammatti- ja Aikuisopisto</title>
@@ -138,118 +138,6 @@
             </div>
         </section>
     </main>
-
-    <script>
-        'use strict';
-
-        // Smooth scroll with error handling
-        const smoothScroll = (targetId) => {
-            const target = document.getElementById(targetId);
-            if (!target) return;
-
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        };
-
-        // Event delegation for scroll buttons
-        document.addEventListener('click', (e) => {
-            const scrollBtn = e.target.closest('[data-scroll]');
-            if (scrollBtn) {
-                e.preventDefault();
-                smoothScroll(scrollBtn.dataset.scroll);
-            }
-        });
-
-        // Intersection Observer for fade-in animations
-        const fadeObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    fadeObserver.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.15,
-            rootMargin: '0px 0px -100px 0px'
-        });
-
-        document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
-
-        // Animated counter with fixed width to prevent jitter
-        const animateCounter = (element, target) => {
-            const duration = 2000;
-            const startTime = performance.now();
-            const suffix = target >= 1000 ? '+' : '';
-
-            const updateCounter = (currentTime) => {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                const current = Math.floor(target * easeOutQuart);
-
-                element.textContent = current.toLocaleString('fi-FI') + suffix;
-
-                if (progress < 1) {
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    element.textContent = target.toLocaleString('fi-FI') + suffix;
-                }
-            };
-
-            requestAnimationFrame(updateCounter);
-        };
-
-        // Stats animation
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const statNumbers = entry.target.querySelectorAll('.stat__number');
-
-                    statNumbers.forEach(stat => {
-                        const target = parseInt(stat.dataset.target, 10);
-                        animateCounter(stat, target);
-                    });
-
-                    statsObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.4 });
-
-        const aboutSection = document.querySelector('.about');
-        if (aboutSection) statsObserver.observe(aboutSection);
-
-        // Menu item hover effect
-        const menuGrid = document.querySelector('.menu__grid');
-        const items = menuGrid.querySelectorAll('.menu-item');
-
-        if (menuGrid) {
-            items.forEach(item => {
-                item.addEventListener('mouseenter', () => {
-                    items.forEach(otherItem => {
-                        otherItem.style.opacity = otherItem === item ? '1' : '0.4';
-                    });
-                });
-                item.addEventListener('mouseleave', () => {
-                    items.forEach(otherItem => {
-                        otherItem.style.opacity = '0.4';
-                    });
-                });
-            });
-            menuGrid.addEventListener('mouseleave', () => {
-                items.forEach(otherItem => {
-                    otherItem.style.opacity = '1';
-                });
-            });
-        }
-
-
-        // Error handling
-        window.addEventListener('error', (e) => {
-            console.error('Page error:', e.error);
-        });
-    </script>
-</body>
-
+    <script type="module" src="js/pages/index.js"></script>
 </html>
+</body>
