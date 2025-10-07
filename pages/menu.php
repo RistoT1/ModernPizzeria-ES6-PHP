@@ -18,31 +18,29 @@
     <?php include_once('../includes/nav.php'); ?>
     <main>
         <div class="container" id="mainContainer">
-            <div class="header">
-                <!-- <div class="hero-container">
-                    <div class="hero">
-                        <div class="hero-shape"></div>
-                        <div class="hero-title">
-                            <h1>Tervetuloa Sakky Pizzeriaan!</h1>
-                            <h2>Sakky opiskelijoille suunniteltu pizzeria.</h2>
+
+            <section class=" fade-in">
+                <div class="header">
+                    <div class="recomend-container">
+                        <div class="recomend-content">
+                            <div class="recomend-title">
+                                <h1>Talon parasta purtavaa</h1>
+                            </div>
+                            <div class="two-items-grid slide-in-left" id="recommended"></div>
                         </div>
-                        <div class="hero-img"></div>
-                    </div>
-                </div> -->
-                <div class="recomend-container">
-                    <div class="recomend-title">
-                        <h1>Talon parasta purtavaa</h1>
-                    </div>
-                    <div class="two-items-grid" id="recommended">
                     </div>
                 </div>
-            </div>
-            <div class="menu-container">
-                <div class="menu-title">
-                    <h1>Menu</h1>
+            </section>
+
+            <section class=" fade-in">
+                <div class="menu-container">
+                    <div class="menu-title">
+                        <h1>Menu</h1>
+                    </div>
+                    <div class="menu" id="menu"></div>
                 </div>
-                <div class="menu" id="menu"></div>
-            </div>
+            </section>
+
             <div id="pizzaPopup" class="popup">
                 <div class="popup-content">
                     <div class="popup-header">
@@ -76,10 +74,10 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
+
         </div>
     </main>
     <script type="module" src="../js/pages/menu.js"></script>

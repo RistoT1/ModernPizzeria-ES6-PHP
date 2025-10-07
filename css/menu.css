@@ -1,17 +1,26 @@
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px); /* small slide-up effect */
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
 .container {
-    margin-top: 5rem;
   width: 100%;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  /* Space-themed layered background: animated nebula + starfield */
   background-color: #000000;
-  background-image: radial-gradient(ellipse at 10% 20%, rgba(206,151,49,0.06) 0%, transparent 20%),
-                    radial-gradient(ellipse at 90% 80%, rgba(255,255,255,0.04) 0%, transparent 25%),
-                    linear-gradient(180deg, #030007 0%, #060018 40%, #0b1230 100%);
+  background-image: radial-gradient(ellipse at 10% 20%, rgba(206, 151, 49, 0.06) 0%, transparent 20%),
+    radial-gradient(ellipse at 90% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 25%),
+    linear-gradient(180deg, #030007 0%, #060018 40%, #0b1230 100%);
   background-size: cover;
   position: relative;
+  overflow-y: hidden;
 }
 
 .header {
@@ -20,7 +29,7 @@
   justify-content: center;
 }
 
-/* Starfield layers */
+/* Optimized starfield layers with will-change */
 .space-stars,
 .space-stars::before,
 .space-stars::after {
@@ -30,6 +39,7 @@
   z-index: 0;
   background-repeat: repeat;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .space-stars {
@@ -46,25 +56,73 @@
 }
 
 .space-stars::after {
-  background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0%, transparent 15%), radial-gradient(circle at 80% 70%, rgba(255,240,200,0.05) 0%, transparent 16%);
+  background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 15%), radial-gradient(circle at 80% 70%, rgba(255, 240, 200, 0.05) 0%, transparent 16%);
   opacity: 0.2;
   animation: twinkle 6s ease-in-out infinite;
 }
 
 @keyframes star-move {
-  from { transform: translateY(0); }
-  to { transform: translateY(-200px); }
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-200px);
+  }
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.18; }
-  50% { opacity: 0.05; }
+  0%, 100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.05;
+  }
 }
 
-/* ===== Recommended Section ===== */
+/* Recommend container fade-in animation */
 .recomend-container {
   width: 78%;
-  margin: 0 auto 3rem;
+  min-height: 100vh;
+  margin: 0 auto;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation for grid items */
+.two-items-grid > * {
+  opacity: 0;
+  animation: fadeInScale 0.6s ease-out forwards;
+}
+
+.two-items-grid > *:nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.two-items-grid > *:nth-child(2) {
+  animation-delay: 0.65s;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .recomend-title,
@@ -78,14 +136,18 @@
   margin-bottom: 2rem;
 }
 
-/* ===== Grid Layout ===== */
+.recomend-content {
+  position: relative;
+  top: 5rem; /* visually moves text down */
+}
+/* Grid Layout */
 .two-items-grid {
   display: flex;
   justify-content: center;
   gap: 1rem;
 }
 
-/* ===== Menu Section ===== */
+/* Menu Section */
 .menu-container {
   padding: 3rem 0;
   margin: 0 auto;
@@ -107,25 +169,26 @@
   margin: 1rem 0;
 }
 
-/* make sure content sits above the star layers */
-.menu, .recomend-container, .header {
+/* Ensure content sits above star layers */
+.menu,
+.recomend-container,
+.header {
   position: relative;
   z-index: 2;
 }
 
-/* ===== Menu Items ===== */
+/* Menu Items - optimized transitions */
 .menuItemSmall,
 .menuItemLarge {
   width: 100%;
   max-width: 350px;
-  /* border: 4px solid #ffffff; */
-  /* translucent panels to show nebula behind */
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
 }
 
 .menuItemSmall {
@@ -134,28 +197,26 @@
 
 .menuItemSmall:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(206,151,49,0.14), 0 0 0 4px rgba(206,151,49,0.06);
+  box-shadow: 0 8px 30px rgba(206, 151, 49, 0.14), 0 0 0 4px rgba(206, 151, 49, 0.06);
 }
 
 .menuItemLarge {
-  border-width: 6px;
   border: 2px solid #ffffff;
 }
 
-/* ===== Item Content ===== */
+/* Item Content */
 .itemImg {
   width: 100%;
   overflow: hidden;
   border-bottom: 4px solid #ffffff;
 }
 
-.itemImg img { filter: saturate(1.05) contrast(1.02); }
-
 .itemImg img {
   width: 100%;
   height: auto;
   display: block;
   object-fit: cover;
+  filter: saturate(1.05) contrast(1.02);
 }
 
 .itemContent {
@@ -163,7 +224,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
 }
 
 .itemHeader {
@@ -183,7 +244,10 @@
   font-size: 1.1em;
 }
 
-.menu-title, .recomend-title { color: #ffe9c8; }
+.menu-title,
+.recomend-title {
+  color: #ffe9c8;
+}
 
 .itemPrice {
   font-weight: 900;
@@ -200,7 +264,7 @@
   font-weight: 500;
 }
 
-/* ===== Responsive ===== */
+/* Responsive */
 @media (max-width: 600px) {
   .menu {
     grid-template-columns: 1fr;
@@ -245,5 +309,29 @@
   .menu-title {
     font-size: 1.5em;
     letter-spacing: 2px;
+  }
+
+  .recomend-container {
+    width: 95%;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .space-stars,
+  .space-stars::before,
+  .space-stars::after {
+    animation: none;
+  }
+  
+  .recomend-container,
+  .two-items-grid > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .menuItemSmall {
+    transition: none;
   }
 }

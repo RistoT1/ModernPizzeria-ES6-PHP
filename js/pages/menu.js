@@ -1,4 +1,5 @@
 import { validateMenuDom } from '../helpers/domValid.js';
+import { initFadeInAnimations } from '../helpers/animations.js';
 import { fetchSizes, fetchPizza } from '../helpers/api.js';
 import { Popup } from '../components/menu/Popup.js';
 import { Menu } from '../components/menu/Menu.js';
@@ -26,8 +27,10 @@ class MenuPage {
 
             console.log('DOM elements validated successfully');
             await this.initializeMenu();
+            initFadeInAnimations();
 
             showNotification('Sivun lataus onnistui!', 'success');
+            window.scrollTo(0, 0);
         } catch (error) {
             console.error('Error initializing page:', error);
             showNotification('Virhe sivun latauksessa', 'error');

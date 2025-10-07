@@ -1,5 +1,5 @@
 import { validateIndexDom } from '../helpers/domValid.js';
-import { initFadeInAnimations, initStatsAnimation } from '../components/index/animations.js';
+import { initFadeInAnimations, initStatsAnimation } from '../helpers/animations.js';
 import { ScrollManager } from '../helpers/ScrollManager.js';
 
 export default class IndexPage {
@@ -50,7 +50,7 @@ export default class IndexPage {
             }
         });
 
-        this.scrollManager = new ScrollManager(sections, menuButton);
+        //this.scrollManager = new ScrollManager(sections, menuButton);
     }
 }
 

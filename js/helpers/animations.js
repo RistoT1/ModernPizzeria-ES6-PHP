@@ -1,4 +1,4 @@
-// js/animations.js
+
 
 export function initFadeInAnimations() {
     const observer = new IntersectionObserver((entries) => {
