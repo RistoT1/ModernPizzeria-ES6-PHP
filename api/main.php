@@ -45,7 +45,7 @@ if (in_array($method, ['POST', 'DELETE', 'PUT'])) {
 }
 
 // Enhanced debug logging
-if (true) {
+if (false) {
     $debugFile = __DIR__ . '/debug.log';
     file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] METHOD: $method\n", FILE_APPEND);
     file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] INPUT: " . json_encode($input) . "\n", FILE_APPEND);
