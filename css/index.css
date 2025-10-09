@@ -7,7 +7,7 @@
     --color-text-lighter: #999;
     --color-border: rgba(255, 255, 255, 0.1);
     --timing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-    --spacing-base: 1rem;
+    --spacing-base: 0.75rem;
 }
 
 * {
@@ -27,7 +27,6 @@ body {
     color: var(--color-secondary);
     overflow-x: hidden;
     overflow-y: scroll;
-    /* Force scrollbar to prevent layout shift */
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -40,10 +39,8 @@ main>section {
     scroll-snap-stop: always;
 }
 
-/* Improve scroll container */
 main {
     scroll-snap-type: y proximity;
-    /* proximity instead of mandatory for better UX */
     scroll-behavior: smooth;
 }
 
@@ -56,8 +53,6 @@ main {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
-
-
 
 /* Hero Section */
 .hero {
@@ -76,17 +71,11 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
     background-image: url("../src/img/Savilahden_kampus_D-585x390.jpg");
-
-    width: clamp(400px, 35vw, 600px);
-    height: clamp(400px, 35vw, 600px);
-
-
-
-
+    width: clamp(300px, 26.25vw, 450px);
+    height: clamp(300px, 26.25vw, 450px);
     border: 2px solid var(--color-border);
     pointer-events: none;
     opacity: 0.3;
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -96,51 +85,51 @@ main {
     position: relative;
     z-index: 10;
     text-align: center;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
 }
 
 .hero__badge {
     display: inline-block;
-    padding: 0.5rem 2rem;
+    padding: 0.375rem 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 0.75rem;
-    letter-spacing: 3px;
-    margin-bottom: 2.5rem;
+    font-size: 0.5625rem;
+    letter-spacing: 2.25px;
+    margin-bottom: 1.875rem;
     text-transform: uppercase;
     font-weight: 300;
 }
 
 .hero__title {
-    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-size: clamp(2.25rem, 6vw, 4.125rem);
     font-weight: 300;
-    letter-spacing: clamp(6px, 2vw, 12px);
-    margin-bottom: 1.5rem;
+    letter-spacing: clamp(4.5px, 1.5vw, 9px);
+    margin-bottom: 1.125rem;
     text-transform: uppercase;
 }
 
 .hero__subtitle {
-    font-size: clamp(1rem, 2vw, 1.1rem);
-    letter-spacing: 4px;
+    font-size: clamp(0.75rem, 1.5vw, 0.825rem);
+    letter-spacing: 3px;
     font-weight: 300;
-    margin-bottom: 3rem;
+    margin-bottom: 2.25rem;
     color: rgba(248, 214, 61, 1);
     text-transform: uppercase;
 }
 
 .hero__actions {
     display: flex;
-    gap: 1.5rem;
+    gap: 1.125rem;
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .btn {
-    padding: 1.2rem 3rem;
+    padding: 0.9rem 2.25rem;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.6375rem;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     transition: all 0.3s var(--timing-smooth);
     border: 1px solid;
@@ -159,7 +148,7 @@ main {
 .btn--primary:focus {
     background: transparent;
     color: var(--color-secondary);
-    transform: translateY(-3px);
+    transform: translateY(-2.25px);
     outline: none;
 }
 
@@ -173,13 +162,13 @@ main {
 .btn--secondary:focus {
     background: var(--color-secondary);
     color: var(--color-primary);
-    transform: translateY(-3px);
+    transform: translateY(-2.25px);
     outline: none;
 }
 
 .scroll-indicator {
     position: absolute;
-    bottom: 3rem;
+    bottom: 2.25rem;
     left: 50%;
     transform: translateX(-50%);
     animation: bounce 2s ease-in-out infinite;
@@ -189,8 +178,8 @@ main {
     background: none;
     border: none;
     color: var(--color-secondary);
-    font-size: 2rem;
-    padding: 0.5rem;
+    font-size: 1.5rem;
+    padding: 0.375rem;
     will-change: transform;
 }
 
@@ -201,7 +190,7 @@ main {
 /* About Section */
 .about {
     height: 100vh;
-    padding: 7rem 5%;
+    padding: 5.25rem 5%;
     background: var(--color-secondary);
     color: var(--color-primary);
     display: flex;
@@ -209,11 +198,11 @@ main {
 }
 
 .about__container {
-    max-width: 1400px;
+    max-width: 1050px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8rem;
+    gap: 6rem;
     align-items: center;
 }
 
@@ -243,18 +232,18 @@ main {
 }
 
 .about__title {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    margin-bottom: 2.5rem;
-    letter-spacing: 2px;
+    font-size: clamp(1.875rem, 3.75vw, 2.625rem);
+    margin: 1.875rem 0;
+    letter-spacing: 1.5px;
     font-weight: 300;
     line-height: 1.2;
     text-transform: uppercase;
 }
 
 .about__text {
-    font-size: 1.05rem;
+    font-size: 0.7875rem;
     line-height: 2;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.125rem;
     color: var(--color-text-light);
     font-weight: 300;
 }
@@ -262,9 +251,9 @@ main {
 .stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 3rem;
-    margin-top: 4rem;
-    padding-top: 3rem;
+    gap: 2.25rem;
+    margin-top: 3rem;
+    padding-top: 2.25rem;
     border-top: 1px solid #e0e0e0;
 }
 
@@ -273,11 +262,11 @@ main {
 }
 
 .stat__number {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-size: clamp(1.875rem, 3.75vw, 2.625rem);
     font-weight: 300;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.375rem;
     color: var(--color-primary);
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     min-height: 1.5em;
     display: flex;
     align-items: center;
@@ -285,8 +274,8 @@ main {
 }
 
 .stat__label {
-    font-size: 0.8rem;
-    letter-spacing: 3px;
+    font-size: 0.6rem;
+    letter-spacing: 2.25px;
     font-weight: 500;
     color: var(--color-text-light);
     text-transform: uppercase;
@@ -295,43 +284,43 @@ main {
 /* Menu Section */
 .menu {
     min-height: 100vh;
-    padding: 9rem 5%;
+    padding: 6.75rem 5%;
     background: var(--color-primary);
     display: flex;
     align-items: center;
 }
 
 .menu__container {
-    max-width: 1400px;
+    max-width: 1050px;
     margin: 0 auto;
 }
 
 .menu__header {
     text-align: center;
-    margin-bottom: 6rem;
+    margin-bottom: 4.5rem;
 }
 
 .menu__title {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    margin-bottom: 1.5rem;
-    letter-spacing: 4px;
+    font-size: clamp(1.875rem, 3.75vw, 2.625rem);
+    margin-bottom: 1.125rem;
+    letter-spacing: 3px;
     font-weight: 300;
     text-transform: uppercase;
 }
 
 .menu__subtitle {
-    font-size: 1rem;
+    font-size: 0.75rem;
     color: var(--color-text-lighter);
-    letter-spacing: 3px;
+    letter-spacing: 2.25px;
     font-weight: 300;
     text-transform: uppercase;
 }
 
 .menu__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 4rem;
-    margin-bottom: 5rem;
+    grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+    gap: 3rem;
+    margin-bottom: 3.75rem;
 }
 
 .menu-item {
@@ -340,7 +329,7 @@ main {
 }
 
 .menu-item:hover {
-    transform: translateY(-10px);
+    transform: translateY(-7.5px);
     will-change: transform;
 }
 
@@ -362,19 +351,19 @@ main {
 }
 
 .menu-item:hover .menu-item__visual {
-    transform: translateY(-5px);
-    box-shadow: 8px 8px 0 #ce9731;
+    transform: translateY(-3.75px);
+    box-shadow: 6px 6px 0 #ce9731;
 }
 
 .menu-item__content {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
 }
 
 .menu-item__title {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    letter-spacing: 3px;
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+    letter-spacing: 2.25px;
     color: orange;
     font-weight: 400;
     text-transform: uppercase;
@@ -382,29 +371,29 @@ main {
 
 .menu-item__description {
     color: var(--color-text-lighter);
-    font-size: 0.95rem;
-    letter-spacing: 1px;
+    font-size: 0.7125rem;
+    letter-spacing: 0.75px;
     line-height: 1.8;
     font-weight: 300;
 }
 
 .menu__button-container {
-    margin: 1.2rem;
+    margin: 0.9rem;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .menu__button {
-    padding: 0.6rem 1.2rem;
+    padding: 0.45rem 0.9rem;
     background: transparent;
     color: white;
     border: 1px solid white;
     cursor: pointer;
     font-family: inherit;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    letter-spacing: 1px;
+    letter-spacing: 0.75px;
     text-transform: uppercase;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -417,31 +406,31 @@ main {
     background: white;
     color: black;
     outline: none;
-    transform: translateY(-5px);
+    transform: translateY(-3.75px);
 }
 
 /* Location Section */
 .location {
     min-height: 100vh;
-    padding: 7rem 5%;
+    padding: 5.25rem 5%;
     background: var(--color-bg-dark);
     display: flex;
     align-items: center;
 }
 
 .location__container {
-    max-width: 1400px;
+    max-width: 1050px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8rem;
+    gap: 6rem;
     align-items: center;
 }
 
 .location__title {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    margin-bottom: 3rem;
-    letter-spacing: 4px;
+    font-size: clamp(1.875rem, 3.75vw, 2.625rem);
+    margin-bottom: 2.25rem;
+    letter-spacing: 3px;
     font-weight: 300;
     text-transform: uppercase;
 }
@@ -453,27 +442,27 @@ main {
 .location__item {
     display: flex;
     align-items: flex-start;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    padding: 1.5rem 0;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1.125rem 0;
     border-bottom: 1px solid var(--color-border);
     transition: padding-left 0.3s ease;
 }
 
 .location__item:hover {
-    padding-left: 1rem;
+    padding-left: 0.75rem;
 }
 
 .location__icon {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     opacity: 0.5;
-    min-width: 24px;
+    min-width: 18px;
 }
 
 .location__text {
-    font-size: 1rem;
+    font-size: 0.75rem;
     color: var(--color-text-lighter);
-    letter-spacing: 1px;
+    letter-spacing: 0.75px;
     line-height: 1.8;
     font-weight: 300;
 }
@@ -484,28 +473,28 @@ main {
 }
 
 .hours {
-    padding-top: 3rem;
+    padding-top: 2.25rem;
 }
 
 .hours__title {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-    letter-spacing: 3px;
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 2.25px;
     font-weight: 400;
     text-transform: uppercase;
 }
 
 .hours__text {
     color: var(--color-text-lighter);
-    margin-bottom: 1rem;
-    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
     font-weight: 300;
-    letter-spacing: 1px;
+    letter-spacing: 0.75px;
 }
 
 .location__visual {
-    height: 600px;
-    width: 600px;
+    height: 450px;
+    width: 450px;
     background: var(--color-bg-medium);
     position: relative;
     overflow: hidden;
@@ -515,33 +504,29 @@ main {
 .about__container,
 .menu__container,
 .location__container {
-    max-width: 1400px;
+    max-width: 1050px;
     margin: 0 auto;
     width: 100%;
 }
 
 /* Animations */
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 1;
     }
-
     50% {
         opacity: 0.5;
     }
 }
 
 @keyframes bounce {
-
     0%,
     100% {
         transform: translate(-50%, 0);
     }
-
     50% {
-        transform: translate(-50%, -15px);
+        transform: translate(-50%, -11.25px);
     }
 }
 
@@ -549,7 +534,6 @@ main {
     from {
         transform: translate(-50%, -50%) rotate(0deg);
     }
-
     to {
         transform: translate(-50%, -50%) rotate(360deg);
     }
@@ -557,7 +541,7 @@ main {
 
 .fade-in {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(30px);
     transition: opacity 0.8s var(--timing-smooth), transform 0.8s var(--timing-smooth);
     will-change: opacity, transform;
 }
@@ -566,7 +550,6 @@ main {
     opacity: 1;
     transform: translateY(0);
     will-change: auto;
-    /* Remove will-change after animation */
 }
 
 /* Responsive */
@@ -578,17 +561,17 @@ main {
 
     .hero {
         height: 100vh;
-        min-height: 600px;
+        min-height: 450px;
     }
 
     .about__container,
     .location__container {
         grid-template-columns: 1fr;
-        gap: 5rem;
+        gap: 3.75rem;
     }
 
     .stats {
-        gap: 2rem;
+        gap: 1.5rem;
     }
 }
 
@@ -603,13 +586,13 @@ main {
 
     .menu__grid {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 2.25rem;
     }
 
     .hero__actions {
         flex-direction: column;
         width: 100%;
-        max-width: 400px;
+        max-width: 300px;
         margin: 0 auto;
     }
 
@@ -623,7 +606,7 @@ main {
 
     .about__visual,
     .location__visual {
-        height: 400px;
+        height: 300px;
     }
 }
 
@@ -648,5 +631,4 @@ main {
         transition-duration: 0.01ms !important;
         will-change: auto !important;
     }
-
 }

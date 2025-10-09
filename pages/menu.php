@@ -54,6 +54,18 @@
                         <div class="popup-info-main">
                             <p class="popup-info"></p>
                             <p class="popup-ingredients"></p>
+                            <!-- <div>
+                                <div class="options-title">Lisävalinnat</div>
+                                <div class="extras-container" id="extrasContainer">
+                                    <div class="drink-container">
+                                        <div class="drink-icon">
+                                            <div class="popup-drinks"></div>
+                                        </div>
+                                    </div>
+                                    <div class="sides-container">
+                                    </div>
+                                </div>
+                            </div> -->
                             <div class="size-options">
                                 <button class="size-btn" data-size="1">
                                     Pieni<br><small>25cm</small>

@@ -2,8 +2,9 @@ import { AddToCartButton } from './AddToCartButton.js';
 import { validatePopupDom } from '../../helpers/domValid.js';
 
 export class Popup {
-    constructor({ sizeMultipliers }) {
+    constructor({ sizeMultipliers, extras } = {}) {
         this.sizeMultipliers = sizeMultipliers || {};
+        this.extras = extras || {};
         this.selectedPizzaID = null;
         this.selectedSizeID = "2";
         this.basePrice = 0;

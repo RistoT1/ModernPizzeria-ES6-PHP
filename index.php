@@ -30,8 +30,8 @@
             <button class="scroll-indicator" aria-label="Vieritä alas" data-scroll="about">↓</button>
         </section>
 
-        <section class="about fade-in" id="about">
-            <div class="about__container">
+        <section class="about" id="about">
+            <div class="about__container fade-in">
                 <div class="about__img-container">
                     <div class="about__visual-wrapper" role="img" aria-label="Decorative element">
                         <img src="src/img/index/kokit-2023-_68.jpg-514x390.jpg" alt="savilahden kampus">
@@ -63,8 +63,8 @@
             </div>
         </section>
 
-        <section class="menu fade-in" id="menu">
-            <div class="menu__container">
+        <section class="menu" id="menu">
+            <div class="menu__container fade-in">
                 <div class="menu__header">
                     <h2 class="menu__title">Valikoimamme</h2>
                     <p class="menu__subtitle">Tuoreita aineksia • Perinteisiä reseptejä</p>
@@ -104,8 +104,8 @@
             </div>
         </section>
 
-        <section class="location fade-in" id="location">
-            <div class="location__container">
+        <section class="location" id="location">
+            <div class="location__container fade-in">
                 <div class="location__info">
                     <h2 class="location__title">Yhteystiedot</h2>
                     <div class="location__details">

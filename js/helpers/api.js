@@ -78,6 +78,14 @@ export const fetchPizza = async () => {
     return response.success && Array.isArray(response.data) ? response.data : [];
 };
 
+export const fetchExtra = async () => {
+    const response = await apiRequest({
+        endpoint: '?lisat',
+        method: 'GET'
+    });
+    return response.success && Array.isArray(response.data) ? response.data : [];
+};
+
 export const fetchCartQuantity = async ({ includeItems = false } = {}) => {
     const response = await apiRequest({
         endpoint: `?kori`,

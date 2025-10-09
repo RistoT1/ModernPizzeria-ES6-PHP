@@ -50,7 +50,7 @@ export default class IndexPage {
             }
         });
 
-        //this.scrollManager = new ScrollManager(sections, menuButton);
+        this.scrollManager = new ScrollManager(sections, menuButton);
     }
 }
 

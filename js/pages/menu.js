@@ -1,6 +1,6 @@
 import { validateMenuDom } from '../helpers/domValid.js';
 import { initFadeInAnimations } from '../helpers/animations.js';
-import { fetchSizes, fetchPizza } from '../helpers/api.js';
+import { fetchSizes, fetchPizza, fetchExtra } from '../helpers/api.js';
 import { Popup } from '../components/menu/Popup.js';
 import { Menu } from '../components/menu/Menu.js';
 import { Recommended } from '../components/menu/Recommended.js';
@@ -13,6 +13,7 @@ class MenuPage {
         this.menu = null;
         this.recommended = null;
         this.pizzas = [];
+        this.extras = [];
         this.sizeMultipliers = {};
     }
 
@@ -48,26 +49,30 @@ class MenuPage {
     }
 
     async initializeMenu() {
-        const [sizeMultipliers, pizzas] = await Promise.all([
+        const [sizeMultipliers, pizzas, extras] = await Promise.all([
             fetchSizes(),
-            fetchPizza()
+            fetchPizza(),
+            fetchExtra()
         ]);
 
         this.sizeMultipliers = sizeMultipliers;
         this.pizzas = pizzas;
+        this.extras = extras;
 
         console.log('Data fetched:', {
             sizes: Object.keys(this.sizeMultipliers).length,
-            pizzas: this.pizzas.length
+            pizzas: this.pizzas.length,
+            extras: this.extras.length
         });
 
-        if (this.pizzas.length <= 0) {
-            throw new Error('Ei pizzoja ladattavissa - tarkista API-yhteys');
+        if (this.pizzas.length <= 0 || this.extras.length <= 0) {
+            throw new Error('Ei pizzoja tai extroja ladattavissa - tarkista API-yhteys');
         }
 
         this.popup = new Popup({
             popupElement: this.DOM.popup,
-            sizeMultipliers: this.sizeMultipliers
+            sizeMultipliers: this.sizeMultipliers,
+            extras: this.extras
         });
         this.popup.init();
 

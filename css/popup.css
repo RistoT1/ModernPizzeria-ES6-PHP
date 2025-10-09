@@ -116,6 +116,26 @@
     font-size: 0.9rem;
     letter-spacing: 0.5px;
 }
+/* drinks */
+.drink-container {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.drink-icon {
+    background-image: url('../src/img/pepsi.png');
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center;
+}
+
+
+
 
 /* === Size Options === */
 .size-options {
