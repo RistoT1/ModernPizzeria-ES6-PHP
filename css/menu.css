@@ -29,56 +29,6 @@
   justify-content: center;
 }
 
-/* Optimized starfield layers with will-change */
-.space-stars,
-.space-stars::before,
-.space-stars::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  z-index: 0;
-  background-repeat: repeat;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.space-stars {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'><circle cx='1' cy='1' r='0.5' fill='%23ffffff' opacity='0.9'/></svg>");
-  opacity: 0.65;
-  animation: star-move 60s linear infinite;
-}
-
-.space-stars::before {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><circle cx='2' cy='2' r='0.8' fill='%23ffffff' opacity='0.25'/></svg>");
-  opacity: 0.35;
-  transform: scale(1.8);
-  animation: star-move 120s linear infinite reverse;
-}
-
-.space-stars::after {
-  background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 15%), radial-gradient(circle at 80% 70%, rgba(255, 240, 200, 0.05) 0%, transparent 16%);
-  opacity: 0.2;
-  animation: twinkle 6s ease-in-out infinite;
-}
-
-@keyframes star-move {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-150px);
-  }
-}
-
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.18;
-  }
-  50% {
-    opacity: 0.05;
-  }
-}
-
 /* Recommend container fade-in animation - scaled */
 .recomend-container {
   width: 78%;

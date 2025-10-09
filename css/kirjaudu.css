@@ -1,25 +1,16 @@
 
 [data-page="login"] {
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    margin: 0;
+    background-color: #000000;
+  background-image: radial-gradient(ellipse at 10% 20%, rgba(206, 151, 49, 0.06) 0%, transparent 20%),
+    radial-gradient(ellipse at 90% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 25%),
+    linear-gradient(180deg, #030007 0%, #060018 40%, #0b1230 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow-x: hidden;
-}
-
-[data-page="login"]::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image:
-        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-    pointer-events: none;
 }
 
 .login-container {
