@@ -125,6 +125,13 @@ class NavInclude {
                 }
             });
 
+            const orderBtn = this.DOM.orderBtn;
+            if (orderBtn) {
+                orderBtn.addEventListener('click', () => {
+                    window.location.href = './pages/menu.php';
+                });
+            }
+
             // Close when clicking outside the navLinks while open
             const outsideClickHandler = (ev) => {
                 if (!navLinks.classList.contains('active')) return;

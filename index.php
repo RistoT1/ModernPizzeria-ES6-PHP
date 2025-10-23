@@ -139,5 +139,6 @@
         </section>
     </main>
     <script type="module" src="js/pages/index.js"></script>
+
 </html>
 </body>

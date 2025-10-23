@@ -151,7 +151,8 @@ export const validateNavDom = () => {
         nav: document.getElementById('navbar'),
         logoutBtn: document.getElementById('logoutBtn'),
         mobileToggle: document.querySelector('.mobile-menu-toggle'),
-        navLinks: document.querySelector('.nav-links')
+        navLinks: document.querySelector('.nav-links'),
+        orderBtn: document.querySelector('.order-btn')
     };
 
     return elements;

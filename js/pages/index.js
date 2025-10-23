@@ -6,14 +6,13 @@ export default class IndexPage {
     constructor() {
         this.DOM = validateIndexDom();
         if (!this.DOM) return console.error('IndexPage DOM validation failed');
-
         this.init();
     }
 
     init() {
         const { menuSection, statsSection, menuButton } = this.DOM;
 
-        // Smooth scroll buttons
+        // Smooth scroll for [data-scroll] buttons
         document.addEventListener('click', e => {
             const btn = e.target.closest('[data-scroll]');
             if (btn) {
@@ -31,26 +30,25 @@ export default class IndexPage {
         const items = menuSection.querySelectorAll('.menu-item');
         items.forEach(item => {
             item.addEventListener('mouseenter', () => {
-                items.forEach(other => other.style.opacity = other === item ? '1' : '0.4');
+                items.forEach(other => (other.style.opacity = other === item ? '1' : '0.4'));
             });
             item.addEventListener('mouseleave', () => {
-                items.forEach(other => other.style.opacity = '1');
+                items.forEach(other => (other.style.opacity = '1'));
             });
         });
 
-        // --- ScrollManager with menu button as virtual section ---
+        // ScrollManager setup for arrow key navigation
         const mainSections = Array.from(document.querySelectorAll('main > section'));
-        const sections = [];
+        const sections = [...mainSections];
 
-        mainSections.forEach(section => {
-            sections.push(section);
-            // Insert menu button after the menu section
-            if (section.id === 'menu' && menuButton) {
-                sections.push(menuButton);
-            }
-        });
+        if (menuButton) {
+            menuButton.addEventListener('click', () => {
+                window.location.href = './pages/menu.php';
+            });
+        }
 
-        this.scrollManager = new ScrollManager(sections, menuButton);
+        // Initialize simplified ScrollManager (always active)
+        this.scrollManager = new ScrollManager(sections);
     }
 }
 
