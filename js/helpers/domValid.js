@@ -2,7 +2,7 @@ export const validateMenuDom = () => {
     const elements = {
         mainContainer: document.getElementById("mainContainer"),
         menu: document.getElementById("menu"),
-        popup: document.getElementById('pizzaPopup'),
+        popup: document.getElementById('Popup'),
         popupHeader: document.querySelector('.popup-header'),
         closeBtn: document.getElementById('closePopup'),
         sizeContainer: document.querySelector('.size-options'),
@@ -46,30 +46,37 @@ export const validateKassaDom = () => {
 };
 
 export const validatePopupDom = () => {
-    const popup = document.getElementById('pizzaPopup');
-    if (!popup) return null;
+    const root = document.querySelector('.popup'); 
+    if (!root) return null;
 
-    const elements = {
-        popup,
-        popupHeader: popup.querySelector('.popup-header'),
-        closeBtn: popup.querySelector('#closePopup'),
-        sizeContainer: popup.querySelector('.size-options'),
-        quantityDisplay: popup.querySelector('#quantity'),
-        qtyContainer: popup.querySelector('.quantity-control'),
-        popupTitle: popup.querySelector('.popup-title'),
-        popupInfo: popup.querySelector('.popup-info'),
-        popupIngredients: popup.querySelector('.popup-ingredients'),
-        popupPrice: popup.querySelector('.popup-price'),
-        popupInfoMain: popup.querySelector('.popup-info-main'),
-        popupBody: popup.querySelector('.popup-body')
+    const required = {
+        popup: root,
+        popupHeader: root.querySelector('.popup-header'),
+        closeBtn: root.querySelector('.close-btn'),
+        popupTitle: root.querySelector('.popup-title'),
+        popupBody: root.querySelector('.popup-body'),
+        popupInfoMain: root.querySelector('.popup-info-main'),
     };
 
-    if (!checkMissingElements(elements)) {
+    const optional = {
+        sizeContainer: root.querySelector('.size-options'),
+        quantityDisplay: root.querySelector('#quantity'),
+        qtyContainer: root.querySelector('.quantity-control'),
+        popupInfo: root.querySelector('.popup-info'),
+        popupIngredients: root.querySelector('.popup-ingredients'),
+        popupPrice: root.querySelector('.popup-price'),
+        historyContainer: root.querySelector('.order-history-container'),
+    };
+
+    const missingRequired = Object.entries(required).filter(([key, el]) => !el);
+    if (missingRequired.length) {
+        console.warn('Missing required popup elements:', missingRequired.map(([k]) => k));
         return null;
     }
 
-    return elements;
+    return { ...required, ...optional };
 };
+
 
 export const validateSignUpDom = () => {
     const passwordToggleBtn = document.getElementById('passwordToggle');
@@ -117,10 +124,6 @@ export const validateLoginDom = () => {
 }
 
 
-
-
-
-
 export const validateCartDom = () => {
     const elements = {
         cartItemContainer: document.getElementById("cartItems"),
@@ -136,7 +139,8 @@ export const validateCartDom = () => {
         saveAddressBtn: document.getElementById("saveAddress"),
         streetInput: document.getElementById("street"),
         cityInput: document.getElementById("city"),
-        postalInput: document.getElementById("postal")
+        postalInput: document.getElementById("postal"),
+        historyBtn: document.getElementById("historyBtn")
     };
 
     if (!checkMissingElements(elements)) {

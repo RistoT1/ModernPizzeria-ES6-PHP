@@ -1,7 +1,7 @@
 import { validateMenuDom } from '../helpers/domValid.js';
 import { initFadeInAnimations } from '../helpers/animations.js';
 import { fetchSizes, fetchPizza, fetchExtra } from '../helpers/api.js';
-import { Popup } from '../components/menu/Popup.js';
+import { PizzaPopup } from '../components/popup/PizzaPopup.js';
 import { Menu } from '../components/menu/Menu.js';
 import { Recommended } from '../components/menu/Recommended.js';
 import { showNotification } from '../helpers/utils.js';
@@ -9,7 +9,7 @@ import { showNotification } from '../helpers/utils.js';
 class MenuPage {
     constructor() {
         this.DOM = null;
-        this.popup = null;
+        this.pizzaPopup = null;
         this.menu = null;
         this.recommended = null;
         this.pizzas = [];
@@ -69,17 +69,16 @@ class MenuPage {
             throw new Error('Ei pizzoja tai extroja ladattavissa - tarkista API-yhteys');
         }
 
-        this.popup = new Popup({
-            popupElement: this.DOM.popup,
+        this.pizzaPopup = new PizzaPopup({
             sizeMultipliers: this.sizeMultipliers,
             extras: this.extras
         });
-        this.popup.init();
+        this.pizzaPopup.init();
 
         this.menu = new Menu({
             container: this.DOM.menu,
             pizzas: this.pizzas,
-            popup: this.popup
+            popup: this.pizzaPopup
         });
 
         console.log('Menu initialized');

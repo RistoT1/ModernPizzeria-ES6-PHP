@@ -34,6 +34,7 @@ require_once "insertUser.php";
 require_once "logOut.php";
 require_once "insertTilaus.php";
 require_once "fetchUser.php";
+require_once "fetchTilausHistory.php";
 require_once "statusHelpper.php";
 
 // Handle request
@@ -60,7 +61,8 @@ $routes = [
         "koko" => "fetchKoot",
         "register" => "handleRegister",
         "kori" => "fetchCart",
-        "asiakas" => "fetchUser"
+        "asiakas" => "fetchUser",
+        "tilaukset" => "fetchTilausHistory"
     ],
     "POST" => [
         "addTilaus" => "createOrder",

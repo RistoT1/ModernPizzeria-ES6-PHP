@@ -1,12 +1,12 @@
 .fade-in {
-    opacity: 0;
-    transform: translateY(22.5px);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(22.5px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-in.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .container {
@@ -33,6 +33,7 @@
 .recomend-container {
   width: 78%;
   min-height: 100vh;
+  max-width: 100%;
   margin: 0 auto;
   opacity: 0;
   animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -44,6 +45,7 @@
     opacity: 0;
     transform: translateY(22.5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -51,16 +53,16 @@
 }
 
 /* Staggered animation for grid items - smoother */
-.two-items-grid > * {
+.two-items-grid>* {
   opacity: 0;
   animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.two-items-grid > *:nth-child(1) {
+.two-items-grid>*:nth-child(1) {
   animation-delay: 0.4s;
 }
 
-.two-items-grid > *:nth-child(2) {
+.two-items-grid>*:nth-child(2) {
   animation-delay: 0.5s;
 }
 
@@ -69,6 +71,7 @@
     opacity: 0;
     transform: scale(0.97) translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -107,7 +110,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  max-width: 100%;
   background-color: #000000;
 }
 
@@ -132,6 +135,7 @@
 /* Menu Items - optimized transitions and scaled */
 .menuItemSmall,
 .menuItemLarge {
+  box-sizing: border-box;
   width: 100%;
   max-width: 262.5px;
   background-color: rgba(0, 0, 0, 0.6);
@@ -139,8 +143,8 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
   backface-visibility: hidden;
   transform: translateZ(0);
@@ -228,6 +232,7 @@
     grid-template-columns: 1fr;
     gap: 0.75rem;
     margin: 0;
+    max-width: 100%;
   }
 
   .menuItemSmall {
@@ -276,23 +281,24 @@
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
+
   .space-stars,
   .space-stars::before,
   .space-stars::after {
     animation: none;
   }
-  
+
   .recomend-container,
-  .two-items-grid > * {
+  .two-items-grid>* {
     animation: none;
     opacity: 1;
     transform: none;
   }
-  
+
   .menuItemSmall {
     transition: none;
   }
-  
+
   * {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;

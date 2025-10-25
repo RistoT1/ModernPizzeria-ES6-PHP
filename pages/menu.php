@@ -41,7 +41,7 @@
                 </div>
             </section>
 
-            <div id="pizzaPopup" class="popup">
+            <div id="Popup" class="popup">
                 <div class="popup-content">
                     <div class="popup-header">
                         <button id="closePopup" class="close-btn">←</button>

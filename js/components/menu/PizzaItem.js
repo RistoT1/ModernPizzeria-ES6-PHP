@@ -33,7 +33,6 @@ export class PizzaItem {
         const img = document.createElement('img');
         img.alt = this.pizza.PizzaNimi || 'Pizza';
         img.src = this.pizza.Kuva ? `${getPath(false)}/src/img/${this.pizza.Kuva}` : `${getPath(false)}/src/img/default-pizza.jpg`;
-
         let fallbackAttempted = false;
         img.onerror = () => {
             if (!fallbackAttempted) {

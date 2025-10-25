@@ -13,6 +13,7 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
     <link rel="stylesheet" href="../css/ostoskori.css">
     <link rel="stylesheet" href="../css/notification.css">
     <link rel="stylesheet" href="../css/nav.css">
+    <link rel="stylesheet" href="../css/popup.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 
 </head>
@@ -29,6 +30,7 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
 
             <!-- Cart Items -->
             <div class="cart-container">
+                <button class="cart-history-btn" id="historyBtn"></button>
                 <div class="cart-items" id="cartItems">
 
                 </div>
@@ -39,6 +41,7 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
                     <p>Lisää pizzoja koriin aloittaaksesi tilauksen</p>
                     <a href="./menu.php" class="btn-primary">Takaisin menuun</a>
                 </div>
+
 
                 <!-- Customer Info Form -->
 
@@ -80,6 +83,25 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
                 </div>
             </div>
         </div>
+        <!--History Popup-->
+        <div id="Popup" class="popup">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <button id="closePopup" class="close-btn">←</button>
+                    <h2 class="popup-title">Historia</h2>
+                </div>
+                <!-- Body -->
+                <div class="popup-body">
+                    <!-- Main info container -->
+                    <div class="popup-info-main">
+                        <div class="order-history-container" id="orderHistoryContainer">
+                            <!-- Order history items will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Address Modal -->
         <div id="addressModal" class="modal">

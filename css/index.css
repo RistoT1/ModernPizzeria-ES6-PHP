@@ -511,20 +511,24 @@ main {
 
 /* Animations */
 @keyframes pulse {
+
     0%,
     100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
 }
 
 @keyframes bounce {
+
     0%,
     100% {
         transform: translate(-50%, 0);
     }
+
     50% {
         transform: translate(-50%, -11.25px);
     }
@@ -534,6 +538,7 @@ main {
     from {
         transform: translate(-50%, -50%) rotate(0deg);
     }
+
     to {
         transform: translate(-50%, -50%) rotate(360deg);
     }
@@ -555,13 +560,15 @@ main {
 /* Responsive */
 @media (max-width: 1024px) {
     main>section {
-        min-height: auto;
-        scroll-snap-align: start;
+        height: auto;
     }
 
-    .hero {
-        height: 100vh;
-        min-height: 450px;
+    .hero,
+    .about,
+    .menu,
+    .location {
+        min-height: 100vh;
+        height: auto;
     }
 
     .about__container,

@@ -185,3 +185,18 @@ export const logoutUser = async () => {
     });
     return response.success;
 };
+
+export const fetchOrderHistory = async (limit = 3, offset = 0) => {
+    const response = await apiRequest({
+        endpoint: `?tilaukset&limit=${limit}&offset=${offset}`,
+        method: 'GET',
+        credentials: 'same-origin'
+    });
+
+    if (response.success && Array.isArray(response.data)) {
+        return response.data;
+    }
+
+    console.warn('Failed to fetch order history:', response);
+    return [];
+};

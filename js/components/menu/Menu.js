@@ -14,7 +14,7 @@ export class Menu {
             new PizzaItem({
                 pizza,
                 container: this.container,
-                openPopupCallback: (p) => this.popup.open(p)
+                openPopupCallback: (pizza) => this.popup.open(pizza)
             });
         });
     }
