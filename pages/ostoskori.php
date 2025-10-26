@@ -30,7 +30,7 @@ $isLoggedIn = isset($_SESSION['AsiakasID']);
 
             <!-- Cart Items -->
             <div class="cart-container">
-                <button class="cart-history-btn" id="historyBtn"></button>
+                <button class="btn-primary" id="historyBtn">Tilaus Historia</button>
                 <div class="cart-items" id="cartItems">
 
                 </div>

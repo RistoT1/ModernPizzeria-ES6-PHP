@@ -116,6 +116,7 @@
     font-size: 0.9rem;
     letter-spacing: 0.5px;
 }
+
 /* drinks */
 .drink-container {
     width: 200px;
@@ -125,6 +126,7 @@
     gap: 15px;
     margin-bottom: 20px;
 }
+
 .drink-icon {
     background-image: url('../src/img/pepsi.png');
     width: 100%;
@@ -144,7 +146,8 @@
     margin-bottom: 20px;
 }
 
-.size-btn {
+.size-btn,
+.see-more-btn {
     flex: 1;
     padding: 14px;
     border: none;
@@ -161,7 +164,7 @@
 }
 
 .size-btn:hover:not(.active) {
-      background: var(--color-gray-900);
+    background: var(--color-gray-900);
 }
 
 /* === Toppings === */
@@ -288,7 +291,6 @@
     color: var(--color-accent);
 }
 
-/* === Add to Cart Button === */
 .add-to-cart-btn {
     width: 100%;
     background: #ce9731;
@@ -309,6 +311,46 @@
     background: var(--color-gray-900);
 }
 
+.popup-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.popup-content::-webkit-scrollbar-track {
+    background: linear-gradient(180deg,
+            rgba(206, 151, 49, 0.05) 0%,
+            rgba(206, 151, 49, 0.1) 50%,
+            rgba(206, 151, 49, 0.05) 100%);
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.popup-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #f8d63d 0%, #ce9731 50%, #8f5c1d 100%);
+    border-radius: 10px;
+    box-shadow:
+        inset 0 0 6px rgba(0, 0, 0, 0.3),
+        0 0 12px rgba(206, 151, 49, 0.4);
+    transition: all 0.3s ease;
+}
+
+.popup-content::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ffe066 0%, #e3b82c 50%, #ce9731 100%);
+    box-shadow:
+        inset 0 0 6px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(206, 151, 49, 0.8);
+}
+
+.popup-content {
+    scrollbar-width: thin;
+    scrollbar-color: #ce9731 rgba(206, 151, 49, 0.1);
+}
+
+
+.popup-content {
+    -webkit-overflow-scrolling: touch;
+}
+
+
 /* === Responsive === */
 @media (max-width: 768px) {
     .toppings-grid {
@@ -317,5 +359,13 @@
 
     .popup-content {
         border-radius: 15px 15px 0 0;
+    }
+
+    .popup-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .popup-content::-webkit-scrollbar-thumb {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     }
 }

@@ -58,11 +58,6 @@ export class HistoryPopup extends Popup {
     }
 
     updateSeeMoreButton() {
-        // Remove existing button if present
-        if (this.seeMoreBtn && this.seeMoreBtn.parentNode) {
-            this.seeMoreBtn.remove();
-        }
-        this.seeMoreBtn = null;
 
         // Add See More button if callback exists and there might be more orders
         if (this.onSeeMoreCallback && this.hasMoreOrders) {

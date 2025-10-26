@@ -17,7 +17,7 @@ export class CartPage {
         this.orderLimitHistory = 5;
         this.historyOffset = 0;
         this.cachedHistory = [];
-        this.seenOrderIds = new Set();
+        this.firstBatch = [];
 
         const isLoggedInField = document.getElementById('isLoggedIn');
         this.isLoggedIn = isLoggedInField?.value === '1';
@@ -75,23 +75,12 @@ export class CartPage {
         this.DOM.historyBtn.style.display = 'inline-block';
         this.DOM.historyBtn.addEventListener('click', async () => {
             try {
-                // COMPLETE RESET - Clear everything
-                this.cachedHistory = [];
-                this.seenOrderIds.clear();
-                this.historyOffset = 0;
 
-                // Fetch fresh first page from server
-                const firstBatch = await fetchOrderHistory(this.orderLimitHistory, 0) || [];
-                
-                // Add to cache and track IDs
-                firstBatch.forEach(order => {
-                    if (!this.seenOrderIds.has(order.TilausID)) {
-                        this.seenOrderIds.add(order.TilausID);
-                        this.cachedHistory.push(order);
-                    }
-                });
-                
-                this.historyOffset = this.cachedHistory.length;
+                if (!this.firstBatch.length) {
+                    this.firstBatch = await fetchOrderHistory(this.orderLimitHistory, 0) || [];
+                    this.cachedHistory = [...this.firstBatch];
+                    this.historyOffset = this.firstBatch.length;
+                }
 
                 // Create popup if needed
                 if (!this.historyPopup) {
@@ -103,30 +92,25 @@ export class CartPage {
                 this.historyPopup.open(this.cachedHistory, {
                     onSeeMore: async () => {
                         const moreOrders = await fetchOrderHistory(this.orderLimitHistory, this.historyOffset);
-                        
+
                         if (!moreOrders || !moreOrders.length) {
                             return { orders: null, hasMore: false };
                         }
 
-                        // Filter out duplicates
-                        const newOrders = moreOrders.filter(order => !this.seenOrderIds.has(order.TilausID));
-                        
-                        if (newOrders.length === 0) {
+                        if (moreOrders.length === 0) {
                             return { orders: null, hasMore: false };
                         }
 
-                        // Add new orders to cache and track their IDs
-                        newOrders.forEach(order => {
-                            this.seenOrderIds.add(order.TilausID);
+                        moreOrders.forEach(order => {
                             this.cachedHistory.push(order);
                         });
-                        
+
                         // Update offset
                         this.historyOffset = this.cachedHistory.length;
-                        
+
                         // Keep button visible if we got exactly the limit amount
                         const hasMore = moreOrders.length === this.orderLimitHistory;
-                        
+
                         return { orders: this.cachedHistory, hasMore };
                     }
                 });
@@ -165,6 +149,9 @@ export class CartPage {
             isLoggedIn: this.isLoggedIn,
             onSubmitSuccess: (customerData, cartItems) => {
                 window.location.href = '../pages/kassa.php';
+                this.cachedHistory = [];
+                this.seenOrderIds.clear();
+                this.historyOffset = 0;
             }
         });
     }
