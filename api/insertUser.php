@@ -45,7 +45,7 @@ function handleRegister($pdo, $input)
         throw new Exception("Database error.", 500);
     }
 
-    // Hash the password
+    // Hash the password et tiennytkään tätä :-D
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Insert user into database

@@ -82,7 +82,6 @@ export class CartPage {
                     this.historyOffset = this.firstBatch.length;
                 }
 
-                // Create popup if needed
                 if (!this.historyPopup) {
                     this.historyPopup = new HistoryPopup();
                     this.historyPopup.init();
@@ -91,6 +90,7 @@ export class CartPage {
                 // Open popup with callback
                 this.historyPopup.open(this.cachedHistory, {
                     onSeeMore: async () => {
+                        //fetch 5 new orders with ofset
                         const moreOrders = await fetchOrderHistory(this.orderLimitHistory, this.historyOffset);
 
                         if (!moreOrders || !moreOrders.length) {
@@ -100,15 +100,13 @@ export class CartPage {
                         if (moreOrders.length === 0) {
                             return { orders: null, hasMore: false };
                         }
-
-                        moreOrders.forEach(order => {
-                            this.cachedHistory.push(order);
-                        });
+                        //add them to array
+                        this.cachedHistory = [...this.cachedHistory, ...moreOrders];
 
                         // Update offset
                         this.historyOffset = this.cachedHistory.length;
 
-                        // Keep button visible if we got exactly the limit amount
+                        // Keep button visible if we got limit amount of items 
                         const hasMore = moreOrders.length === this.orderLimitHistory;
 
                         return { orders: this.cachedHistory, hasMore };

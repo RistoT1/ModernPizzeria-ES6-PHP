@@ -1,5 +1,4 @@
 import { Popup } from './Popup.js';
-
 export class HistoryPopup extends Popup {
     constructor() {
         super();
@@ -22,7 +21,7 @@ export class HistoryPopup extends Popup {
     open(orders, options = {}) {
         this.orders = orders || [];
         this.onSeeMoreCallback = options.onSeeMore || null;
-        this.hasMoreOrders = true; // Always show button initially, let callback determine if there's more
+        this.hasMoreOrders = true; // Always show button initially, let callback determine if theres more
         this.seeMoreBtn = null;
         this.populateOrderHistory();
         super.open(orders);
@@ -59,7 +58,6 @@ export class HistoryPopup extends Popup {
 
     updateSeeMoreButton() {
 
-        // Add See More button if callback exists and there might be more orders
         if (this.onSeeMoreCallback && this.hasMoreOrders) {
             this.seeMoreBtn = document.createElement('button');
             this.seeMoreBtn.textContent = 'See More';
@@ -71,10 +69,11 @@ export class HistoryPopup extends Popup {
                 this.seeMoreBtn.textContent = 'Loading...';
 
                 try {
+                    //callback function that returns more orders and bool value hasmore
                     const result = await this.onSeeMoreCallback();
 
                     if (result && result.orders && result.orders.length > 0) {
-                        // Replace entire orders array with updated one
+                        // replase old with new
                         this.orders = result.orders;
                         this.hasMoreOrders = result.hasMore;
                         this.populateOrderHistory();
