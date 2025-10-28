@@ -112,7 +112,7 @@ export const fetchCartQuantity = async ({ includeItems = false } = {}) => {
 
 export const deleteItemFromCart = async (item) => {
     const response = await apiRequest({
-        method: 'DELETE',
+        method: 'POST',
         payload: {
             deleteItem: true,
             cartRowID: item.cartRowID
@@ -124,7 +124,7 @@ export const deleteItemFromCart = async (item) => {
 
 export const updateCartItemQuantity = async (cartRowID, newQuantity) => {
     const response = await apiRequest({
-        method: 'PUT',
+        method: 'POST',
         payload: {
             updateItemQuantity: true,
             cartRowID,

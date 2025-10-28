@@ -39,19 +39,20 @@ require_once "statusHelpper.php";
 
 // Handle request
 $method = $_SERVER["REQUEST_METHOD"];
-if (in_array($method, ['POST', 'DELETE', 'PUT'])) {
+if (in_array($method, ['POST'])) {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
 } else {
     $input = $_GET;
 }
 
-// Enhanced debug logging
+// Enhanced debug logging (disabled by default)
 if (false) {
     $debugFile = __DIR__ . '/debug.log';
     file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] METHOD: $method\n", FILE_APPEND);
     file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] INPUT: " . json_encode($input) . "\n", FILE_APPEND);
     file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] SESSION: " . json_encode($_SESSION) . "\n", FILE_APPEND);
 }
+
 // Define routes
 $routes = [
     "GET" => [
@@ -69,15 +70,10 @@ $routes = [
         "addItem" => "addCartItem",
         "login" => "handleLogin",
         "register" => "handleRegister",
-        "logout" => "handleLogout"
-    ],
-    "DELETE" => [
-        "deleteItem" => "deleteCartItem"
-    ],
-    "PUT" => [
-        "updateItemQuantity" => "updateCartItemQuantity"
+        "logout" => "handleLogout",
+        "updateItemQuantity" => "updateCartItemQuantity", // moved from PUT cause deployment doesnt support those methods :dd
+        "deleteItem" => "deleteCartItem" // moved from Delete
     ]
-
 ];
 
 try {
@@ -107,7 +103,6 @@ try {
 
     if (!$handled) {
         http_response_code(404);
-        // Add more debug info
         $availableParams = implode(', ', array_keys($routes[$method]));
         $receivedParams = implode(', ', array_keys($input));
         echo json_encode(apiError("Unknown endpoint. Available: [$availableParams]. Received: [$receivedParams]"));
@@ -115,10 +110,5 @@ try {
 } catch (Exception $e) {
     http_response_code($e->getCode() ?: 500);
     echo json_encode(apiError($e->getMessage()));
-
-    //$errorMessage = json_encode(apiError($e->getMessage()));
-    //$debugFile = __DIR__ . '/debug.log';
-    //file_put_contents($debugFile, "[" . date("Y-m-d H:i:s") . "] ERRORS: " . json_encode($errorMessage) . "\n", FILE_APPEND);
-
 }
 ?>
